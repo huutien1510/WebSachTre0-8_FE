@@ -1,0 +1,24 @@
+.book_detail_page{
+    @apply min-h-screen bg-bgChapterReader text-white flex justify-center items-start py-8 
+}
+.book_thumbnail{
+    @apply relative w-full md:w-1/3
+}
+.book_price{
+    @apply absolute top-3 left-3 bg-green-500 text-white px-2 py-1 text-sm font-bold rounded
+}
+.book_info{
+    @apply w-full md:w-2/3 space-y-4
+}
+.book_title{
+    @apply text-2xl font-bold
+}
+.book_rating{
+    @apply flex items-center  space-x-4 text-yellow-400
+}
+.book_rating_text{
+    @apply text-lg font-semibold
+}
+.book_rating.star{
+    @apply flex space-x-1
+}
