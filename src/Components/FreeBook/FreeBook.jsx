@@ -11,10 +11,10 @@ const FreeBook = () => {
         const fetchBooks = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:3000/api/books/freebooks?page=${page}&limit=10`)
+                const response = await fetch(`http://localhost:8080/books/freebooks?page=${page - 1}&limit=10`)
                 const json = await response.json()
-                setBooks(json.data)
-                setTotalPages(json.totalPages)
+                setBooks(json.data.content)
+                setTotalPages(json.data.totalPages)
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 }, 200);

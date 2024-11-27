@@ -16,11 +16,11 @@ const GenreBookPage = () => {
         const fetchBooks = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:3000/api/books/genre/${genreId}?page=${page}&limit=10`)
+                const response = await fetch(`http://localhost:8080/books/genre/${genreId}?page=${page - 1}&size=10`)
                 const json = await response.json()
-                setGenre(json.data[0].genre.name)
-                setBooks(json.data)
-                setTotalPages(json.totalPages)
+                setGenre(location.state.genre)
+                setBooks(json.data.content)
+                setTotalPages(json.data.totalPages)
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 }, 200);
@@ -44,12 +44,15 @@ const GenreBookPage = () => {
     return (
         <div className='container mx-auto pt-24 bg-black px-8'>
             {genre && (
-                <h1 className='text-2xl md:text-3xl font-bold text-white mb-8'>Thể loại: {genre}</h1>
+                <div>
+                    <h1 className='text-2xl md:text-3xl font-bold text-white mb-3'>Thể loại: {genre.name}</h1>
+                    <p className='mb-4'>{genre.description}</p>
+                </div>
             )}
             <div className={`${books.length <= 0 && 'hidden'}`}>
                 <div className={`grid grid-cols-2 pt-2 pb-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-6`}>
                     {books?.map((book) => (
-                        <BookCard key={book._id} book={book} />
+                        <BookCard key={book.id} book={book} />
                     ))}
                 </div>
                 <div className="flex items-center justify-center mt-8 ">

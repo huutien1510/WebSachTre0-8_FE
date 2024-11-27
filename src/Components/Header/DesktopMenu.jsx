@@ -125,6 +125,7 @@ const DesktopMenu = ({ menuItems }) => {
                           <li key={subItem.id}>
                             <NavLink
                               to={`/genre/${subItem.id}`}
+                              state={{ genre: subItem }}
                               className="block px-4 py-2 text-gray-300 hover:text-emerald-400 hover:bg-gray-700 hover:rounded-xl"
                               onClick={() => setOpenedMenus({})}
                             >

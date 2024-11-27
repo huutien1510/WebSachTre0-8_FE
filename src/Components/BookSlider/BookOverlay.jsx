@@ -35,7 +35,7 @@ const BookOverlay = ({ book }) => {
         } catch (error) {
           console.error("Error checking favorite status:", error);
         }
-      } 
+      }
     }
     checkFavoriteStatus();
   }, [id, book.bookId]);
@@ -68,7 +68,7 @@ const BookOverlay = ({ book }) => {
         )}
       </div>
       <div className="flex gap-2 justify-center">
-        <NavLink to={`/book/${book.bookId}`}>
+        <NavLink to={`/book/${book.id}`} state={{ book: book }}>
           <button className="flex items-center justify-center gap-2 bg-[#18B088] text-white px-4 py-2 rounded-lg hover:bg-[#18B088]/90 transition-colors w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"

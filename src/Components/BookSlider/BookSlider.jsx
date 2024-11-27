@@ -11,10 +11,10 @@ function BookSlider() {
     const fecthBook = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:3000/api/books?page=${page}&limit=15`);
+        const response = await fetch(`http://localhost:8080/books?page=${page - 1}&size=15`);
         const json = await response.json();
-        setBook(json.data);
-        setTotalPages(json.totalPages);
+        setBook(json.data.content);
+        setTotalPages(json.data.totalPages);
         setTimeout(() => {
           window.scrollTo({ top: 450, behavior: "smooth" });
         }, 200);
@@ -32,7 +32,6 @@ function BookSlider() {
 
   };
 
-
   return (
     <div className="bg-black py-8 px-4 md:px-8">
       <div className="container mx-auto">
@@ -46,7 +45,7 @@ function BookSlider() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-6">
           {books?.map((book) => (
-            <BookCard key={book._id} book={book} />
+            <BookCard key={book.id} book={book} />
           ))}
         </div>
       </div>

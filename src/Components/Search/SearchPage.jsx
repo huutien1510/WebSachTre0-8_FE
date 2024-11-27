@@ -15,11 +15,11 @@ const SearchPage = () => {
     const fetchResults = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:3000/api/books/search?keyword=${query}&page=${page}&limit=10`);
+        const response = await fetch(`http://localhost:8080/books/search?keyword=${query}&page=${page - 1}&size=10`);
         const data = await response.json();
         if (response.ok) {
-          setSearchResults(data.data);
-          setTotalPages(data.totalPages);
+          setSearchResults(data.data.content);
+          setTotalPages(data.data.totalPages);
         } else {
           setSearchResults([]);
         }
@@ -49,7 +49,7 @@ const SearchPage = () => {
       <div className={`${searchResults.length <= 0 && 'hidden'} mb-10`}>
         <div className="grid grid-cols-2 pt-2 pb-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-6">
           {searchResults?.map((book) => (
-            <BookCard key={book._id} book={book} on />
+            <BookCard key={book.id} book={book} on />
           ))}
         </div>
         <div className="flex items-center justify-center mt-8 ">

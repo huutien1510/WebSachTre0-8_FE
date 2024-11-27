@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import { NavLink } from "react-router-dom";
+import { Description } from "@mui/icons-material";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,10 +11,9 @@ const Header = () => {
   useEffect(() => {
     const fetchGenre = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/genre`);
+        const response = await fetch(`http://localhost:8080/genres/getAll`);
         const json = await response.json();
-        setGenre(json.genres
-        );
+        setGenre(json.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -22,12 +22,10 @@ const Header = () => {
   }, []);
 
   const menuItems = [
-    { name: "Thể loại ", subMenu: genre.map((item) => ({ name: item.name, id: item._id })), },
+    { name: "Thể loại ", subMenu: genre },
     { name: "Sách miễn phí", href: "/free-book" },
     { name: "Sách tính phí", href: "/fee-book" },
   ];
-
-  console.log(menuItems);
 
   return (
     <nav className="bg-black/50 backdrop-blur-md fixed w-full top-0 z-50">

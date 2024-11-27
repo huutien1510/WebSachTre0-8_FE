@@ -1,6 +1,6 @@
 import "./BookDetail.css";
 import { useState, useEffect } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,112 +23,104 @@ function BookDetail() {
         (state) => state.auth.login.currentUser?.data.account.accountId
     );
     const [isFavorite, setIsFavorite] = useState(false);
-    const [book, setBook] = useState(null);
     const bookID = useParams().bookID;
     const [avgRating, setAvgRating] = useState(0);
     const [ratings, setRatings] = useState([]);
     const [paymentUrl, setPaymentUrl] = useState(null);
     const dispatch = useDispatch();
+    const location = useLocation();
+    console.log(location.state.book)
+    const [book, setBook] = useState(location.state.book || null);
 
+    // useEffect(() => {
+    //     const checkFavoriteStatus = async () => {
+    //         if (id && bookID) {
+    //             try {
+    //                 const status = await getFavoriteStatus(
+    //                     id,
+    //                     bookID,
+    //                     dispatch,
+    //                     user,
+    //                     accessToken
+    //                 );
+    //                 setIsFavorite(status);
+    //             } catch (error) {
+    //                 console.error("Error checking favorite status:", error);
+    //             }
+    //         }
+    //     };
+
+    //     checkFavoriteStatus();
+    // }, [id, bookID]);
+    // const handleFavoriteClick = async () => {
+    //     if (!user) {
+    //         // Xử lý khi chưa đăng nhập
+    //         alert("Vui lòng đăng nhập để thực hiện chức năng này");
+    //         return;
+    //     }
+    //     try {
+    //         if (isFavorite) {
+    //             await removeFromFavorites(id, bookID, dispatch, user, accessToken);
+    //         } else {
+    //             await addToFavorites(id, bookID, dispatch, user, accessToken);
+    //         }
+    //         setIsFavorite(!isFavorite);
+    //     } catch (error) {
+    //         console.error("Error updating favorite status:", error);
+    //         alert("Có lỗi xảy ra khi cập nhật trạng thái yêu thích" + error);
+    //     }
+    // };
     useEffect(() => {
-        const checkFavoriteStatus = async () => {
-            if (id && bookID) {
-                try {
-                    const status = await getFavoriteStatus(
-                        id,
-                        bookID,
-                        dispatch,
-                        user,
-                        accessToken
-                    );
-                    setIsFavorite(status);
-                } catch (error) {
-                    console.error("Error checking favorite status:", error);
-                }
-            }
-        };
-
-        checkFavoriteStatus();
-    }, [id, bookID]);
-    const handleFavoriteClick = async () => {
-        if (!user) {
-            // Xử lý khi chưa đăng nhập
-            alert("Vui lòng đăng nhập để thực hiện chức năng này");
-            return;
-        }
-        try {
-            if (isFavorite) {
-                await removeFromFavorites(id, bookID, dispatch, user, accessToken);
-            } else {
-                await addToFavorites(id, bookID, dispatch, user, accessToken);
-            }
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error("Error updating favorite status:", error);
-            alert("Có lỗi xảy ra khi cập nhật trạng thái yêu thích" + error);
-        }
-    };
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(
-                    `http://localhost:3000/api/books/${bookID}`
-                );
-                const json = await response.json();
-                setBook(json);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 200);
     }, []);
 
-    useEffect(() => {
-        const checkIsBuy = async () => {
-            try {
-                if (user1?.account?.is_admin) return;
-                const response2 = await fetch(
-                    `http://localhost:3000/api/order/checkPaidBook/${bookID}/${user1?.account?.accountId}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            token: `Bearer ${user1?.accessToken}`,
-                        },
-                    }
-                );
-                if (response2.status === 400) {
-                    const response3 = await fetch(
-                        "http://localhost:3000/api/order/buybook",
-                        {
-                            method: "POST",
-                            body: JSON.stringify({
-                                bookID: bookID, // ID của sách, kiểu Number
-                                accountID: user1.account.accountId, // ID của tài khoản, kiểu Number
-                                price: book.data.price, // Giá trị của đơn hàng, kiểu Number (tùy chọn, có giá trị mặc định là 0)
-                                method: "MOMO", // Phương thức thanh toán, kiểu String
-                                status: "Chờ thanh toán", // Trạng thái của đơn hàng, kiểu String
-                                date: new Date(), // Ngày đặt hàng, kiểu Date
-                            }),
-                            headers: {
-                                "Content-Type": "application/json",
-                                token: `Bearer ${user1?.accessToken}`,
-                            },
-                        })
-                    const json3 = await response3.json();
-                    setPaymentUrl(json3.paymentUrl);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+    // useEffect(() => {
+    //     const checkIsBuy = async () => {
+    //         try {
+    //             if (user1?.account?.is_admin) return;
+    //             const response2 = await fetch(
+    //                 `http://localhost:3000/api/order/checkPaidBook/${bookID}/${user1?.account?.accountId}`,
+    //                 {
+    //                     method: "GET",
+    //                     headers: {
+    //                         "Content-Type": "application/json",
+    //                         token: `Bearer ${user1?.accessToken}`,
+    //                     },
+    //                 }
+    //             );
+    //             if (response2.status === 400) {
+    //                 const response3 = await fetch(
+    //                     "http://localhost:3000/api/order/buybook",
+    //                     {
+    //                         method: "POST",
+    //                         body: JSON.stringify({
+    //                             bookID: bookID, // ID của sách, kiểu Number
+    //                             accountID: user1.account.accountId, // ID của tài khoản, kiểu Number
+    //                             price: book.data.price, // Giá trị của đơn hàng, kiểu Number (tùy chọn, có giá trị mặc định là 0)
+    //                             method: "MOMO", // Phương thức thanh toán, kiểu String
+    //                             status: "Chờ thanh toán", // Trạng thái của đơn hàng, kiểu String
+    //                             date: new Date(), // Ngày đặt hàng, kiểu Date
+    //                         }),
+    //                         headers: {
+    //                             "Content-Type": "application/json",
+    //                             token: `Bearer ${user1?.accessToken}`,
+    //                         },
+    //                     })
+    //                 const json3 = await response3.json();
+    //                 setPaymentUrl(json3.paymentUrl);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
 
 
-        if (book && book?.data?.price > 0 && user) checkIsBuy();
-    }, [book]);
+    //     if (book && book?.data?.price > 0 && user) checkIsBuy();
+    // }, [book]);
 
-    if (!book?.data) {
+    if (!book) {
         return <p className="absolute top-16">Không có sách này</p>;
     }
 
@@ -138,13 +130,13 @@ function BookDetail() {
             <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 mt-16">
                 {/* Book Image */}
                 <div className="book_thumbnail">
-                    <img src={book?.data?.thumbnail} alt="Book Cover" className="rounded-lg shadow-lg" />
-                    <span className={`absolute top-3 left-3 ${book?.data?.price === 0 ? 'bg-emerald-500' : 'bg-red-500'} text-white px-4 py-2 rounded-md text-sm font-bold`}>{book?.data?.price === 0 ? "Miễn phí" : book?.data?.price?.toLocaleString("vi-VN") + "₫"}</span>
+                    <img src={book?.thumbnail} alt="Book Cover" className="rounded-lg shadow-lg" />
+                    <span className={`absolute top-3 left-3 ${book?.price === 0 ? 'bg-emerald-500' : 'bg-red-500'} text-white px-4 py-2 rounded-md text-sm font-bold`}>{book?.price === 0 ? "Miễn phí" : book?.price?.toLocaleString("vi-VN") + "₫"}</span>
                 </div>
 
                 {/* Book Details */}
                 <div className="book_info">
-                    <h1 className="book_title">{book.data.name}</h1>
+                    <h1 className="book_title">{book.name}</h1>
                     <div className="book_rating">
                         <span className="book_rating_text text-white text-base">
                             {avgRating.toFixed(1)}
@@ -167,19 +159,19 @@ function BookDetail() {
 
                     <div className="text-sm space-y-1">
                         <p>
-                            <strong>Tác giả:</strong> {book?.data?.author}
+                            <strong>Tác giả:</strong> {book?.author}
                         </p>
-                        <p>
-                            <strong>Thể loại:</strong> {book?.data?.genre.name}
-                        </p>
-                        <p>
-                            <strong>Nhà xuất bản:</strong> Đang cập nhật
+                        <p className="flex flex-wrap item-centers gap-1">
+                            <strong>Thể loại:</strong>
+                            {book?.genres.map((genre) => {
+                                return <p> {genre.name}</p>
+                            })}
                         </p>
                         <p>
                             <strong>Giá truyện:</strong>{" "}
-                            {book.data.price === 0
+                            {book.price === 0
                                 ? "Miễn phí"
-                                : book?.data?.price?.toLocaleString("vi-VN") + "₫"}
+                                : book?.price?.toLocaleString("vi-VN") + "₫"}
                         </p>
                     </div>
 
@@ -206,17 +198,17 @@ function BookDetail() {
                     <div className="flex items-center space-x-4 mt-4">
                         <NavLink to={user === null ? '/login' : (paymentUrl || `/book/${bookID}/chaptercontent/1`)}>
                             <button
-                                className={`${((user && paymentUrl === null) || book?.data?.price == 0)
+                                className={`${((user && paymentUrl === null) || book?.price == 0)
                                     ? "bg-gradient-to-br from-teal-600 to-green-500"
                                     : "bg-gradient-to-br from-red-400 to-red-500"
                                     } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
                             >
-                                {((user && paymentUrl === null) || book?.data?.price == 0) ? "Đọc sách" : "Mua sách"}
+                                {((user && paymentUrl === null) || book?.price == 0) ? "Đọc sách" : "Mua sách"}
                             </button>
                         </NavLink>
 
                         <button
-                            onClick={handleFavoriteClick}
+                            // onClick={handleFavoriteClick}
                             className={`flex items-center justify-center w-12 h-12 rounded-full transition-colors ${isFavorite
                                 ? "bg-emerald-500 text-white"
                                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -240,15 +232,15 @@ function BookDetail() {
                         </button>
                     </div>
                     <p className="text-gray-300 mt-4 leading-relaxed">
-                        {book.data.description}
+                        {book.description}
                     </p>
 
                     {/* Rating */}
                     <h2 className="text-lg font-semibold mt-8">
-                        Độc giả nói gì về “{book.data.name}”
+                        Độc giả nói gì về “{book.name}”
                     </h2>
                     <RatingComponent
-                        bookId={book.data._id}
+                        bookId={book.id}
                         avgRating={avgRating}
                         setAvgRating={setAvgRating}
                         ratings={ratings}
