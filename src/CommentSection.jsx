@@ -9,10 +9,10 @@ function CommentSection({ chapterID }) {
   const fetchComment = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/comment/chapter/${chapterID}`
+        `http://localhost:8080/comments/chapter/${chapterID}`
       );
       const json = await response.json();
-      setComments(json);
+      setComments(json.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -37,24 +37,21 @@ function CommentSection({ chapterID }) {
           fetchComment={fetchComment}
         ></CommentForm>
         {/* Bình luận của người dùng */}
-        {comments?.data?.comments?.length > 0 &&
-          comments.data.comments.map((i) => (
-            <div key={i._id} className="flex items-start mb-4">
+        {comments?.length > 0 &&
+          comments?.map((i) => (
+            <div key={i.id} className="flex items-start mb-4">
               <img
-                src={
-                  users.find((user) => user.accountId === i.accountId)
-                    ?.avatar || "https://via.placeholder.com/50"
-                } // Thay thế bằng URL ảnh đại diện
+                src={i.accountAvt || "https://via.placeholder.com/50"}
                 alt="Avatar"
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div className="flex-grow">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-blue-600">
-                    {i.accountId}
+                    {i.accountName}
                   </span>
                   <span className="bg-green-200 text-green-700 text-xs px-2 py-1 rounded">
-                    {new Date(i.post_date).toLocaleDateString("vi-VN", {
+                    {new Date(i.postDate).toLocaleDateString("vi-VN", {
                       day: "2-digit",
                       month: "2-digit",
                       year: "numeric",

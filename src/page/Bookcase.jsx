@@ -29,8 +29,8 @@ function Bookcase() {
               user,
               accessToken
             );
-            setFavoriteBooks(response.data.books);
-            setTotalPages(response.data.pagination.totalPages);
+            setFavoriteBooks(response.data);
+            // setTotalPages(response.data.pagination.totalPages);
           } else {
             try {
               const response = await fetch(`http://localhost:3000/api/readbook/${accountId}`, {
@@ -67,8 +67,6 @@ function Bookcase() {
 
   const bookList = activeTab === "favorite" ? favoriteBooks : readBooks;
 
-  bookList.map((item) =>
-    console.log(item))
   return (
     <div className="min-h-screen bg-black ">
       <div className="max-w-7xl mx-auto">
@@ -104,15 +102,16 @@ function Bookcase() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-2 lg:gap-2">
           {activeTab === 'favorite' && bookList?.map((item) => (
             <Link
-              to={`/book/${item.book.bookId}/chaptercontent/${1}`}
-              key={item.book.bookId}
+              to={`/book/${item.id}/chaptercontent/${1}`}
+              state={{ book: item }}
+              key={item.id}
               className="group cursor-pointer"
             >
               <div className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 relative">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src={item.book.thumbnail}
-                    alt={item.book.name}
+                    src={item.thumbnail}
+                    alt={item.name}
                     className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
                   />
                 </div>
@@ -121,7 +120,7 @@ function Bookcase() {
                     className="text-white group-hover:text-[#119F7B] transition-colors"
                     style={{ fontSize: "13px", fontWeight: "bold" }}
                   >
-                    {truncateText(item.book.name, 13)}
+                    {truncateText(item.name, 13)}
                   </h3>
                 </div>
               </div>
@@ -129,15 +128,15 @@ function Bookcase() {
           ))}
           {activeTab === 'read' && bookList?.map((item) => (
             <Link
-              to={`/book/${item.book.bookId}/chaptercontent/${item.chapter?.chapter_number}`}
-              key={item.book.bookId}
+              to={`/book/${item.id}/chaptercontent/${item?.chapterNumber}`}
+              key={item.id}
               className="group cursor-pointer"
             >
               <div className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 relative">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src={item.book.thumbnail}
-                    alt={item.book.name}
+                    src={item.thumbnail}
+                    alt={item.name}
                     className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
                   />
                 </div>
@@ -149,7 +148,7 @@ function Bookcase() {
                     className="text-white group-hover:text-[#119F7B] transition-colors"
                     style={{ fontSize: "13px", fontWeight: "bold" }}
                   >
-                    {truncateText(item.book.name, 13)}
+                    {truncateText(item.name, 13)}
                   </h3>
                 </div>
               </div>

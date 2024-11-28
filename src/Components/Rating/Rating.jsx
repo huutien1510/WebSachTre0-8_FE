@@ -21,12 +21,12 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/rating/book/${bookId}`);
+                const response = await fetch(`http://localhost:8080/ratings/book/${bookId}`);
                 const json = await response.json();
-                setRatings(json.ratings);
-                if (json.ratings.length > 0) {
-                    const sum = json.ratings.reduce((acc, rating) => acc + rating.star, 0);
-                    setAvgRating(sum / json.ratings.length);
+                setRatings(json.data);
+                if (json.data.length > 0) {
+                    const sum = json.data.reduce((acc, rating) => acc + rating.star, 0);
+                    setAvgRating(sum / json.data.length);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -35,8 +35,8 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
         fetchData();
     }, [reloadRatings]);
 
-    const foundRating = ratings.find(rating => rating.accountId?._id === user?.data?.account._id);
-    const foundStar = ratings.find(rating => rating.accountId?._id === user?.data?.account._id && rating.bookId._id === bookId);
+    const foundRating = ratings.find(rating => rating.accountID === user?.data?.account.id);
+    const foundStar = ratings.find(rating => rating.accountID === user?.data?.account.id && rating.bookID === bookId);
 
 
     const handleRating = () => {
@@ -80,15 +80,15 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
             </div>
             <div className="space-y-4">
                 {ratings.map((rating) => (
-                    <div key={rating._id} className="flex items-start space-x-4 bg-[#1C1C1E] p-4 rounded-lg">
+                    <div key={rating.id} className="flex items-start space-x-4 bg-[#1C1C1E] p-4 rounded-lg">
                         <div className="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-xl font-semibold">
-                            <img src={rating.accountId?.avatar} alt="avarta" className='w-full h-full rounded-full object-cover' />
+                            <img src={rating.accountAvt} alt="avarta" className='w-full h-full rounded-full object-cover' />
                         </div>
                         <div className="flex-1">
                             <div className="flex justify-between items-center">
-                                <div className="font-semibold ">{rating.accountId.name}</div>
+                                <div className="font-semibold ">{rating.accountName}</div>
                                 <div className="text-sm text-gray-400">
-                                    {new Date(rating.date).toLocaleDateString("vi-VN", {
+                                    {new Date(rating.postDate).toLocaleDateString("vi-VN", {
                                         day: "2-digit",
                                         month: "2-digit",
                                         year: "numeric",
