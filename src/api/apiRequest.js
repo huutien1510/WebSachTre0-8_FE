@@ -422,7 +422,7 @@ export const getFavoriteBooks = async (
 
   try {
     const response = await axiosInstance.get(
-      `/favoritebook/${accountId}?page=${page}&limit=${limit}`,
+      `http://localhost:8080/favbooks/account/${accountId}?page=${page}&limit=${limit}`,
       {
         headers: {
           token: `Bearer ${accessToken}`,

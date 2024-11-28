@@ -36,7 +36,7 @@ const FeeBook = () => {
 
             <div className='grid grid-cols-2 pt-2 pb-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-6'>
                 {books?.map((book) => (
-                    <BookCard key={book._id} book={book} />
+                    <BookCard key={book.id} book={book} />
                 ))}
             </div>
 

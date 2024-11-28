@@ -1,4 +1,4 @@
-import { json, useNavigate, useParams } from "react-router-dom";
+import { json, useLocation, useNavigate, useParams } from "react-router-dom";
 import ChapterImage from "./ChapterImage";
 import { useState, useEffect } from "react";
 import CommentSection from "./CommentSection";
@@ -13,9 +13,10 @@ function ChapterReader() {
   const accessToken = useSelector(
     (state) => state.auth?.login?.currentUser?.data.accessToken
   );
+  const localtion = useLocation();
   const bookID = useParams().bookID
   const chapter_number = useParams().chapter_number;
-  const [book, setBook] = useState(null);
+  const [book, setBook] = useState(localtion?.state?.book);
   const [listChapter, setListChapter] = useState(null);
   const [this_chapter, setThisChapter] = useState(null);
   const [image, setImage] = useState(null);
@@ -23,43 +24,31 @@ function ChapterReader() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      if (user?.account?.accountId && bookID) {
-        try {
-          const status = await getFavoriteStatus(
-            user?.account?.accountId,
-            bookID,
-            dispatch,
-            user1,
-            user?.accessToken
-          );
-          setIsFavorite(status);
-        } catch (error) {
-          console.error("Error checking favorite status:", error);
-        }
-      }
-    }
-    checkFavoriteStatus();
-  }, [user?.account?.accountId, bookID]);
+  // useEffect(() => {
+  //   const checkFavoriteStatus = async () => {
+  //     if (user?.account?.accountId && bookID) {
+  //       try {
+  //         const status = await getFavoriteStatus(
+  //           user?.account?.accountId,
+  //           bookID,
+  //           dispatch,
+  //           user1,
+  //           user?.accessToken
+  //         );
+  //         setIsFavorite(status);
+  //       } catch (error) {
+  //         console.error("Error checking favorite status:", error);
+  //       }
+  //     }
+  //   }
+  //   checkFavoriteStatus();
+  // }, [user?.account?.accountId, bookID]);
 
   useEffect(() => {
-    const fecthBook = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/books/${bookID}`);
-        const json = await response.json();
-        setBook(json.data);
-      }
-      catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fecthBook()
 
     const fetchListChapter = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/chapter/${bookID}`);
+        const response = await fetch(`http://localhost:8080/chapters/${bookID}`);
         const json = await response.json()
         setListChapter(json.data)
         setThisChapter(json.data[chapter_number - 1])
@@ -95,7 +84,7 @@ function ChapterReader() {
         body: JSON.stringify({
           "accountID": user.account.accountId,
           "bookID": bookID,
-          "chapterID": this_chapter._id,
+          "chapterID": this_chapter.id,
           "chapter_number": this_chapter.chapter_number
         }),
         headers: {
@@ -123,7 +112,7 @@ function ChapterReader() {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/chaptercontent/${this_chapter._id}`)
+        const response = await fetch(`http://localhost:8080/chaptercontents/${this_chapter.id}`)
         const json = await response.json()
         setImage(json);
       } catch (error) {
@@ -132,16 +121,15 @@ function ChapterReader() {
     };
     if (this_chapter) {
       fetchImage();
-      handleUpReadView(this_chapter._id)
-      handleAddReadBook(this_chapter._id)
+      // handleUpReadView(this_chapter.id)
+      // handleAddReadBook(this_chapter.id)
     }
   }, [this_chapter]);
 
-
-  if (!(image && book)) {
+  if (!(image)) {
     return <h1 className="mt-16">Chưa có chương này</h1>
   }
- 
+
   return (
     <div className="bg-bgChapterReader p-4">
       <div className="bg-white mx-auto mg-b-5 w-2/3 shadow-md mt-16">
@@ -153,18 +141,26 @@ function ChapterReader() {
               <li>•</li>
               <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href="#">Thể loại</a></li>
               <li>•</li>
-              <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href={`/book/${bookID}`}>{book.name}</a></li>
+              <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href={`/book/${bookID}`}>{book?.name}</a></li>
               <li>•</li>
-              <li>Chapter {this_chapter.chapter_number}</li>
+              <li>Chapter {this_chapter.chapterNumber}</li>
             </ul>
           </nav>
 
           {/* Title section */}
           <div className="mb-4">
             <h1 className="text-xl">
-              <span className="text-blue-500">{book.name}</span> - Chapter {this_chapter.chapter_number}
-              <span className="text-sm text-gray-500 ml-2">[Cập nhật lúc: {this_chapter.publish_date}]</span>
-              <span className="text-sm text-gray-500 ml-2">[View: {this_chapter.chapter_view}]</span>
+              <span className="text-blue-500">{book?.name}</span> - Chapter {this_chapter.chapterNumber}
+              <span className="text-sm text-gray-500 ml-2">
+                [Cập nhật lúc: {new Date(this_chapter.pushlishDate)
+                  .toLocaleDateString("vi-VN",
+                    {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }
+                  )}]</span>
+              <span className="text-sm text-gray-500 ml-2">[View: {this_chapter.viewCount}]</span>
             </h1>
           </div>
 
@@ -178,9 +174,9 @@ function ChapterReader() {
 
         {/* Chapter navigation */}
         <div className="flex justify-center items-center gap-2 p-4">
-          {(this_chapter.chapter_number > 1) && (<button
+          {(this_chapter.chapterNumber > 1) && (<button
             onClick={() => {
-              const selectedChapter = listChapter.find(chapter => chapter.chapter_number === this_chapter.chapter_number - 1);
+              const selectedChapter = listChapter.find(chapter => chapter.chapterNumber === this_chapter.chapterNumber - 1);
               setThisChapter(selectedChapter)
             }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -188,21 +184,21 @@ function ChapterReader() {
             Back
           </button>)}
           <select className="border p-2 rounded"
-            value={this_chapter?._id || ""}
+            value={this_chapter?.chapterNumber || ""}
             onChange={(e) => {
-              const selectedChapter = listChapter.find(chapter => chapter._id === e.target.value);
+              const selectedChapter = listChapter.find(chapter => chapter.chapterNumber == e.target.value);
               setThisChapter(selectedChapter);
             }}
           >
             {listChapter?.map((chapter) => (
-              <option key={chapter._id} value={chapter._id}>
-                {chapter.chapter_title}
+              <option key={chapter.id} value={chapter.chapterNumber}>
+                {chapter.title}
               </option>
             ))}
           </select>
-          {(this_chapter.chapter_number < listChapter.length) && (<button
+          {(this_chapter.chapterNumber < listChapter.length) && (<button
             onClick={() => {
-              const selectedChapter = listChapter.find(chapter => chapter.chapter_number === this_chapter.chapter_number + 1);
+              const selectedChapter = listChapter.find(chapter => chapter.chapterNumber === this_chapter.chapterNumber + 1);
               setThisChapter(selectedChapter)
             }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -214,13 +210,13 @@ function ChapterReader() {
         </div>
       </div>
       <div>
-        {image?.data?.map((i) => (
-          <ChapterImage key={i.content_number} link={i.content}>
+        {image?.map((i) => (
+          <ChapterImage key={i.contentNumber} link={i.content}>
           </ChapterImage>
         )
         )}
       </div>
-      <CommentSection chapterID={this_chapter._id}>
+      <CommentSection chapterID={this_chapter.id}>
       </CommentSection>
     </div>
   );

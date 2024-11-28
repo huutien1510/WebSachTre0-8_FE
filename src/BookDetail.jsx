@@ -29,8 +29,8 @@ function BookDetail() {
     const [paymentUrl, setPaymentUrl] = useState(null);
     const dispatch = useDispatch();
     const location = useLocation();
-    console.log(location.state.book)
     const [book, setBook] = useState(location.state.book || null);
+
 
     // useEffect(() => {
     //     const checkFavoriteStatus = async () => {
@@ -161,12 +161,12 @@ function BookDetail() {
                         <p>
                             <strong>Tác giả:</strong> {book?.author}
                         </p>
-                        <p className="flex flex-wrap item-centers gap-1">
+                        <div className="flex flex-wrap item-centers gap-1">
                             <strong>Thể loại:</strong>
                             {book?.genres.map((genre) => {
-                                return <p> {genre.name}</p>
+                                return <p key={genre.id}> {genre.name}</p>
                             })}
-                        </p>
+                        </div>
                         <p>
                             <strong>Giá truyện:</strong>{" "}
                             {book.price === 0
@@ -196,16 +196,28 @@ function BookDetail() {
                         </button>
                     </div>
                     <div className="flex items-center space-x-4 mt-4">
-                        <NavLink to={user === null ? '/login' : (paymentUrl || `/book/${bookID}/chaptercontent/1`)}>
-                            <button
-                                className={`${((user && paymentUrl === null) || book?.price == 0)
-                                    ? "bg-gradient-to-br from-teal-600 to-green-500"
-                                    : "bg-gradient-to-br from-red-400 to-red-500"
-                                    } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
-                            >
-                                {((user && paymentUrl === null) || book?.price == 0) ? "Đọc sách" : "Mua sách"}
-                            </button>
-                        </NavLink>
+                        {user === null &&
+                            <NavLink to={'/login'} >
+                                <button
+                                    className={`${book?.price == 0
+                                        ? "bg-gradient-to-br from-teal-600 to-green-500"
+                                        : "bg-gradient-to-br from-red-400 to-red-500"
+                                        } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
+                                >
+                                    {(book?.price == 0) ? "Đọc sách" : "Mua sách"}
+                                </button>
+                            </NavLink>}
+                        {!(user === null) &&
+                            <NavLink to={(paymentUrl || `/book/${bookID}/chaptercontent/1`)} >
+                                <button
+                                    className={`${(paymentUrl === null || book?.price == 0)
+                                        ? "bg-gradient-to-br from-teal-600 to-green-500"
+                                        : "bg-gradient-to-br from-red-400 to-red-500"
+                                        } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
+                                >
+                                    {(paymentUrl === null || book?.price == 0) ? "Đọc sách" : "Mua sách"}
+                                </button>
+                            </NavLink>}
 
                         <button
                             // onClick={handleFavoriteClick}
