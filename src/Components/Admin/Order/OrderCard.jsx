@@ -64,7 +64,7 @@ function OrderCard({ order }) {
             <div className="ml-4 flex flex-col justify-between w-full">
                 {/* Tên sách và trạng thái */}
                 <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-800">Mã đơn hàng: #{order._id}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">Mã đơn hàng: #{order.id}</h3>
                     <span className={`flex items-center mr-20 justify-center ${getStatusColor()} text-white px-3 py-2 rounded-lg`}>
                         {order.status}
                     </span>
@@ -72,21 +72,20 @@ function OrderCard({ order }) {
 
                 {/* Người mua */}
                 <p className="text-lg text-gray-500">
-                    <span className="font-medium">Người mua:</span> {order.accountID}
-                </p>
-                <p className="text-lg text-gray-500">
-                    <span className="font-medium">Sản phẩm:</span> {order.bookID}
+                    <span className="font-medium">Người mua:</span> {order.accountName}
                 </p>
 
                 {/* Giá và ngày mua */}
                 <div className="flex justify-between items-center mt-2">
-                    <p className="text-xl font-bold text-green-600">Tổng tiền: {order.price.toLocaleString("vi-VN")}₫</p>
+                    <p className="text-xl font-bold text-green-600">Tổng tiền: {order.totalPrice.toLocaleString("vi-VN")}₫</p>
                     <p className="text-base w-1/3 text-gray-400">Ngày mua: {new Date(order.date).toLocaleString('vi-VN')}</p>
                 </div>
             </div>
             <div className="justify-center gap-2 p-4">
                 {/* buttonEdit */}
-                <NavLink to={`/admin/orders/updateOrder/${order._id}`}>
+                <NavLink to={`/admin/orders/updateOrder/${order.id}`}
+                    state={{ order: order }}
+                >
                     <button
                         className="flex items-center mb-4 justify-center mt-1 text-white w-full px-5 py-2.5 rounded-lg text-lg font-bold bg-[#18B088] hover:bg-[#148F70]  transition-colors">
                         <svg
@@ -104,7 +103,7 @@ function OrderCard({ order }) {
                 </NavLink>
 
                 {/* buttonDelete */}
-                <button onClick={() => openModal(order._id)}
+                <button onClick={() => openModal(order.id)}
                     className="flex items-center justify-center mt-1 text-white px-5 py-2.5 rounded-lg text-lg font-bold bg-red-500  hover:bg-red-700 transition-colors">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

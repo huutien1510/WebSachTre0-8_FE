@@ -14,7 +14,7 @@ function OrderManager() {
         const fecthOrder = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:3000/api/order/getAll?page=${page}&limit=10`, {
+                const response = await fetch(`http://localhost:8080/orders/getAll?page=${page}&limit=10`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -23,6 +23,7 @@ function OrderManager() {
                 });
                 const json = await response.json();
                 setOrders(json.data);
+                console.log(json.data)
                 setTotalPages(json.totalPages);
             }
             catch (error) {
@@ -44,7 +45,7 @@ function OrderManager() {
                 </div>
                 <div >
                     {orders?.map((order) => (
-                        <OrderCard key={order._id} order={order} />
+                        <OrderCard key={order.id} order={order} />
                     ))}
                 </div>
             </div>

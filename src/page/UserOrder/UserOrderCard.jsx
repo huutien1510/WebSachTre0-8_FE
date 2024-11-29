@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useSelector } from 'react-redux';
 function UserOrderCard({ order }) {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
-    const [book, setBook] = useState();
     const navigate = useNavigate();
 
     const getStatusColor = () => {
@@ -20,50 +19,33 @@ function UserOrderCard({ order }) {
         }
     };
 
-    useEffect(() => {
-        const fetchBook = async () => {
-            try {
-                const response = await fetch(
-                    `http://localhost:3000/api/books/${order.bookID}`
-                );
-                const json = await response.json();
-                setBook(json);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        if (order) fetchBook();
-    }, []);
-
-
     return (
         <div className="flex items-center w-full max-w-full bg-gray-200 border border-gray-200 rounded-lg shadow-md p-4 mb-4">
             {/* Nội dung thông tin */}
             <div className="ml-4 flex flex-col justify-between w-full">
                 {/* Tên sách và trạng thái */}
                 <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-800">Mã đơn hàng: #{order._id}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">Mã đơn hàng: #{order.id}</h3>
                     <span className={`flex items-center mr-20 justify-center ${getStatusColor()} text-white px-3 py-2 rounded-lg`}>
                         {order.status}
                     </span>
                 </div>
 
                 <p className="text-lg text-gray-500">
-                    <span className="font-medium">Sản phẩm:</span> {book?.data?.name}
+                    <span className="font-medium">Người mua:</span> {order.accountName}
                 </p>
 
                 {/* Giá và ngày mua */}
                 <div className="flex justify-between items-center mt-2">
-                    <p className="text-xl font-bold text-green-600">Tổng tiền: {order.price.toLocaleString("vi-VN")}₫</p>
+                    <p className="text-xl font-bold text-green-600">Tổng tiền: {order.totalPrice.toLocaleString("vi-VN")}₫</p>
                     <p className="text-base w-1/3 text-gray-400">Ngày mua: {new Date(order.date).toLocaleString('vi-VN')}</p>
                 </div>
             </div>
             <div className="justify-center gap-2 p-4">
                 {/* buttonEdit */}
                 <NavLink
-                    to={`/account/orders/orderDetails/${order._id}`}
-                    state={{ book: book?.data }}
+                    to={`/account/orders/orderDetails/${order.id}`}
+                    state={{ order: order }}
                 >
                     <button
                         className="items-center mb-4 justify-center mt-1 text-white w-full px-5 py-2.5 rounded-lg text-lg font-bold bg-[#18B088] hover:bg-[#148F70]  transition-colors">

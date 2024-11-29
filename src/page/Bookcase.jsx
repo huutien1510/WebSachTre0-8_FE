@@ -33,7 +33,7 @@ function Bookcase() {
             // setTotalPages(response.data.pagination.totalPages);
           } else {
             try {
-              const response = await fetch(`http://localhost:3000/api/readbook/${accountId}`, {
+              const response = await fetch(`http://localhost:8080/readinghistory/account/${accountId}`, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
@@ -103,7 +103,7 @@ function Bookcase() {
           {activeTab === 'favorite' && bookList?.map((item) => (
             <Link
               to={`/book/${item.id}/chaptercontent/${1}`}
-              state={{ book: item }}
+              state={{ bookName: item.name }}
               key={item.id}
               className="group cursor-pointer"
             >
@@ -128,27 +128,28 @@ function Bookcase() {
           ))}
           {activeTab === 'read' && bookList?.map((item) => (
             <Link
-              to={`/book/${item.id}/chaptercontent/${item?.chapterNumber}`}
-              key={item.id}
+              to={`/book/${item.bookID}/chaptercontent/${item?.chapterNumber}`}
+              state={{ bookName: item.bookName }}
+              key={item.chapterID}
               className="group cursor-pointer"
             >
               <div className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 relative">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
                     src={item.thumbnail}
-                    alt={item.name}
+                    alt={item.bookName}
                     className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
                   />
                 </div>
                 <div className="absolute flex items-center justify-center bg-black w-full h-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <span className="text-white text-base font-bold">Đọc tiếp chapter {item.chapter?.chapter_number}</span>
+                  <span className="text-white text-base font-bold">Đọc tiếp chapter {item.chapterNumber}</span>
                 </div>
                 <div className="p-2">
                   <h3
                     className="text-white group-hover:text-[#119F7B] transition-colors"
                     style={{ fontSize: "13px", fontWeight: "bold" }}
                   >
-                    {truncateText(item.name, 13)}
+                    {truncateText(item.bookName, 13)}
                   </h3>
                 </div>
               </div>

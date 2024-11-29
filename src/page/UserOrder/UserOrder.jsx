@@ -14,7 +14,7 @@ function OrderManager() {
         const fecthOrder = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:3000/api/order/getOrderByAccountID/${user.account.accountId}/?page=${page}&limit=10`, {
+                const response = await fetch(`http://localhost:8080/orders/account/${user.account.accountId}?page=${page}&limit=10`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ function OrderManager() {
                 </div>
                 <div >
                     {orders?.map((order) => (
-                        <UserOrderCard key={order._id} order={order} />
+                        <UserOrderCard key={order.id} order={order} />
                     ))}
                 </div>
             </div>
