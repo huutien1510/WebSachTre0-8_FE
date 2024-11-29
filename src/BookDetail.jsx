@@ -28,30 +28,29 @@ function BookDetail() {
     const [ratings, setRatings] = useState([]);
     const [paymentUrl, setPaymentUrl] = useState(null);
     const dispatch = useDispatch();
-    const location = useLocation();
-    const [book, setBook] = useState(location.state.book || null);
+    const [book, setBook] = useState(null);
 
+    useEffect(() => {
+        const checkFavoriteStatus = async () => {
+            if (id && bookID) {
+                try {
+                    const status = await getFavoriteStatus(
+                        id,
+                        bookID,
+                        dispatch,
+                        user,
+                        accessToken
+                    );
+                    setIsFavorite(status);
+                } catch (error) {
+                    console.error("Error checking favorite status:", error);
+                }
+            }
+        };
 
-    // useEffect(() => {
-    //     const checkFavoriteStatus = async () => {
-    //         if (id && bookID) {
-    //             try {
-    //                 const status = await getFavoriteStatus(
-    //                     id,
-    //                     bookID,
-    //                     dispatch,
-    //                     user,
-    //                     accessToken
-    //                 );
-    //                 setIsFavorite(status);
-    //             } catch (error) {
-    //                 console.error("Error checking favorite status:", error);
-    //             }
-    //         }
-    //     };
+        checkFavoriteStatus();
+    }, [id, bookID]);
 
-    //     checkFavoriteStatus();
-    // }, [id, bookID]);
     // const handleFavoriteClick = async () => {
     //     if (!user) {
     //         // Xử lý khi chưa đăng nhập
@@ -71,6 +70,19 @@ function BookDetail() {
     //     }
     // };
     useEffect(() => {
+        const fetchBook = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/books/${bookID}`
+                );
+                const json = await response.json();
+                setBook(json.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchBook();
         setTimeout(() => {
             window.scrollTo({ top: 0, behavior: "smooth" });
         }, 200);
@@ -136,7 +148,7 @@ function BookDetail() {
 
                 {/* Book Details */}
                 <div className="book_info">
-                    <h1 className="book_title">{book.name}</h1>
+                    <h1 className="book_title">{book?.name}</h1>
                     <div className="book_rating">
                         <span className="book_rating_text text-white text-base">
                             {avgRating.toFixed(1)}
@@ -163,13 +175,13 @@ function BookDetail() {
                         </p>
                         <div className="flex flex-wrap item-centers gap-1">
                             <strong>Thể loại:</strong>
-                            {book?.genres.map((genre) => {
-                                return <p key={genre.id}> {genre.name}</p>
+                            {book?.genres?.map((genre) => {
+                                return <p key={genre?.id}> {genre?.name}</p>
                             })}
                         </div>
                         <p>
                             <strong>Giá truyện:</strong>{" "}
-                            {book.price === 0
+                            {book?.price === 0
                                 ? "Miễn phí"
                                 : book?.price?.toLocaleString("vi-VN") + "₫"}
                         </p>
@@ -208,7 +220,7 @@ function BookDetail() {
                                 </button>
                             </NavLink>}
                         {!(user === null) &&
-                            <NavLink to={(paymentUrl || `/book/${bookID}/chaptercontent/1`)} >
+                            <NavLink to={(paymentUrl || `/book/${bookID}/chaptercontent/1`)} state={{ bookName: book?.name }} >
                                 <button
                                     className={`${(paymentUrl === null || book?.price == 0)
                                         ? "bg-gradient-to-br from-teal-600 to-green-500"
@@ -244,15 +256,15 @@ function BookDetail() {
                         </button>
                     </div>
                     <p className="text-gray-300 mt-4 leading-relaxed">
-                        {book.description}
+                        {book?.description}
                     </p>
 
                     {/* Rating */}
                     <h2 className="text-lg font-semibold mt-8">
-                        Độc giả nói gì về “{book.name}”
+                        Độc giả nói gì về “{book?.name}”
                     </h2>
                     <RatingComponent
-                        bookId={book.id}
+                        bookId={book?.id}
                         avgRating={avgRating}
                         setAvgRating={setAvgRating}
                         ratings={ratings}

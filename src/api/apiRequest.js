@@ -342,14 +342,14 @@ export const getFavoriteStatus = async (
 
   try {
     const response = await axiosInstance.get(
-      `/favoritebook/status/${accountId}/${bookId}`,
+      `http://localhost:8080/favbooks/checkIsFavorites/${accountId}/${bookId}`,
       {
         headers: {
           token: `Bearer ${accessToken}`,
         },
       }
     );
-    return response.data.data.isFavorite;
+    return response.data.data;
   } catch (error) {
     console.error("Error checking favorite status:", error);
     return false;

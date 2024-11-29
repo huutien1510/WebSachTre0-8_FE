@@ -103,7 +103,7 @@ const AccountLayout = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-20 pb-10">
+      <div className="w-full pl-28 pr-0 pt-20 pb-10">
         {/* Header Section */}
         <div className="bg-black rounded-xl p-4  shadow-lg ">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
@@ -131,7 +131,7 @@ const AccountLayout = () => {
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-0">
           {/* Sidebar Navigation */}
-          <div className="w-full lg:w-72">
+          <div className="w-1/2 lg:w-72">
             <div className="bg-black rounded-xl p-4  ">
               <nav className="space-y-2">
                 {menuItems.map((item) => (
@@ -155,7 +155,7 @@ const AccountLayout = () => {
           </div>
 
           {/* Content Area */}
-          <div className="flex-1">
+          <div className="flex-1 ">
             <div className="bg-black rounded-xl px-6 shadow-lg">
               <Outlet />
             </div>

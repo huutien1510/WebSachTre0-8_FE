@@ -16,7 +16,7 @@ function ChapterReader() {
   const localtion = useLocation();
   const bookID = useParams().bookID
   const chapter_number = useParams().chapter_number;
-  const [book, setBook] = useState(localtion?.state?.book);
+  const bookName = localtion?.state?.bookName;
   const [listChapter, setListChapter] = useState(null);
   const [this_chapter, setThisChapter] = useState(null);
   const [image, setImage] = useState(null);
@@ -24,25 +24,25 @@ function ChapterReader() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const checkFavoriteStatus = async () => {
-  //     if (user?.account?.accountId && bookID) {
-  //       try {
-  //         const status = await getFavoriteStatus(
-  //           user?.account?.accountId,
-  //           bookID,
-  //           dispatch,
-  //           user1,
-  //           user?.accessToken
-  //         );
-  //         setIsFavorite(status);
-  //       } catch (error) {
-  //         console.error("Error checking favorite status:", error);
-  //       }
-  //     }
-  //   }
-  //   checkFavoriteStatus();
-  // }, [user?.account?.accountId, bookID]);
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user?.account?.accountId && bookID) {
+        try {
+          const status = await getFavoriteStatus(
+            user?.account?.accountId,
+            bookID,
+            dispatch,
+            user1,
+            user?.accessToken
+          );
+          setIsFavorite(status);
+        } catch (error) {
+          console.error("Error checking favorite status:", error);
+        }
+      }
+    }
+    checkFavoriteStatus();
+  }, [user?.account?.accountId, bookID]);
 
   useEffect(() => {
 
@@ -79,13 +79,11 @@ function ChapterReader() {
 
   const handleAddReadBook = async (chapterID) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/readbook`, {
+      const response = await fetch(`http://localhost:8080/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
           "accountID": user.account.accountId,
-          "bookID": bookID,
           "chapterID": this_chapter.id,
-          "chapter_number": this_chapter.chapter_number
         }),
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +97,7 @@ function ChapterReader() {
 
   const handleUpReadView = async (chapterID) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/chapter/upView/${chapterID}`, {
+      const response = await fetch(`http://localhost:8080/chapters/upView/${chapterID}`, {
         method: "PATCH"
       });
     } catch (error) {
@@ -121,8 +119,8 @@ function ChapterReader() {
     };
     if (this_chapter) {
       fetchImage();
-      // handleUpReadView(this_chapter.id)
-      // handleAddReadBook(this_chapter.id)
+      handleUpReadView(this_chapter.id)
+      handleAddReadBook(this_chapter.id)
     }
   }, [this_chapter]);
 
@@ -141,7 +139,7 @@ function ChapterReader() {
               <li>•</li>
               <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href="#">Thể loại</a></li>
               <li>•</li>
-              <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href={`/book/${bookID}`}>{book?.name}</a></li>
+              <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href={`/book/${bookID}`}>{bookName}</a></li>
               <li>•</li>
               <li>Chapter {this_chapter.chapterNumber}</li>
             </ul>
@@ -150,7 +148,7 @@ function ChapterReader() {
           {/* Title section */}
           <div className="mb-4">
             <h1 className="text-xl">
-              <span className="text-blue-500">{book?.name}</span> - Chapter {this_chapter.chapterNumber}
+              <span className="text-blue-500">{bookName} - Chapter {this_chapter?.chapterNumber}</span>
               <span className="text-sm text-gray-500 ml-2">
                 [Cập nhật lúc: {new Date(this_chapter.pushlishDate)
                   .toLocaleDateString("vi-VN",
