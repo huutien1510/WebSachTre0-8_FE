@@ -7,25 +7,25 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/books/total')
+                const response = await fetch('http://localhost:8080/books/total')
                 const data = await response.json()
                 setTotalBooks(data.data)
 
-            }catch (error) {
+            } catch (error) {
                 console.error('Error fetching data:', error)
-            } 
+            }
         }
         fetchData()
-     }, [totalBooks])
+    }, [totalBooks])
     useEffect(() => {
         const fetchView = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/chapter/viewtotal')
+                const response = await fetch('http://localhost:8080/chapters/totalView')
                 const data = await response.json()
                 setTotalView(data.data)
-            }catch (error) {
+            } catch (error) {
                 console.error('Error fetching data:', error)
-            } 
+            }
         }
         fetchView()
         const fetchPrice = async () => {
@@ -33,13 +33,13 @@ const Dashboard = () => {
                 const response = await fetch('http://localhost:3000/api/order/getPriceAll')
                 const data = await response.json()
                 setPrice(data.data)
-            }catch (error) {
+            } catch (error) {
                 console.error('Error fetching data:', error)
-            } 
+            }
         }
         fetchPrice()
     }
-    , [])
+        , [])
     return (
         <>
             <main>

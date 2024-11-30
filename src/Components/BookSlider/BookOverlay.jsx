@@ -22,11 +22,11 @@ const BookOverlay = ({ book }) => {
   );
   useEffect(() => {
     const checkFavoriteStatus = async () => {
-      if (id && book.bookId) {
+      if (id && book.id) {
         try {
           const status = await getFavoriteStatus(
             id,
-            book.bookId,
+            book.id,
             dispatch,
             user,
             accessToken
@@ -38,7 +38,8 @@ const BookOverlay = ({ book }) => {
       }
     }
     checkFavoriteStatus();
-  }, [id, book.bookId]);
+  }, [id, book.id]);
+
   const handleFavoriteClick = async () => {
     if (!user) {
       // Xử lý khi chưa đăng nhập
@@ -46,9 +47,9 @@ const BookOverlay = ({ book }) => {
     }
     try {
       if (isFavorite) {
-        await removeFromFavorites(id, book.bookId, dispatch, user, accessToken);
+        await removeFromFavorites(id, book.id, dispatch, user, accessToken);
       } else {
-        await addToFavorites(id, book.bookId, dispatch, user, accessToken);
+        await addToFavorites(id, book.id, dispatch, user, accessToken);
       }
       setIsFavorite(!isFavorite);
     } catch (error) {
@@ -56,6 +57,7 @@ const BookOverlay = ({ book }) => {
       alert("Có lỗi xảy ra khi cập nhật trạng thái yêu thích" + error);
     }
   };
+
   return (
     <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
       <div>
@@ -68,7 +70,7 @@ const BookOverlay = ({ book }) => {
         )}
       </div>
       <div className="flex gap-2 justify-center">
-        <NavLink to={`/book/${book.id}`} state={{ book: book }}>
+        <NavLink to={`/book/${book.id}`}>
           <button className="flex items-center justify-center gap-2 bg-[#18B088] text-white px-4 py-2 rounded-lg hover:bg-[#18B088]/90 transition-colors w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +97,7 @@ const BookOverlay = ({ book }) => {
           </svg>
         </button>
       </div>
-    </div>
+    </div >
   );
 }
 export default BookOverlay;

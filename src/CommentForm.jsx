@@ -31,13 +31,13 @@ function CommentForm({ chapterID, fetchComment }) {
     // Gửi bình luận đến server
     const postComment = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/comment/`, {
+        const response = await fetch(`http://localhost:8080/comments/post`, {
           method: "POST",
           body: JSON.stringify({
-            "accountId": user.account.accountId,
-            "chapterId": chapterID,
+            "accountID": user.account.accountId,
+            "chapterID": chapterID,
             "content": comment,
-            "post_date": new Date()
+            "postDate": new Date(),
           }),
           headers: {
             "Content-Type": "application/json",
