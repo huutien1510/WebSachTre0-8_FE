@@ -132,7 +132,6 @@ function BookDetail() {
 
     //     if (book && book?.data?.price > 0 && user) checkIsBuy();
     // }, [book]);
-    if (book) console.log(book)
 
     if (!book) {
         return <p className="absolute top-16">Không có sách này</p>;

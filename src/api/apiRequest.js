@@ -58,10 +58,8 @@ export const createAxiosInstance = (user, dispatch) => {
     async (config) => {
       let date = new Date();
       const decodeToken = jwt_decode(user?.data.accessToken);
-      console.log("Decode token:", decodeToken);
       if (decodeToken.exp < date.getTime() / 1000) {
         const data = await refreshToken();
-        console.log("Refresh token data:", data);
         const refreshUser = {
           ...user,
           accessToken: data.accessToken,
@@ -103,7 +101,6 @@ export const loginUser = async (user, dispatch, navigate) => {
 export const getAllUsers = async (accessToken, dispatch) => {
   dispatch(getUsersStart());
   try {
-    console.log("Access Token:", accessToken); // Kiểm tra token trong log
     const res = await axios.get("http://localhost:8080/api/user", {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Đảm bảo header này
@@ -160,9 +157,8 @@ export const registerUser = async (user, navigate) => {
       "http://localhost:8080/api/auth/register",
       user
     );
-    console.log("Register response:", res);
+    
     if (res.status === 200) {
-      console.log("Register success:", res.data?.data?.message);
       toast.success(res.data?.data?.message, {
         style: {
           backgroundColor: "#0D0D0D",
@@ -183,7 +179,7 @@ export const updateUser = async (user, id, accessToken, dispatch, upUser) => {
   try {
     const updateRes = await axiosInstance.patch(`/user/${id}`, upUser, {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (updateRes.data && updateRes.status === 200) {
@@ -266,7 +262,7 @@ export const createRating = async (rating, accessToken, user, dispatch) => {
   try {
     const res = await axiosInstance.post("http://localhost:8080/ratings/add", rating, {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return {
@@ -287,7 +283,7 @@ export const updateRating = async (id, rating, accessToken, user, dispatch) => {
   try {
     const res = await axiosInstance.patch(`http://localhost:8080/ratings/update/${id}`, rating, {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return {
@@ -307,7 +303,7 @@ export const getAllRating = async (accessToken, dispatch, user) => {
   try {
     const res = await axiosInstance.get("http://localhost:8080/ratings/getAll?page=1&limit=15", {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return {
@@ -327,7 +323,7 @@ export const deleteRating = async (id, accessToken, user, dispatch) => {
   try {
     const res = await axiosInstance.delete(`http://localhost:8080/ratings/delete/${id}`, {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return {
@@ -356,7 +352,7 @@ export const getFavoriteStatus = async (
       `http://localhost:8080/favbooks/checkIsFavorites/${accountId}/${bookId}`,
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -380,10 +376,11 @@ export const addToFavorites = async (
       `http://localhost:8080/favbooks/addFavorite/${accountId}/${bookId}`,
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error checking favorite status:", error);
@@ -404,7 +401,7 @@ export const removeFromFavorites = async (
     const response = await axiosInstance.delete(`http://localhost:8080/favbooks/removeFavorite/${accountId}/${bookId}`,
       {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       }
     });
     return response.data;
@@ -428,7 +425,7 @@ export const getFavoriteBooks = async (
       `http://localhost:8080/favbooks/account/${accountId}?page=${page}&limit=${limit}`,
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -457,7 +454,7 @@ export const createChapter = async (
       },
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -488,7 +485,7 @@ export const updateChapter = async (
       },
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -518,7 +515,7 @@ export const createChapterContent = async (
       },
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -549,7 +546,7 @@ export const updateChapterContent = async (
       },
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -564,7 +561,7 @@ export const deleteChapter = async (chapterID, dispatch, user, accessToken) => {
   try {
     const response = await axiosInstance.delete(`/chapter/${chapterID}`, {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;

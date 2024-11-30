@@ -13,6 +13,7 @@ function BookSlider() {
         if (inputRef.current) inputRef.current.value = page;
         const response = await fetch(`http://localhost:8080/books/getAll?page=${page - 1}&size=15`);
         const json = await response.json();
+        console.log(json)
         setBook(json.data.content);
         setTotalPages(json.data.totalPages);
         setTimeout(() => {
