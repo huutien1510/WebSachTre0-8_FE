@@ -77,9 +77,9 @@ function ChapterReader() {
 
 
 
-  const handleAddReadBook = async (chapterID) => {
+  const handleAddReadBook = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/readinghistory`, {
+      await fetch(`http://localhost:8080/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
           "accountID": user.account.accountId,
@@ -97,7 +97,7 @@ function ChapterReader() {
 
   const handleUpReadView = async (chapterID) => {
     try {
-      const response = await fetch(`http://localhost:8080/chapters/upView/${chapterID}`, {
+      await fetch(`http://localhost:8080/chapters/upView/${chapterID}`, {
         method: "PATCH"
       });
     } catch (error) {
@@ -120,7 +120,7 @@ function ChapterReader() {
     if (this_chapter) {
       fetchImage();
       handleUpReadView(this_chapter.id)
-      handleAddReadBook(this_chapter.id)
+      handleAddReadBook()
     }
   }, [this_chapter]);
 

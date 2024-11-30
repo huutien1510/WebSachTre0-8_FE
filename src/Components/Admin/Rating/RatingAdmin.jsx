@@ -18,8 +18,9 @@ const RatingAdmin = () => {
         try {
             const res = await getAllRating(user?.data.accessToken, dispatch, user);
             if (res.success) {
-                setRatings(res.data.ratings);
+                setRatings(res.data.data);
             }
+            console.log(res)
         } catch (error) {
             console.log("Error: ", error);
         }
@@ -65,25 +66,25 @@ const RatingAdmin = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {ratings?.map((user, index) => (
+                            {ratings?.map((rating, index) => (
                                 <tr key={user._id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
                                     <td className="py-3 px-4 border-b text-gray-800">{index + 1}</td>
-                                    <td className="py-3 px-4 border-b text-gray-800">{user.accountId.name}</td>
-                                    <td className="py-3 px-4 border-b text-gray-800">{user.bookId.name}</td>
+                                    <td className="py-3 px-4 border-b text-gray-800">{rating.accountName}</td>
+                                    <td className="py-3 px-4 border-b text-gray-800">{rating.bookName}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">
                                         <Rating
                                             name="size-large"
                                             size="medium"
-                                            value={user.star}
+                                            value={rating.star}
                                             readOnly
                                             precision={0.1}
                                             icon={<StarIcon fontSize="inherit" sx={{ color: 'gold' }} />}
                                             emptyIcon={<StarBorderIcon fontSize="inherit" sx={{ color: 'gold' }} />}
                                         />
                                     </td>
-                                    <td className="py-3 px-4 border-b text-gray-800">{user.content}</td>
+                                    <td className="py-3 px-4 border-b text-gray-800">{rating.content}</td>
                                     <td className="py-3 px-4 border-b flex space-x-2">
-                                        <button onClick={() => handleDeleteRating(user._id)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
+                                        <button onClick={() => handleDeleteRating(rating.id)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
                                     </td>
                                 </tr>
                             ))}

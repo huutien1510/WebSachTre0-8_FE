@@ -252,12 +252,11 @@ export const updatebyAdmin = async (
 export const createRating = async (rating, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.post("/rating/", rating, {
+    const res = await axiosInstance.post("http://localhost:8080/ratings/add", rating, {
       headers: {
         token: `Bearer ${accessToken}`,
       },
     });
-    console.log(res);
     return {
       success: true,
       data: res.data,
@@ -274,7 +273,7 @@ export const createRating = async (rating, accessToken, user, dispatch) => {
 export const updateRating = async (id, rating, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.patch(`/rating/${id}`, rating, {
+    const res = await axiosInstance.patch(`http://localhost:8080/ratings/update/${id}`, rating, {
       headers: {
         token: `Bearer ${accessToken}`,
       },
@@ -294,7 +293,7 @@ export const updateRating = async (id, rating, accessToken, user, dispatch) => {
 export const getAllRating = async (accessToken, dispatch, user) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.get("/rating/", {
+    const res = await axiosInstance.get("http://localhost:8080/ratings/getAll?page=1&limit=15", {
       headers: {
         token: `Bearer ${accessToken}`,
       },
@@ -314,7 +313,7 @@ export const getAllRating = async (accessToken, dispatch, user) => {
 export const deleteRating = async (id, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.delete(`/rating/${id}`, {
+    const res = await axiosInstance.delete(`http://localhost:8080/ratings/delete/${id}`, {
       headers: {
         token: `Bearer ${accessToken}`,
       },
@@ -366,18 +365,14 @@ export const addToFavorites = async (
 
   try {
     const response = await axiosInstance.post(
-      `/favoritebook`,
-      {
-        accountId: accountId,
-        bookId: bookId,
-      },
+      `http://localhost:8080/favbooks/addFavorite/${accountId}/${bookId}`,
       {
         headers: {
           token: `Bearer ${accessToken}`,
         },
       }
     );
-    return response.data.data.isFavorite;
+    return response.data.data;
   } catch (error) {
     console.error("Error checking favorite status:", error);
     return false;
@@ -394,15 +389,11 @@ export const removeFromFavorites = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
 
   try {
-    const response = await axiosInstance.delete(`/favoritebook`, {
+    const response = await axiosInstance.delete(`http://localhost:8080/favbooks/removeFavorite/${accountId}/${bookId}`,
+      {
       headers: {
         token: `Bearer ${accessToken}`,
-      },
-      data: {
-        // Thay body bằng data
-        accountId: accountId,
-        bookId: bookId,
-      },
+      }
     });
     return response.data;
   } catch (error) {

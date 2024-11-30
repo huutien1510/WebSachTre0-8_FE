@@ -35,8 +35,8 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
         fetchData();
     }, [reloadRatings]);
 
-    const foundRating = ratings.find(rating => rating.accountID === user?.data?.account.id);
-    const foundStar = ratings.find(rating => rating.accountID === user?.data?.account.id && rating.bookID === bookId);
+    const foundRating = ratings.find(rating => rating.accountID === user?.data?.account.accountId);
+    const foundStar = ratings.find(rating => rating.accountID === user?.data?.account.accountId && rating.bookID === bookId);
 
 
     const handleRating = () => {

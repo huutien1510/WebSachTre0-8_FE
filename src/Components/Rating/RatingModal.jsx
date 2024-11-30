@@ -25,29 +25,29 @@ const ReviewModal = ({ bookId, foundRating, star, isOpen, onClose, onSuccess }) 
         if (newValue) {
             setRating(newValue);
         } else {
-            setRating(rating); 
+            setRating(rating);
         }
     };
 
     const handleRating = async (e) => {
         e.preventDefault();
         const newRating = {
-            bookId: bookId,
-            accountId: user?.data?.account._id,
             star: rating,
-            content: comment
+            content: comment,
+            postDate: new Date(),
+            bookID: bookId,
+            accountID: user?.data?.account.accountId,
         };
-        console.log(newRating);
         try {
             if (!foundRating) {
                 const res = await createRating(newRating, user?.data.accessToken, user, dispatch);
-                if (res.success) {
+                if (res.data.code === 1000) {
                     toast.success('Đánh giá thành công!');
                     onSuccess();
                     onClose();
                 }
             } else {
-                const res = await updateRating(foundRating._id, newRating, user?.data.accessToken, user, dispatch);
+                const res = await updateRating(foundRating.id, newRating, user?.data.accessToken, user, dispatch);
                 if (res.success) {
                     toast.success('Cập nhật thành công!');
                     onSuccess();
@@ -107,12 +107,11 @@ const ReviewModal = ({ bookId, foundRating, star, isOpen, onClose, onSuccess }) 
                 {/* Submit button */}
                 <button
                     onClick={handleRating}
-                    className={`w-full py-3 rounded-lg text-white ${
-                        (comment === "" )
-                            ? "bg-gray-500 cursor-not-allowed" 
-                            : "bg-emerald-600 hover:bg-emerald-700 duration-300" 
-                    }`}
-                    disabled={comment === "" }
+                    className={`w-full py-3 rounded-lg text-white ${(comment === "")
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-emerald-600 hover:bg-emerald-700 duration-300"
+                        }`}
+                    disabled={comment === ""}
                 >
                     Gửi đánh giá
                 </button>
