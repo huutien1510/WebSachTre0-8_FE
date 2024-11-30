@@ -9,7 +9,7 @@ const LayoutAdmin = () => {
   useEffect(() => {
     if (!user) {
       navigate('/login');
-    } else if (!user.data.account.is_admin) {
+    } else if (!(user.data.account.roles[0] === "ADMIN")) {
       navigate('*');
     }
   }, []);

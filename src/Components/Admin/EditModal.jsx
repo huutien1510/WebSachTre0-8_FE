@@ -13,6 +13,7 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
     const [role, setRole] = useState(user.is_admin ? 'Admin' : 'User');
     const [state, setState] = useState(user.is_active ? 'Active' : 'Inactive');
     const [sex, setSex] = useState(user.sex);
+    const [phone, setPhone] = useState(user.phone);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,9 +23,10 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
             is_admin: role === 'Admin',
             is_active: state === 'Active',
             sex,
+            phone,
         };
         try {
-            const result = await updatebyAdmin(user1, user.accountId, user1?.data.accessToken, dispatch, newUser);
+            const result = await updatebyAdmin(user1, user.id, user1?.data.accessToken, dispatch, newUser);
             console.log(result);
             if (result.success) {
                 toast.success('Cập nhật thành công!');
@@ -81,7 +83,7 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
                                     type="text"
                                     id="userId"
                                     className="mt-1 p-2 w-full bg-gray-800 rounded text-gray-300"
-                                    value={user.accountId}
+                                    value={user.id}
                                     disabled
                                 />
                             </div>
@@ -101,6 +103,21 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
                                     onChange={(e) => setName(e.target.value)}
                                 />
                             </div>
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="sdt"
+                                    className="block text-sm font-medium text-gray-300"
+                                >
+                                    Số điện thoại
+                                </label>
+                                <input
+                                    type="text"
+                                    id="sdt"
+                                    className="mt-1 p-2 w-full bg-gray-800 rounded text-gray-300"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            </div>
 
                             <div className="flex gap-4 mb-4">
                                 <div className="w-1/2">
@@ -115,7 +132,7 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
                                             type="text"
                                             id="birthday"
                                             className="mt-1 p-2 w-full bg-gray-800 rounded text-gray-300"
-                                            value={formatDate(date)}
+                                            value={date}
                                             onChange={(e) => setDate(e.target.value)}
                                         />
                                     </div>
