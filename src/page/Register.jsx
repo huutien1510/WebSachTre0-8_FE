@@ -11,6 +11,7 @@ const Register = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [birthday, setBirthday] = useState(null);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,7 +40,7 @@ const Register = () => {
         if (password !== confirmPassword) return;
 
         setLoading(true); // Bắt đầu loading
-        const newUser = { username, email, birthday, password, sex };
+        const newUser = { username, email, birthday, password, sex , phone};
 
         try {
             await registerUser(newUser, navigate);
@@ -82,6 +83,16 @@ const Register = () => {
                             placeholder="Email"
                             name='email'
                             onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-gray-300 text-sm"><span className='text-red-600 text-lg'>*</span> Số điện thoại</label>
+                        <input
+                            type="tel"
+                            className="w-full bg-gray-700 rounded-lg px-4 py-3 text-white mt-1"
+                            placeholder="Số điện thoại"
+                            name='phone'
+                            onChange={(e) => setPhone(e.target.value)}
                         />
                     </div>
                     <div>

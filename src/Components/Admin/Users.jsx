@@ -86,7 +86,7 @@ export default function Users() {
                         </thead>
                         <tbody>
                             {users?.data.map((user) => (
-                                <tr key={user.accountId} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
+                                <tr key={user.id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.accountId}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.username}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.email}</td>
@@ -98,7 +98,7 @@ export default function Users() {
                                     <td className="py-3 px-4 border-b text-gray-800">{user.is_admin ? "Admin" : "User"}</td>
                                     <td className="py-3 px-4 border-b flex space-x-2">
                                         <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 font-medium transition duration-150">Edit</button>
-                                        <button onClick={() => openModal(user.accountId)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
+                                        <button onClick={() => openModal(user.id)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
                                     </td>
                                 </tr>
                             ))}

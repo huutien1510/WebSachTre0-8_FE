@@ -18,7 +18,7 @@ import {
 import { toast } from "react-toastify";
 import jwt_decode from "jwt-decode";
 
-const baseURL = "http://localhost:3000/api";
+const baseURL = "http://localhost:8080/api";
 
 const axiosClient = axios.create({
   baseURL: baseURL,
@@ -31,12 +31,19 @@ const axiosClient = axios.create({
 
 const refreshToken = async () => {
   try {
-    const res = await axiosClient.post("/auth/refresh");
+    const res = await axios.post(
+      "http://localhost:8080/api/auth/refresh",
+      {},
+      {
+        withCredentials: true, // Cho phép gửi cookie
+      }
+    );
     return res.data.data;
   } catch (err) {
     console.log(err);
   }
 };
+
 
 export const createAxiosInstance = (user, dispatch) => {
   const axiosInstance = axios.create({
@@ -51,15 +58,16 @@ export const createAxiosInstance = (user, dispatch) => {
     async (config) => {
       let date = new Date();
       const decodeToken = jwt_decode(user?.data.accessToken);
+      console.log("Decode token:", decodeToken);
       if (decodeToken.exp < date.getTime() / 1000) {
         const data = await refreshToken();
+        console.log("Refresh token data:", data);
         const refreshUser = {
           ...user,
           accessToken: data.accessToken,
         };
-        console.log("Refreshed user:", refreshUser);
         dispatch(loginSuccess(refreshUser));
-        config.headers["token"] = "Bearer " + data.accessToken;
+        config.headers["Authorization"] = "Bearer " + data.accessToken;
       }
       return config;
     },
@@ -74,33 +82,36 @@ export const createAxiosInstance = (user, dispatch) => {
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
   try {
-    const res = await axiosClient.post("/auth/login", user);
+    const res = await axios.post("http://localhost:8080/api/auth/login", user, { withCredentials: true });
     dispatch(loginSuccess(res.data));
-    if (res.data.data.account.is_admin) {
+    
+    if (res.data.data.account.roles[0] === "ADMIN") {
       navigate("/admin/");
       return;
     }
     navigate("/");
   } catch (err) {
     dispatch(loginFailed());
+    console.log("Login error:", err);
     throw (
-      err.response?.data?.details?.message || "Đã xảy ra lỗi khi đăng nhập."
+      err.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập."
     );
   }
 };
 
-export const getAllUsers = async (accessToken, dispatch, user) => {
-  const axiosInstance = createAxiosInstance(user, dispatch);
+
+export const getAllUsers = async (accessToken, dispatch) => {
   dispatch(getUsersStart());
   try {
-    const res = await axiosInstance.get("http://localhost:3000/api/user", {
+    console.log("Access Token:", accessToken); // Kiểm tra token trong log
+    const res = await axios.get("http://localhost:8080/api/user", {
       headers: {
-        token: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`, // Đảm bảo header này
       },
     });
     dispatch(getUsersSuccess(res.data));
   } catch (err) {
-    console.log(err);
+    console.log(err); // Xem chi tiết lỗi
     dispatch(getUsersFailure());
   }
 };
@@ -110,10 +121,10 @@ export const deleteUser = async (id, accessToken, dispatch, user) => {
   dispatch(deleteUserStart());
   try {
     const res = await axiosInstance.delete(
-      `http://localhost:3000/api/user/${id}`,
+      `http://localhost:8080/api/user/account/${id}`,
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -128,11 +139,11 @@ export const logout = async (dispatch, navigate, token, user) => {
   try {
     const axiosInstance = createAxiosInstance(user, dispatch);
     await axiosInstance.post(
-      "/auth/logout",
+      "http://localhost:8080/api/auth/logout",
       {},
       {
         headers: {
-          token: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -146,12 +157,13 @@ export const logout = async (dispatch, navigate, token, user) => {
 export const registerUser = async (user, navigate) => {
   try {
     const res = await axios.post(
-      "http://localhost:3000/api/auth/register",
+      "http://localhost:8080/api/auth/register",
       user
     );
-    if (res.status === 201) {
-      console.log("Register success:", res.data.data.message);
-      toast.success(res.data.data.message, {
+    console.log("Register response:", res);
+    if (res.status === 200) {
+      console.log("Register success:", res.data?.data?.message);
+      toast.success(res.data?.data?.message, {
         style: {
           backgroundColor: "#0D0D0D",
           color: "#FFFFFF",
@@ -162,7 +174,7 @@ export const registerUser = async (user, navigate) => {
       }, 3000);
     }
   } catch (err) {
-    throw err.response?.data?.details?.message || "Đã xảy ra lỗi khi đăng ký.";
+    throw err.response?.data?.message || "Đã xảy ra lỗi khi đăng ký.";
   }
 };
 
@@ -217,12 +229,12 @@ export const updatebyAdmin = async (
 ) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.patch(
-      `http://localhost:3000/api/user/${id}`,
+    const res = await axiosInstance.put(
+      `http://localhost:8080/api/user/account/${id}`,
       upUser,
       {
         headers: {
-          token: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );

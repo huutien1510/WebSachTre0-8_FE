@@ -14,16 +14,17 @@ const ForgotPassword = () => {
         e.preventDefault();
         setLoading(true); // Bắt đầu loading
         try {
-            const res = await axios.post('http://localhost:3000/api/auth/forgot-password', { email });
+            const res = await axios.post('http://localhost:8080/api/auth/forgot-password', { email });
+            console.log(res);
             if (res.data.status === 201) {
                 setState(true);
             }
-            setMessage(res.data.data.message);
+            setMessage(res.data.message);
             setTimeout(() => {
                 navigate("/login");
             }, 3000);
         } catch (error) {
-            setMessage(error.response?.data?.details?.message || "Something went wrong");
+            setMessage(error.response?.data?.message || "Something went wrong");
         } finally {
             setLoading(false); // Kết thúc loading
         }
