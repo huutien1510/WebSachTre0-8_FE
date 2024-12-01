@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import { logout } from "../../api/apiRequest";
 import { set } from "date-fns";
 
@@ -195,9 +195,9 @@ const DesktopMenu = ({ menuItems }) => {
       {/* Auth Buttons */}
       {user ? (
         <>
-          <a href="/account/profile" className="text-emerald-500 text-sm">
+          <Link to="/account/profile" className="text-emerald-500 text-sm">
             Hi, <span>{user.data.account.username}</span>
-          </a>
+          </Link>
           <NavLink
             className="bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-emerald-600 transition-colors"
             onClick={handleLogout}

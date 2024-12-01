@@ -17,7 +17,6 @@ const authSlice = createSlice({
       state.login.isFetching = false;
       state.login.currentUser = action.payload;
       state.login.error = false;
-      console.log(state.login.currentUser.data.accessToken); // Kiểm tra state
     },
     loginFailed: (state) => {
       state.login.isFetching = false;

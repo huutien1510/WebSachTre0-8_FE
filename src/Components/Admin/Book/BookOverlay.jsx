@@ -19,7 +19,7 @@ const BookOverlay = ({ book }) => {
       const response = await fetch(`http://localhost:8080/books/deleteBook/${bookIDToDelete}`, {
         method: "DELETE",
         headers: {
-          token: `Bearer ${user?.data.accessToken}`
+          Authorization: `Bearer ${user?.data.accessToken}`
         }
       });
       const json = await response.json();

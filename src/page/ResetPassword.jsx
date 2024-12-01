@@ -21,7 +21,7 @@ const ResetPassword = () => {
     const handleReset = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/reset-password', { email, token, newPassword: password });
+            const response = await axios.post('http://localhost:8080/auth/reset-password', { email, token, newPassword: password });
             setMessage(response.data.message);
             setTimeout(() => {
                 navigate("/login");
@@ -52,11 +52,11 @@ const ResetPassword = () => {
                             name='password'
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        <button type='button' className='absolute right-10 top-[55%] -translate-y-1/2 text-gray-400' onClick={() => setShowPassword(!showPassword)}>
+                        <button type='button' className='absolute right-10 top-[144px] -translate-y-1/2 text-gray-400' onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
-                    {message && <p className='text-red-500'>{message}</p>}
+                    
                     {/* Register button */}
                     <button
                         type="submit"
@@ -64,6 +64,7 @@ const ResetPassword = () => {
                     >
                         Đặt lại mật khẩu
                     </button>
+                    {message && <p className='text-emerald-400'>{message}</p>}
                 </form>
             </div>
         </div>

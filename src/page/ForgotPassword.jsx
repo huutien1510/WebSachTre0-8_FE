@@ -14,9 +14,9 @@ const ForgotPassword = () => {
         e.preventDefault();
         setLoading(true); // Bắt đầu loading
         try {
-            const res = await axios.post('http://localhost:8080/api/auth/forgot-password', { email });
+            const res = await axios.post('http://localhost:8080/auth/forgot-password', { email });
             console.log(res);
-            if (res.data.status === 201) {
+            if (res.status === 200) {
                 setState(true);
             }
             setMessage(res.data.message);

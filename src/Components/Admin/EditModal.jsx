@@ -168,8 +168,9 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
                                     >
                                         Role
                                     </label>
-                                    <div className="relative">
+                                    <div className={`relative ${user.is_admin ? "opacity-50 cursor-not-allowed" : ""}`}>
                                         <select
+                                            disabled={user.is_admin}
                                             className="mt-1 p-2 w-full bg-gray-800 rounded text-gray-300 appearance-none"
                                             value={role}
                                             onChange={(e) => setRole(e.target.value)}
@@ -187,8 +188,9 @@ const EditModal = ({ isOpen, onClose, user, onEditSuccess }) => {
                                     >
                                         State
                                     </label>
-                                    <div className="relative">
+                                    <div className={`relative ${user.is_admin ? "opacity-50 cursor-not-allowed" : ""}`}>
                                         <select
+                                            disabled={user.is_admin}
                                             className="mt-1 p-2 w-full bg-gray-800 rounded text-gray-300 appearance-none"
                                             value={state}
                                             onChange={(e) => setState(e.target.value)}

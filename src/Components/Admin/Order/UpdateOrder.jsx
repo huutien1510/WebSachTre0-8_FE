@@ -25,7 +25,7 @@ function UpdateOrder() {
                 method: "PATCH",
                 body: JSON.stringify({
                     "bookID": order.bookID,
-                    "accountID": order.accountID,
+                    "id": order.id,
                     "price": order.price,
                     "method": order.method,
                     "status": order.status,
@@ -79,8 +79,8 @@ function UpdateOrder() {
                                     <label className="block mb-1">Mã khách hàng:</label>
                                     <input
                                         type="text"
-                                        name="accountID"
-                                        value={order.accountID}
+                                        name="id"
+                                        value={order.id}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                         disabled
                                     />

@@ -37,7 +37,7 @@ function Bookcase() {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
-                  token: `Bearer ${accessToken}`
+                  Authorization: `Bearer ${accessToken}`
                 }
               });
               const json = await response.json();

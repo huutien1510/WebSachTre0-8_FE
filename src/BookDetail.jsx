@@ -20,7 +20,7 @@ function BookDetail() {
         (state) => state.auth?.login?.currentUser?.data.accessToken
     );
     const id = useSelector(
-        (state) => state.auth.login.currentUser?.data.account.accountId
+        (state) => state.auth.login.currentUser?.data.account.id
     );
     const [isFavorite, setIsFavorite] = useState(false);
     const bookID = useParams().bookID;

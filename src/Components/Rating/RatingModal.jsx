@@ -36,7 +36,7 @@ const ReviewModal = ({ bookId, foundRating, star, isOpen, onClose, onSuccess }) 
             content: comment,
             postDate: new Date(),
             bookID: bookId,
-            accountID: user?.data?.account.accountId,
+            id: user?.data?.account.id,
         };
         try {
             if (!foundRating) {
