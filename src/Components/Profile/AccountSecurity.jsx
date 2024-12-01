@@ -11,7 +11,7 @@ function AccountSecurity() {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.auth.login.currentUser);
   const accessToken = currentUser?.data.accessToken;
-  const id = currentUser?.data.account.accountId;
+  const id = currentUser?.data.account.id;
 
   const handleDeleteAccount = async () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {

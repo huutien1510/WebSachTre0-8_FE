@@ -5,10 +5,10 @@ import CommentSection from "./CommentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavorites, getFavoriteStatus, removeFromFavorites } from "./api/apiRequest";
 function ChapterReader() {
-  const user = useSelector((state) => state.auth?.login?.currentUser?.data)
+  const  user = useSelector((state) => state.auth?.login?.currentUser?.data)
   const user1 = useSelector((state) => state.auth?.login?.currentUser);
   const id = useSelector(
-    (state) => state.auth.login.currentUser?.data.account.accountId
+    (state) => state.auth.login.currentUser?.data.account.id
   );
   const accessToken = useSelector(
     (state) => state.auth?.login?.currentUser?.data.accessToken
@@ -26,10 +26,10 @@ function ChapterReader() {
 
   useEffect(() => {
     const checkFavoriteStatus = async () => {
-      if (user?.account?.accountId && bookID) {
+      if (user?.account?.id && bookID) {
         try {
           const status = await getFavoriteStatus(
-            user?.account?.accountId,
+            user?.account?.id,
             bookID,
             dispatch,
             user1,
@@ -42,7 +42,7 @@ function ChapterReader() {
       }
     }
     checkFavoriteStatus();
-  }, [user?.account?.accountId, bookID]);
+  }, [user?.account?.id, bookID]);
 
   useEffect(() => {
 
@@ -79,17 +79,23 @@ function ChapterReader() {
 
   const handleAddReadBook = async () => {
     try {
-      await fetch(`http://localhost:8080/readinghistory`, {
+      const response = await fetch(`http://localhost:8080/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
-          "accountID": user.account.accountId,
-          "chapterID": this_chapter.id,
+          accountID: user.account.id,
+          chapterID: this_chapter.id,
         }),
         headers: {
           "Content-Type": "application/json",
-          token: `Bearer ${user?.accessToken}`
-        }
+          Authorization: `Bearer ${user?.accessToken}`,
+        },
       });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      console.log("Đã thêm sách vào lịch sử đọc", user?.accessToken);
     } catch (error) {
       console.error("Lỗi khi thêm sách:", error.message);
     }

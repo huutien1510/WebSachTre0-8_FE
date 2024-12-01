@@ -19,7 +19,7 @@ const BookOverlay = ({ book }) => {
       const response = await fetch(`http://localhost:3000/api/books/${bookIDToDelete}`, {
         method: "DELETE",
         headers: {
-          token: `Bearer ${user?.data.accessToken}`
+          Authorization: `Bearer ${user?.data.accessToken}`
         }
       });
       const json = await response.json();
@@ -66,7 +66,7 @@ const BookOverlay = ({ book }) => {
       </div>
       <div className="flex justify-center gap-2">
         {/* buttonEdit */}
-        <NavLink to={`/admin/books/updateBook/${book.bookId}`}>
+        <NavLink to={`/admin/books/updateBook/${book.id}`}>
           <button className="flex items-center justify-center text-white px-3 py-2 rounded-lg bg-[#18B088] hover:bg-[#18B088]/90 transition-colors w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"

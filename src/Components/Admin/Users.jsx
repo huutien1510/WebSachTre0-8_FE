@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LiaTimesCircle } from "react-icons/lia";
 import { CiCircleCheck } from "react-icons/ci";
+import { TbLock } from "react-icons/tb";
 
 export default function Users() {
     const user = useSelector((state) => state.auth.login?.currentUser);
@@ -89,7 +90,7 @@ export default function Users() {
                         <tbody>
                             {users?.data.map((user) => (
                                 <tr key={user.id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
-                                    <td className="py-3 px-4 border-b text-gray-800">{user.accountId}</td>
+                                    <td className="py-3 px-4 border-b text-gray-800">{user.id}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.username}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.email}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">
@@ -98,9 +99,9 @@ export default function Users() {
                                             : <div className='text-red-700 text-3xl'><LiaTimesCircle /></div>}
                                     </td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.is_admin ? "Admin" : "User"}</td>
-                                    <td className="py-3 px-4 border-b flex space-x-2">
-                                        <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 font-medium transition duration-150">Edit</button>
-                                        <button onClick={() => openModal(user.id)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
+                                    <td className="py-3 px-4 border-b flex space-x-4">
+                                        <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 font-medium transition duration-150">Cập nhật</button>
+                                        <button onClick={() => openModal(user.id)} disabled={user.is_admin}className={`text-red-500 hover:text-red-700 font-medium transition duration-150 ${user.is_admin ? "opacity-50 cursor-not-allowed " : ""}` } >{user.is_deleted ? "Hiện" : "Ẩn"}</button>
                                     </td>
                                 </tr>
                             ))}

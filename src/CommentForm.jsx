@@ -34,7 +34,7 @@ function CommentForm({ chapterID, fetchComment }) {
         const response = await fetch(`http://localhost:8080/comments/post`, {
           method: "POST",
           body: JSON.stringify({
-            "accountID": user.account.accountId,
+            "id": user.account.id,
             "chapterID": chapterID,
             "content": comment,
             "postDate": new Date(),

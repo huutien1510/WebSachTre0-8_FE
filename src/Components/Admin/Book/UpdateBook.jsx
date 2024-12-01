@@ -7,7 +7,7 @@ import defaultAvatar from "../../../image/default-avatar.png";
 
 function UpdateBook() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
-    const bookId = useParams().bookId
+    const bookId = useParams().id
     const navigate = useNavigate();
     const [book, setBook] = useState(null)
     const [genre, setGenre] = useState([])
@@ -32,7 +32,7 @@ function UpdateBook() {
     useEffect(() => {
         const fetchBook = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/books/${bookId}`);
+                const response = await fetch(`http://localhost:8080/books/${bookId}`);
                 const json = await response.json();
                 setBook(json.data);
             } catch (error) {
@@ -51,16 +51,17 @@ function UpdateBook() {
                 priceInputRef.current?.setCustomValidity("Truyện miễn phí hoặc có giá từ 1,000.");
             else
                 priceInputRef.current?.setCustomValidity('');
+        setBook({ ...book, [name]: value });
 
-        if (name === "genre") {
-            const selectedGenre = genre.find((item) => item._id === value);
-            setBook({
-                ...book,
-                genre: selectedGenre ? { _id: value, name: selectedGenre.name } : {},
-            });
-        } else {
-            setBook({ ...book, [name]: value });
-        }
+        // if (name === "genre") {
+        //     const selectedGenre = genre.find((item) => item._id === value);
+        //     setBook({
+        //         ...book,
+        //         genre: selectedGenre ? { _id: value, name: selectedGenre.name } : {},
+        //     });
+        // } else {
+        //     setBook({ ...book, [name]: value });
+        // }
     };
 
     const handleThumbnailChange = async (e) => {
@@ -82,10 +83,10 @@ function UpdateBook() {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("upload_preset", "bookstore");
+            formData.append("upload_preset", "demo-upload");
 
             const response = await axios.post(
-                "https://api.cloudinary.com/v1_1/dhs93uix6/image/upload",
+                "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
                 formData
             );
 
@@ -202,7 +203,7 @@ function UpdateBook() {
                                 />
                             </div>
                         </div>
-                        <div className="mb-4">
+                        {/* <div className="mb-4">
                             {book && genre && (
                                 <div className="mb-4">
                                     <label className="block mb-1 text-gray-300">Thể loại</label>
@@ -220,7 +221,7 @@ function UpdateBook() {
                                 </div>
                             )}
 
-                        </div>
+                        </div> */}
                         <div className="mb-4">
                             <label className="block mb-1 w-full">Mô tả truyện</label>
                             <textarea

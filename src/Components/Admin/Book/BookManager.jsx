@@ -18,6 +18,7 @@ function BookManager() {
         const json = await response.json();
         setBook(json.data.content);
         setTotalPages(json.data.totalPages);
+        console.log("json", json.data.content);
       }
       catch (error) {
         console.error('Error fetching data:', error);
