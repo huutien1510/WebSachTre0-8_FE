@@ -120,21 +120,13 @@ function UpdateBook() {
 
     const updateBook = async () => {
         try {
-            console.log(JSON.stringify({
-                "name": book.name,
-                "author": book.author,
-                "description": book.description,
-                "genres": JSON.stringify(book.genres),
-                "thumbnail": book.thumbnail,
-                "price": book.price
-            }),)
             const response = await fetch(`http://localhost:8080/books/updateBook/${bookId}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     "name": book.name,
                     "author": book.author,
                     "description": book.description,
-                    "genres": book.genres,
+                    "genreIDs": book.genres.map((genre) => genre.id),
                     "thumbnail": book.thumbnail,
                     "price": book.price
                 }),
@@ -145,7 +137,7 @@ function UpdateBook() {
             });
             const json = await response.json();
             console.log(json);
-            if (json.status === 200) {
+            if (json.code === 200) {
                 toast.success("Cập nhật thành công!")
                 navigate("/admin/books")
             } else {
