@@ -16,7 +16,7 @@ const BookOverlay = ({ book }) => {
 
   const deleteBook = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/books/${bookIDToDelete}`, {
+      const response = await fetch(`http://localhost:8080/books/deleteBook/${bookIDToDelete}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user?.data.accessToken}`
@@ -30,6 +30,7 @@ const BookOverlay = ({ book }) => {
   }
 
   const openModal = (id) => {
+    console.log(id);
     setBookIDToDelete(id);
     setIsModalOpen(true);
   };
@@ -42,16 +43,14 @@ const BookOverlay = ({ book }) => {
   const confirmDelete = async () => {
     if (bookIDToDelete) {
       const response = await deleteBook();
-      console.log(response)
-      if (response.status === 200) {
+      if (response.code === 200) {
         toast.success("Xóa thành công")
         navigate("/admin/books")
       }
-      else toast.success("Xóa thất bại")
+      else toast.error("Xóa thất bại")
     }
     closeModal();
   };
-
 
   return (
     <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
@@ -83,7 +82,7 @@ const BookOverlay = ({ book }) => {
         </NavLink>
 
         {/* buttonDelete */}
-        <button onClick={() => openModal(book.bookId)} className="flex items-center justify-center text-white px-3 py-2 rounded-lg bg-red-500  hover:bg-red-500/90 transition-colors w-full">
+        <button onClick={() => openModal(book.id)} className="flex items-center justify-center text-white px-3 py-2 rounded-lg bg-red-500  hover:bg-red-500/90 transition-colors w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-6"

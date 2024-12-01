@@ -82,8 +82,8 @@ function ChapterReader() {
       const response = await fetch(`http://localhost:8080/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
-          accountID: user.account.id,
-          chapterID: this_chapter.id,
+          "accountID": user.account.id,
+          "chapterID": this_chapter.id,
         }),
         headers: {
           "Content-Type": "application/json",

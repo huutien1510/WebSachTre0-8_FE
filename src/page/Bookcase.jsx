@@ -7,7 +7,7 @@ function Bookcase() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.data.accessToken;
-  const id = user?.data.account.id;
+  const accountId = user?.data.account.id;
 
   const [activeTab, setActiveTab] = useState("favorite");
   const [favoriteBooks, setFavoriteBooks] = useState([]);
@@ -19,10 +19,10 @@ function Bookcase() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        if (id && accessToken) {
+        if (accountId && accessToken) {
           if (activeTab === "favorite") {
             const response = await getFavoriteBooks(
-              id,
+              accountId,
               currentPage,
               limit,
               dispatch,
@@ -33,7 +33,7 @@ function Bookcase() {
             // setTotalPages(response.data.pagination.totalPages);
           } else {
             try {
-              const response = await fetch(`http://localhost:8080/readinghistory/account/${id}`, {
+              const response = await fetch(`http://localhost:8080/readinghistory/account/${accountId}`, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
@@ -41,6 +41,7 @@ function Bookcase() {
                 }
               });
               const json = await response.json();
+              console.log(json)
               setReadBooks(json.data);
               setTotalPages(json.totalPages);
             } catch (error) {
@@ -54,7 +55,7 @@ function Bookcase() {
     };
 
     fetchBooks();
-  }, [id, accessToken, dispatch, user, currentPage, activeTab]);
+  }, [accountId, accessToken, dispatch, user, currentPage, activeTab]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

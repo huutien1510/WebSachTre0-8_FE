@@ -16,7 +16,7 @@ function AddBook() {
         name: "",
         author: "",
         description: "",
-        genre: 0,
+        genres: [],
         price: 0,
         thumbnail: defaultAvatar
     });
@@ -30,15 +30,29 @@ function AddBook() {
             else
                 priceInputRef.current?.setCustomValidity('');
 
-        if (name === "genre") {
-            const selectedGenre = genre.find((item) => item._id === value);
-            setBook({
-                ...book,
-                genre: selectedGenre ? { _id: value, name: selectedGenre.name } : {},
-            });
-        } else {
-            setBook({ ...book, [name]: value });
+        setBook({ ...book, [name]: value });
+
+    };
+
+    const handleGenresChange = (event) => {
+        const selectedValue = event.target.value;
+        let newGenres = book.genres;
+
+        // Nếu thể loại đã được chọn, bỏ qua
+        if (book.genres.some((item) => item.id == selectedValue)) return;
+
+        // Tìm thể loại theo `id` và thêm vào danh sách đã chọn
+        const selectedGenre = genre.find((item) => item.id == selectedValue);
+        newGenres.push(selectedGenre)
+        if (selectedGenre) {
+            setBook({ ...book, genres: newGenres });
         }
+    };
+
+    const handleRemoveGenre = (id) => {
+        // Xóa thể loại khỏi danh sách đã chọn
+        const selectedGenres = book.genres.filter((item) => item.id !== id);
+        setBook({ ...book, genres: selectedGenres });
     };
 
     const handleThumbnailChange = async (e) => {
@@ -92,10 +106,9 @@ function AddBook() {
     useEffect(() => {
         const fetchGenre = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/genre`);
+                const response = await fetch(`http://localhost:8080/genres/getAll`);
                 const json = await response.json();
-                setGenre(json.genres
-                );
+                setGenre(json.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -107,30 +120,30 @@ function AddBook() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!book.name || !book.description || !book.author || !book.genre || !book.thumbnail) {
+        if (!book.name || !book.description || !book.author || !book.genres || !book.thumbnail) {
             toast.error("Thiếu dữ liệu !");
             return;
         }
 
         const addBook = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/books/`, {
+                const response = await fetch(`http://localhost:8080/books/addBook`, {
                     method: "POST",
                     body: JSON.stringify({
                         "name": book.name,
-                        "description": book.description,
                         "author": book.author,
-                        "genre": book.genre,
-                        "price": book.price,
-                        "thumbnail": book.thumbnail
+                        "description": book.description,
+                        "genreIDs": book.genres.map((genre) => genre.id),
+                        "thumbnail": book.thumbnail,
+                        "price": book.price
                     }),
                     headers: {
                         "Content-Type": "application/json",
-                        token: `Bearer ${user?.accessToken}`
+                        Authorization: `Bearer ${user?.accessToken}`
                     }
                 });
                 const json = await response.json();
-                if (json.status === 200) {
+                if (json.code === 200) {
                     toast.success("Thêm sách thành công");
                     navigate("/admin/books")
                 }
@@ -190,20 +203,39 @@ function AddBook() {
                             </div>
                         </div>
                         <div className="mb-4">
-                            {book && genre && (
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-gray-300">Thể loại</label>
-                                    <select
-                                        className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
-                                        name="genre"
-                                        value={book.genre._id || ""}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="" disabled>Chọn thể loại</option>
-                                        {genre.map((item) => (
-                                            <option key={item._id} value={item._id}>{item.name}</option>
-                                        ))}
-                                    </select>
+                            <div className="mb-4">
+                                <label className="block mb-1 text-gray-300">Thể loại</label>
+                                <select
+                                    className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
+                                    name="genres"
+                                    onChange={handleGenresChange}
+                                >
+                                    <option value="" disabled>Chọn thể loại</option>
+                                    {genre.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Danh sách thể loại đã chọn */}
+                            {book.genres.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                    {book.genres.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="flex items-center bg-gray-700 text-white px-3 py-1 rounded-lg"
+                                        >
+                                            <span>{item.name}</span>
+                                            <button
+                                                className="ml-2 text-red-500"
+                                                onClick={() => handleRemoveGenre(item.id)}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
@@ -223,7 +255,7 @@ function AddBook() {
                                 type="submit"
                                 className="bg-gradient-to-br from-teal-500 to-green-600 text-white py-2 px-4 rounded-lg"
                             >
-                                Thêm truyện
+                                Thêm sách
                             </button>
                             <button
                                 onClick={() => navigate(-1)}
