@@ -82,7 +82,7 @@ function ChapterReader() {
       await fetch(`http://localhost:8080/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
-          "accountID": user.account.accountId,
+          "accountID": user.account.id,
           "chapterID": this_chapter.id,
         }),
         headers: {

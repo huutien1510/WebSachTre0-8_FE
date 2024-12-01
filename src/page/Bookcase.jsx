@@ -7,7 +7,7 @@ function Bookcase() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.data.accessToken;
-  const accountId = user?.data.account.accountId;
+  const accountId = user?.data.account.id;
 
   const [activeTab, setActiveTab] = useState("favorite");
   const [favoriteBooks, setFavoriteBooks] = useState([]);
@@ -41,6 +41,7 @@ function Bookcase() {
                 }
               });
               const json = await response.json();
+              console.log(json)
               setReadBooks(json.data);
               setTotalPages(json.totalPages);
             } catch (error) {
