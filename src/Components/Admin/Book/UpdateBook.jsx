@@ -7,7 +7,7 @@ import defaultAvatar from "../../../image/default-avatar.png";
 
 function UpdateBook() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
-    const bookId = useParams().bookId
+    const bookId = useParams().bookID
     const navigate = useNavigate();
     const [book, setBook] = useState(null)
     const [genre, setGenre] = useState([])

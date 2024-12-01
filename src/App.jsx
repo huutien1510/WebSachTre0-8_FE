@@ -65,7 +65,7 @@ function App() {
             <Route path="books" element={<div><Outlet /></div>} >
               <Route index element={<BookManager />} />
               <Route path="addBook" element={<AddBook />} />
-              <Route path="updateBook/:id" element={<UpdateBook />} />
+              <Route path="updateBook/:bookID" element={<UpdateBook />} />
             </Route>
             <Route path="ratings" element={<RatingAdmin />} />
             <Route path="orders" element={<div><Outlet /></div>} >
