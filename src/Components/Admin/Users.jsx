@@ -100,8 +100,8 @@ export default function Users() {
                                     </td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.is_admin ? "Admin" : "User"}</td>
                                     <td className="py-3 px-4 border-b flex space-x-4">
-                                        <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 font-medium transition duration-150">Cập nhật</button>
-                                        <button onClick={() => openModal(user.id)} disabled={user.is_admin}className={`text-red-500 hover:text-red-700 font-medium transition duration-150 ${user.is_admin ? "opacity-50 cursor-not-allowed " : ""}` } >{user.is_deleted ? "Hiện" : "Ẩn"}</button>
+                                        <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 font-medium transition duration-150">Update</button>
+                                        <button onClick={() => openModal(user.id)} disabled={user.is_admin} className={`text-red-500 hover:text-red-700 font-medium transition duration-150 ${user.is_admin ? "opacity-50 cursor-not-allowed " : ""}`} >{user.is_deleted ? "Unlock" : "Lock"}</button>
                                     </td>
                                 </tr>
                             ))}

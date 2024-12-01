@@ -36,12 +36,12 @@ const ReviewModal = ({ bookId, foundRating, star, isOpen, onClose, onSuccess }) 
             content: comment,
             postDate: new Date(),
             bookID: bookId,
-            id: user?.data?.account.id,
+            accountID: user?.data?.account.id,
         };
         try {
             if (!foundRating) {
                 const res = await createRating(newRating, user?.data.accessToken, user, dispatch);
-                if (res.data.code === 1000) {
+                if (res.data.code === 200) {
                     toast.success('Đánh giá thành công!');
                     onSuccess();
                     onClose();
