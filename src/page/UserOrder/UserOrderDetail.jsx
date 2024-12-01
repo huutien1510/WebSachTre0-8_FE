@@ -20,7 +20,7 @@ function UserOrderDetail() {
                         method: "POST",
                         body: JSON.stringify({
                             bookID: book.bookId, // ID của sách, kiểu Number
-                            accountID: user.account.accountId, // ID của tài khoản, kiểu Number
+                            id: user.account.id, // ID của tài khoản, kiểu Number
                             price: book.price, // Giá trị của đơn hàng, kiểu Number (tùy chọn, có giá trị mặc định là 0)
                             method: "MOMO", // Phương thức thanh toán, kiểu String
                             status: "Chờ thanh toán", // Trạng thái của đơn hàng, kiểu String
@@ -75,8 +75,8 @@ function UserOrderDetail() {
                                     <label className="block mb-1">Mã khách hàng:</label>
                                     <input
                                         type="text"
-                                        name="accountID"
-                                        value={order.accountID}
+                                        name="id"
+                                        value={order.id}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                         disabled
                                     />

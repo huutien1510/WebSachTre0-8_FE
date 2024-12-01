@@ -18,7 +18,7 @@ const BookOverlay = ({ book }) => {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const id = useSelector(
-    (state) => state.auth.login.currentUser?.data.account.accountId
+    (state) => state.auth.login.currentUser?.data.account.id
   );
   useEffect(() => {
     const checkFavoriteStatus = async () => {

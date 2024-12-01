@@ -5,18 +5,20 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import defaultAvatar from "../../image/default-avatar.png";
 import { updateUser } from "../../api/apiRequest.js";
+import { format } from 'date-fns';
 
 function AccountInfo() {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const currentUser = useSelector((state) => state.auth.login.currentUser);
   const accessToken = currentUser?.data.accessToken;
-  const id = currentUser?.data.account.accountId;
+  const id = currentUser?.data.account.id;
   const [user, setUser] = useState({
     username: "",
-    accountId: "",
+    id: "",
     name: "",
     dateOfBirth: "",
+    phone: "",
     sex: "Khác",
     avatar: defaultAvatar,
   });
@@ -24,22 +26,18 @@ function AccountInfo() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const formatbirthday = (birthday) => {
-    if (!birthday) return "";
-
-    if (birthday.$date?.$numberLong) {
-      return new Date(parseInt(birthday.$date.$numberLong))
-        .toISOString()
-        .split("T")[0];
+    if (!birthday) return ""; // Trả về chuỗi rỗng nếu không có ngày
+  
+    if (typeof birthday === "string") {
+      // Chuỗi dạng dd/MM/yyyy
+      const [day, month, year] = birthday.split("/");
+      return `${year}-${month}-${day}`; // Định dạng thành yyyy-MM-dd cho input[type="date"]
     }
-
+  
     if (birthday instanceof Date) {
       return birthday.toISOString().split("T")[0];
     }
-
-    if (typeof birthday === "string") {
-      return new Date(birthday).toISOString().split("T")[0];
-    }
-
+  
     return "";
   };
 
@@ -48,9 +46,10 @@ function AccountInfo() {
       const account = currentUser.data.account;
       setUser({
         username: account.username || "",
-        accountId: account.accountId || "",
+        id: account.id || "",
         name: account.name || "",
         dateOfBirth: formatbirthday(account.birthday),
+        phone: account.phone || "",
         sex:
           account.sex?.charAt(0).toUpperCase() +
           account.sex?.slice(1).toLowerCase() || "Khác",
@@ -69,20 +68,19 @@ function AccountInfo() {
       toast.error("Thông tin xác thực không hợp lệ!");
       return;
     }
-
+  
     setIsUpdating(true);
     try {
-      console.log(currentUser);
-      console.log();
       const updateData = {
         name: user.name,
         birthday: user.dateOfBirth
-          ? new Date(user.dateOfBirth).toISOString()
+          ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") // Chuyển đổi định dạng
           : null,
         sex: user.sex.toLowerCase(),
+        phone: user.phone,
         avatar: user.avatar,
       };
-      console.log(currentUser);
+  
       const result = await updateUser(
         currentUser,
         id,
@@ -90,10 +88,10 @@ function AccountInfo() {
         dispatch,
         updateData
       );
-
+  
       if (result.success) {
         toast.success("Cập nhật thông tin thành công!");
-        //  setTimeout(() => window.location.reload(), 1500);
+        // setTimeout(() => window.location.reload(), 1500);
       } else {
         toast.error(result.error || "Có lỗi xảy ra khi cập nhật!");
       }
@@ -103,6 +101,7 @@ function AccountInfo() {
       setIsUpdating(false);
     }
   };
+  
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
@@ -122,10 +121,10 @@ function AccountInfo() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "bookstore");
+      formData.append("upload_preset", "demo-upload");
 
       const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dhs93uix6/image/upload",
+        "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
         formData
       );
 
@@ -155,7 +154,7 @@ function AccountInfo() {
       const account = currentUser.data.account;
       setUser({
         username: account.username || "",
-        accountId: account.accountId || "",
+        id: account.id || "",
         name: account.name || "",
         dateOfBirth: formatbirthday(account.birthday),
         sex:
@@ -185,7 +184,7 @@ function AccountInfo() {
             <label className="block text-sm text-gray-400">ID người dùng</label>
             <input
               type="text"
-              value={user.accountId}
+              value={user.id}
               disabled
               className="w-full bg-gray-700 rounded-lg px-4 py-2.5 text-white"
             />
@@ -197,6 +196,16 @@ function AccountInfo() {
               type="text"
               name="name"
               value={user.name}
+              onChange={handleChange}
+              className="w-full bg-gray-900 rounded-lg px-4 py-2.5 text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm text-gray-400">Số điện thoại</label>
+            <input
+              type="text"
+              name="phone"
+              value={user.phone}
               onChange={handleChange}
               className="w-full bg-gray-900 rounded-lg px-4 py-2.5 text-white"
             />

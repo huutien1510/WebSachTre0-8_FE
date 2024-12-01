@@ -18,7 +18,7 @@ import {
 import { toast } from "react-toastify";
 import jwt_decode from "jwt-decode";
 
-const baseURL = "http://localhost:8080/api";
+const baseURL = "http://localhost:8080";
 
 const axiosClient = axios.create({
   baseURL: baseURL,
@@ -32,7 +32,7 @@ const axiosClient = axios.create({
 const refreshToken = async () => {
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/auth/refresh",
+      "http://localhost:8080/auth/refresh",
       {},
       {
         withCredentials: true, // Cho phép gửi cookie
@@ -80,7 +80,7 @@ export const createAxiosInstance = (user, dispatch) => {
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
   try {
-    const res = await axios.post("http://localhost:8080/api/auth/login", user, { withCredentials: true });
+    const res = await axios.post("http://localhost:8080/auth/login", user, { withCredentials: true });
     dispatch(loginSuccess(res.data));
     
     if (res.data.data.account.roles[0] === "ADMIN") {
@@ -101,7 +101,7 @@ export const loginUser = async (user, dispatch, navigate) => {
 export const getAllUsers = async (accessToken, dispatch) => {
   dispatch(getUsersStart());
   try {
-    const res = await axios.get("http://localhost:8080/api/user", {
+    const res = await axios.get("http://localhost:8080/user", {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Đảm bảo header này
       },
@@ -118,7 +118,7 @@ export const deleteUser = async (id, accessToken, dispatch, user) => {
   dispatch(deleteUserStart());
   try {
     const res = await axiosInstance.delete(
-      `http://localhost:8080/api/user/account/${id}`,
+      `http://localhost:8080/user/account/${id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -136,7 +136,7 @@ export const logout = async (dispatch, navigate, token, user) => {
   try {
     const axiosInstance = createAxiosInstance(user, dispatch);
     await axiosInstance.post(
-      "http://localhost:8080/api/auth/logout",
+      "http://localhost:8080/auth/logout",
       {},
       {
         headers: {
@@ -154,7 +154,7 @@ export const logout = async (dispatch, navigate, token, user) => {
 export const registerUser = async (user, navigate) => {
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/auth/register",
+      "http://localhost:8080/auth/register",
       user
     );
     
@@ -177,7 +177,7 @@ export const registerUser = async (user, navigate) => {
 export const updateUser = async (user, id, accessToken, dispatch, upUser) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const updateRes = await axiosInstance.patch(`/user/${id}`, upUser, {
+    const updateRes = await axiosInstance.put(`http://localhost:8080/user/account/my-info`, upUser, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -226,7 +226,7 @@ export const updatebyAdmin = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
     const res = await axiosInstance.put(
-      `http://localhost:8080/api/user/account/${id}`,
+      `http://localhost:8080/user/account/${id}`,
       upUser,
       {
         headers: {
