@@ -75,10 +75,8 @@ function App() {
             <Route path="chapter" element={<div><Outlet /></div>}>
               <Route index element={<ChapterAdmin />} />
               <Route path="book/:bookId" element={<ChapterBookAdmin />} />
-              <Route path="addChapter/:bookId" element={<ChapterAddAdmin />} />
-              <Route
-                path="editChapter/:bookID/:chapterNumber"
-                element={<ChapterEditAdmin />}
+              <Route path="addChapter/:bookID/:newChapterNumber" element={<ChapterAddAdmin />} />
+              <Route path="editChapter/:chapterID" element={<ChapterEditAdmin />}
               />
             </Route>
           </Route>

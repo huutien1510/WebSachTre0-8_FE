@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  updateChapter,
+  updateChapterTitle,
   createChapterContent,
   createAxiosInstance,
 } from "../../../api/apiRequest.js";
@@ -10,11 +10,11 @@ import {
 function ChapterEditAdmin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { bookID, chapterNumber } = useParams();
+  const chapterID = useParams().chapterID;
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.data.accessToken;
-
-  const [book, setBook] = useState(null);
+  const location = useLocation();
+  const [book, setBook] = useState(location.state.book);
   const [chapter, setChapter] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
   const [contentItems, setContentItems] = useState([]);
@@ -27,21 +27,15 @@ function ChapterEditAdmin() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const bookResponse = await fetch(
-          `http://localhost:3000/api/books/${bookID}`
-        );
-        const bookData = await bookResponse.json();
-        setBook(bookData?.data);
-
         const chapterResponse = await fetch(
-          `http://localhost:3000/api/chapter/${bookID}/${chapterNumber}`
+          `http://localhost:8080/chapters/chapter/${chapterID}`
         );
         const chapterData = await chapterResponse.json();
         setChapter(chapterData?.data);
-        setChapterTitle(chapterData?.data?.chapter_title);
+        setChapterTitle(chapterData?.data?.title);
 
         const contentsResponse = await fetch(
-          `http://localhost:3000/api/chaptercontent/${chapterData?.data?._id}`
+          `http://localhost:8080/chaptercontents/${chapterID}`
         );
         const contentsData = await contentsResponse.json();
         setContentItems(contentsData?.data);
@@ -51,16 +45,16 @@ function ChapterEditAdmin() {
     };
 
     fetchData();
-  }, [bookID, chapterNumber]);
+  }, [chapterID]);
 
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "chapterUpload");
+    formData.append("upload_preset", "demo-upload");
 
     try {
       const response = await fetch(
-        "https://api.cloudinary.com/v1_1/dhs93uix6/image/upload",
+        "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
         {
           method: "POST",
           body: formData,
@@ -83,8 +77,8 @@ function ChapterEditAdmin() {
     setNewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleDeleteClick = (content) => {
-    setContentToDelete(content);
+  const handleDeleteClick = (contentID) => {
+    setContentToDelete(contentID);
     setShowDeleteModal(true);
   };
 
@@ -92,22 +86,17 @@ function ChapterEditAdmin() {
     try {
       const axiosInstance = createAxiosInstance(user, dispatch);
 
-      const response = await axiosInstance.post(
-        `/chaptercontent/delete`,
-        {
-          chapterID: contentToDelete.chapterID,
-          content_number: contentToDelete.content_number,
-          content: contentToDelete.content,
-        },
+      const response = await axiosInstance.delete(
+        `http://localhost:8080/chaptercontents/deleteContent/${contentToDelete}`,
         {
           headers: {
-            token: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-      if (response.status === 200) {
+      if (response.data.code === 200) {
         setContentItems(
-          contentItems.filter((item) => item._id !== contentToDelete._id)
+          contentItems.filter((item) => item.id !== contentToDelete)
         );
         alert("Xóa ảnh thành công!");
       } else {
@@ -128,9 +117,8 @@ function ChapterEditAdmin() {
 
     try {
       // Update chapter title
-      await updateChapter(
-        bookID,
-        chapter.chapter_number,
+      await updateChapterTitle(
+        chapterID,
         chapterTitle,
         dispatch,
         user,
@@ -151,15 +139,18 @@ function ChapterEditAdmin() {
 
       // Find the highest content_number
       const maxContentNumber = contentItems.reduce(
-        (max, item) => Math.max(max, item.content_number),
+        (max, item) => {
+          return Math.max(max, item.contentNumber)
+        },
         0
       );
+
 
       // Create chapter contents with Cloudinary URLs
       for (let i = 0; i < uploadedUrls.length; i++) {
         const newContentNumber = maxContentNumber + i + 1;
         await createChapterContent(
-          chapter._id,
+          chapter.id,
           newContentNumber,
           uploadedUrls[i],
           dispatch,
@@ -178,7 +169,7 @@ function ChapterEditAdmin() {
       }
 
       alert("Cập nhật chapter thành công!");
-      navigate(`/admin/chapter/book/${bookID}`);
+      navigate(-1);
     } catch (error) {
       console.error("Error in update process:", error);
       alert("Lỗi khi cập nhật chapter. Vui lòng thử lại.");
@@ -193,7 +184,7 @@ function ChapterEditAdmin() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-2">
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-            {chapterTitle} - {book?.name}
+            {book?.name || "Đang tải thông tin truyện..."} - Chapter {chapter?.chapterNumber}
           </h1>
         </div>
 
@@ -221,21 +212,21 @@ function ChapterEditAdmin() {
                 {contentItems && contentItems.length > 0 ? (
                   contentItems.map((item) => (
                     <div
-                      key={item._id}
+                      key={item.id}
                       className="group relative rounded-xl overflow-hidden"
                     >
                       <img
                         src={item.content}
-                        alt={`Content ${item.content_number}`}
+                        alt={`Content ${item.contentNumber}`}
                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <span className="absolute bottom-2 left-2 text-sm text-white">
-                          Ảnh {item.content_number}
+                          Ảnh {item.contentNumber}
                         </span>
                         <button
                           type="button"
-                          onClick={() => handleDeleteClick(item)}
+                          onClick={() => handleDeleteClick(item.id)}
                           className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                         >
                           ×

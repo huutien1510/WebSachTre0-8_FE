@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
 import { deleteChapter } from "../../../api/apiRequest.js"; // Import hàm deleteChapter
@@ -11,22 +11,16 @@ function ChapterBookAdmin() {
   const accessToken = useSelector(
     (state) => state.auth.login.currentUser?.data.accessToken
   );
+  const location = useLocation();
   const bookID = useParams().bookId;
-  const [book, setBook] = useState(null);
+  const [book, setBook] = useState(location.state?.book);
   const [chapters, setChapters] = useState([]);
   const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/books/${bookID}`);
-      const bookData = await response.json();
-      setBook(bookData.data);
-    } catch (error) {
-      console.error("Error fetching book data:", error);
-    }
-    try {
       const response2 = await fetch(
-        `http://localhost:3000/api/chapter/${bookID}`
+        `http://localhost:8080/chapters/${bookID}`
       );
       const chapterData = await response2.json();
       setChapters(chapterData.data);
@@ -40,11 +34,17 @@ function ChapterBookAdmin() {
   }, [bookID]);
 
   const handleAddChapter = () => {
-    navigate(`/admin/chapter/addChapter/${bookID}`);
+    const maxChapterNumber = chapters.reduce(
+      (max, item) => {
+        return Math.max(max, item.chapterNumber)
+      },
+      0
+    );
+    navigate(`/admin/chapter/addChapter/${bookID}/${maxChapterNumber + 1}`, { state: { book: book } });
   };
 
-  const handleEditChapter = (chapterNumber) => {
-    navigate(`/admin/chapter/editChapter/${bookID}/${chapterNumber}`);
+  const handleEditChapter = (chapterID) => {
+    navigate(`/admin/chapter/editChapter/${chapterID}`, { state: { book: book } });
   };
 
   const handleDeleteChapter = async (chapterId) => {
@@ -81,9 +81,6 @@ function ChapterBookAdmin() {
                 </h2>
                 <p className="text-gray-400 mb-2">Tác giả: {book.author}</p>
                 <p className="text-gray-300 mb-4">{book.description}</p>
-                <p className="text-gray-500 text-sm">
-                  Ngày tạo: {format(new Date(book.createdAt), "dd/MM/yyyy")}
-                </p>
               </div>
             </div>
 
@@ -106,23 +103,23 @@ function ChapterBookAdmin() {
           <div className="space-y-3">
             {chapters.map((chapter) => (
               <div
-                key={chapter._id}
+                key={chapter.id}
                 className="flex items-center justify-between bg-gray-700 p-4 rounded-md shadow-md"
               >
                 {/* Thông tin chapter */}
                 <div>
                   <h4 className="text-lg font-semibold text-gray-200">
-                    {chapter.chapter_title}
+                    Chapter {chapter.chapterNumber}
                   </h4>
                   {/* <p className="text-gray-400 text-sm">
                     Số Chapter: {chapter.chapter_number}
                   </p> */}
                   <p className="text-gray-500 text-xs">
                     Ngày xuất bản:{" "}
-                    {format(new Date(chapter.publish_date), "dd/MM/yyyy")}
+                    {format(new Date(chapter.pushlishDate), "dd/MM/yyyy")}
                   </p>
                   <p className="text-gray-500 text-xs">
-                    Lượt xem: {chapter.chapter_view}
+                    Lượt xem: {chapter.viewCount}
                   </p>
                 </div>
 
@@ -130,7 +127,7 @@ function ChapterBookAdmin() {
                 <div className="flex items-center space-x-3">
                   <button
                     className="flex items-center justify-center mt-1 text-white w-full px-5 py-2.5 rounded-lg text-lg font-bold transition-colors bg-[#18B088] hover:bg-[#148F70]"
-                    onClick={() => handleEditChapter(chapter.chapter_number)}
+                    onClick={() => handleEditChapter(chapter.id)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +143,7 @@ function ChapterBookAdmin() {
                   </button>
                   <button
                     className="flex items-center justify-center mt-1 text-white px-5 py-2.5 rounded-lg text-lg font-bold transition-colors bg-red-500  hover:bg-red-600"
-                    onClick={() => handleDeleteChapter(chapter._id)}
+                    onClick={() => handleDeleteChapter(chapter.id)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

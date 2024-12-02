@@ -9,7 +9,7 @@ function UpdateOrder() {
     const orderID = useParams().orderID
     const navigate = useNavigate();
     const location = useLocation();
-    const [order, setOrder] = useState(location.state.order)
+    const [order, setOrder] = useState(location.state?.order)
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,19 +21,17 @@ function UpdateOrder() {
 
     const updateOrder = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/order/updateOrder/${orderID}`, {
+            const response = await fetch(`http://localhost:8080/orders/updateOrder/${orderID}`, {
                 method: "PATCH",
                 body: JSON.stringify({
-                    "bookID": order.bookID,
-                    "id": order.id,
-                    "price": order.price,
-                    "method": order.method,
+                    "totalPrice": order.totalPrice,
+                    "paymentMethod": order.paymentMethod,
                     "status": order.status,
-                    "date": order.date
+                    "address": order.address
                 }),
                 headers: {
                     "Content-Type": "application/json",
-                    token: `Bearer ${user?.accessToken}`
+                    Authorization: `Bearer ${user?.accessToken}`
                 }
             });
             if (response.status === 200) {
@@ -90,7 +88,7 @@ function UpdateOrder() {
                                     <label className="block mb-1">Tên khách hàng:</label>
                                     <input
                                         type="text"
-                                        name="bookID"
+                                        name="accountName"
                                         value={order.accountName}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                         disabled
@@ -101,7 +99,7 @@ function UpdateOrder() {
                                 <label className="block mb-1">Tổng tiền:</label>
                                 <input
                                     type="number"
-                                    name="price"
+                                    name="totalPrice"
                                     value={order.totalPrice}
                                     min="1000"
                                     max="50000000"
@@ -114,7 +112,7 @@ function UpdateOrder() {
                                 <div className="mb-4 w-1/2">
                                     <label className="block mb-1">Phương thức thanh toán:</label>
                                     <select
-                                        name="method"
+                                        name="paymentMethod"
                                         value={order.paymentMethod}
                                         onChange={handleChange}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
@@ -179,7 +177,7 @@ function UpdateOrder() {
                         <div className="w-1/3">
                             <label className="block mb-1">Sản phẩm:</label>
                             {order?.orderDetails?.map(
-                                (orderDetail) => <OrderDetailCard orderDetail={orderDetail}></OrderDetailCard>
+                                (orderDetail) => <OrderDetailCard key={orderDetail.bookID} orderDetail={orderDetail}></OrderDetailCard>
                             )}
                         </div>
                     </form>
