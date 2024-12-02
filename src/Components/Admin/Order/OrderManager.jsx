@@ -23,7 +23,6 @@ function OrderManager() {
                 });
                 const json = await response.json();
                 setOrders(json.data);
-                console.log(json.data)
                 setTotalPages(json.totalPages);
             }
             catch (error) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createChapter,
@@ -13,28 +13,13 @@ function ChapterAddAdmin() {
   const accessToken = useSelector(
     (state) => state.auth.login.currentUser?.data.accessToken
   );
-  const bookID = useParams().bookId;
-
-  const [book, setBook] = useState(null);
+  const { bookID, newChapterNumber } = useParams();
+  const location = useLocation();
+  const [book, setBook] = useState(location.state.book);
   const [chapterTitle, setChapterTitle] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/books/${bookID}`
-        );
-        const bookData = await response.json();
-        setBook(bookData?.data);
-      } catch (error) {
-        console.error("Error fetching book data:", error);
-      }
-    };
-    fetchData();
-  }, [bookID]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -48,11 +33,11 @@ function ChapterAddAdmin() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "chapterUpload");
+    formData.append("upload_preset", "demo-upload");
 
     try {
       const response = await fetch(
-        "https://api.cloudinary.com/v1_1/dhs93uix6/image/upload",
+        "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
         {
           method: "POST",
           body: formData,
@@ -86,10 +71,10 @@ function ChapterAddAdmin() {
       return;
     }
 
-    if (selectedImages.length === 0) {
-      alert("Vui lòng tải lên ít nhất một ảnh!");
-      return;
-    }
+    // if (selectedImages.length === 0) {
+    //   alert("Vui lòng tải lên ít nhất một ảnh!");
+    //   return;
+    // }
 
     setLoading(true);
     setUploadProgress(0);
@@ -99,15 +84,16 @@ function ChapterAddAdmin() {
       const chapterResponse = await createChapter(
         bookID,
         chapterTitle,
+        newChapterNumber,
         dispatch,
         user,
         accessToken
       );
 
-      const chapterID = chapterResponse.data._id;
+      const chapterID = chapterResponse.data.id;
 
       // 2. Upload tất cả ảnh lên Cloudinary
-      const totalImages = selectedImages.length;
+      const totalImages = selectedImages?.length;
       const uploadedUrls = [];
 
       for (let i = 0; i < totalImages; i++) {
@@ -139,7 +125,7 @@ function ChapterAddAdmin() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       alert("Chapter created successfully!");
-      navigate(`/admin/chapter/book/${bookID}`);
+      navigate(-1);
     } catch (error) {
       console.error("Error in create process:", error);
       alert("Error creating chapter. Please try again.");

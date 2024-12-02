@@ -5,7 +5,7 @@ import CommentSection from "./CommentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavorites, getFavoriteStatus, removeFromFavorites } from "./api/apiRequest";
 function ChapterReader() {
-  const  user = useSelector((state) => state.auth?.login?.currentUser?.data)
+  const user = useSelector((state) => state.auth?.login?.currentUser?.data)
   const user1 = useSelector((state) => state.auth?.login?.currentUser);
   const id = useSelector(
     (state) => state.auth.login.currentUser?.data.account.id
@@ -19,7 +19,8 @@ function ChapterReader() {
   const bookName = localtion?.state?.bookName;
   const [listChapter, setListChapter] = useState(null);
   const [this_chapter, setThisChapter] = useState(null);
-  const [image, setImage] = useState(null);
+  const [chapter_index, setChapterIndex] = useState(null);
+  const [image, setImage] = useState();
   const [isFavorite, setIsFavorite] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,14 +45,16 @@ function ChapterReader() {
     checkFavoriteStatus();
   }, [user?.account?.id, bookID]);
 
-  useEffect(() => {
 
+  useEffect(() => {
     const fetchListChapter = async () => {
       try {
         const response = await fetch(`http://localhost:8080/chapters/${bookID}`);
         const json = await response.json()
         setListChapter(json.data)
-        setThisChapter(json.data[chapter_number - 1])
+        const index = json.data.findIndex((chapter) => chapter.chapterNumber == chapter_number);
+        setChapterIndex(index)
+        setThisChapter(json.data[index])
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -90,12 +93,10 @@ function ChapterReader() {
           Authorization: `Bearer ${user?.accessToken}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
-      console.log("Đã thêm sách vào lịch sử đọc", user?.accessToken);
     } catch (error) {
       console.error("Lỗi khi thêm sách:", error.message);
     }
@@ -111,14 +112,12 @@ function ChapterReader() {
     }
   };
 
-
-
   useEffect(() => {
     const fetchImage = async () => {
       try {
         const response = await fetch(`http://localhost:8080/chaptercontents/${this_chapter.id}`)
         const json = await response.json()
-        setImage(json);
+        setImage(json.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -133,6 +132,7 @@ function ChapterReader() {
   if (!(image)) {
     return <h1 className="mt-16">Chưa có chương này</h1>
   }
+  console.log(chapter_index)
 
   return (
     <div className="bg-bgChapterReader p-4">
@@ -154,7 +154,7 @@ function ChapterReader() {
           {/* Title section */}
           <div className="mb-4">
             <h1 className="text-xl">
-              <span className="text-blue-500">{bookName} - Chapter {this_chapter?.chapterNumber}</span>
+              <span className="text-blue-500">{bookName} - {this_chapter?.title}</span>
               <span className="text-sm text-gray-500 ml-2">
                 [Cập nhật lúc: {new Date(this_chapter.pushlishDate)
                   .toLocaleDateString("vi-VN",
@@ -178,9 +178,10 @@ function ChapterReader() {
 
         {/* Chapter navigation */}
         <div className="flex justify-center items-center gap-2 p-4">
-          {(this_chapter.chapterNumber > 1) && (<button
+          {(chapter_index > 0) && (<button
             onClick={() => {
-              const selectedChapter = listChapter.find(chapter => chapter.chapterNumber === this_chapter.chapterNumber - 1);
+              const selectedChapter = listChapter[chapter_index - 1];
+              setChapterIndex((prev) => prev - 1)
               setThisChapter(selectedChapter)
             }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -196,13 +197,14 @@ function ChapterReader() {
           >
             {listChapter?.map((chapter) => (
               <option key={chapter.id} value={chapter.chapterNumber}>
-                {chapter.title}
+                Chapter {chapter.chapterNumber}
               </option>
             ))}
           </select>
-          {(this_chapter.chapterNumber < listChapter.length) && (<button
+          {(chapter_index < listChapter.length - 1) && (<button
             onClick={() => {
-              const selectedChapter = listChapter.find(chapter => chapter.chapterNumber === this_chapter.chapterNumber + 1);
+              const selectedChapter = listChapter[chapter_index + 1];
+              setChapterIndex((prev) => prev + 1)
               setThisChapter(selectedChapter)
             }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -215,7 +217,7 @@ function ChapterReader() {
       </div>
       <div>
         {image?.map((i) => (
-          <ChapterImage key={i.contentNumber} link={i.content}>
+          <ChapterImage key={i.id} link={i.content}>
           </ChapterImage>
         )
         )}
