@@ -30,6 +30,7 @@ function UpdateBook() {
             const response = await fetch(`http://localhost:8080/books/${bookId}`);
             const json = await response.json();
             setBook(json.data);
+            console.log("book", json.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -89,13 +90,13 @@ function UpdateBook() {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("upload_preset", "bookstore");
+            formData.append("upload_preset", "demo-upload");
 
             const response = await axios.post(
-                "https://api.cloudinary.com/v1_1/dhs93uix6/image/upload",
+                "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
                 formData
             );
-
+            console.log(response.data.secure_url);
 
             setBook((prev) => ({
                 ...prev,
@@ -127,6 +128,8 @@ function UpdateBook() {
                     "author": book.author,
                     "description": book.description,
                     "genreIDs": book.genres.map((genre) => genre.id),
+                    "type": book.type,
+                    "quantity": book.quantity,
                     "thumbnail": book.thumbnail,
                     "price": book.price
                 }),
@@ -175,6 +178,18 @@ function UpdateBook() {
                 <div className="w-2/3">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
+                            <label className="block mb-1">Loại sách</label>
+                            <select
+                                className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
+                                name="type"
+                                value={book.type || "Sach mem"}
+                                onChange={handleChange}
+                            >
+                                <option value="Sach mem">Sách mềm</option>
+                                <option value="Sach cung">Sách cứng</option>
+                            </select>
+                        </div>
+                        <div className="mb-4">
                             <label className="block mb-1">Tiêu đề</label>
                             <input
                                 type="text"
@@ -213,8 +228,8 @@ function UpdateBook() {
                                 />
                             </div>
                         </div>
-                        <div className="mb-4">
-                            <div className="mb-4">
+                        <div className='flex space-x-4'>
+                            <div className="mb-4 w-3/5">
                                 <label className="block mb-1 text-gray-300">Thể loại</label>
                                 <select
                                     className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
@@ -229,27 +244,40 @@ function UpdateBook() {
                                     ))}
                                 </select>
                             </div>
-
+                            <div className="mb-4 w-2/5">
+                                <label className="block mb-1">Số lượng</label>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    value={book.quantity || 0}
+                                    min="0"
+                                    max="50000000"
+                                    placeholder="Nhập số lượng"
+                                    onChange={handleChange}
+                                    className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border h-[45px]"
+                                    disabled={book.type === "Sach mem"}
+                                />
+                            </div>
                             {/* Danh sách thể loại đã chọn */}
-                            {book.genres.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-4">
-                                    {book.genres.map((item) => (
-                                        <div
-                                            key={item.id}
-                                            className="flex items-center bg-gray-700 text-white px-3 py-1 rounded-lg"
-                                        >
-                                            <span>{item.name}</span>
-                                            <button
-                                                className="ml-2 text-red-500"
-                                                onClick={() => handleRemoveGenre(item.id)}
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
+                        {book.genres.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {book.genres.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="flex items-center bg-gray-700 text-white px-3 py-1 rounded-lg"
+                                    >
+                                        <span>{item.name}</span>
+                                        <button
+                                            className="ml-2 text-red-500"
+                                            onClick={() => handleRemoveGenre(item.id)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         <div className="mb-4">
                             <label className="block mb-1 w-full">Mô tả truyện</label>
                             <textarea

@@ -37,6 +37,10 @@ import FreeBook from "./Components/FreeBook/FreeBook.jsx";
 import FeeBook from "./Components/FeeBook/FeeBook.jsx";
 import UserOrder from "./page/UserOrder/UserOrder.jsx"
 import UserOrderDetail from "./page/UserOrder/UserOrderDetail.jsx"
+import Cart from "./Components/Cart/Cart.jsx";
+import Order from "./Components/Order/Order.jsx";
+import OrderSuccess from "./Components/Order/OrderSuccess.jsx";
+
 
 
 
@@ -58,6 +62,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/book/:bookID" element={<BookDetail />} />
+          <Route path="/cart" element={<Cart/>} />
+          <Route path="/ordersuccess" element={<OrderSuccess/>} />
+          <Route path="/checkout" element={<Order/>}/>
           <Route path="/book/:bookID/chaptercontent/:chapter_number" element={<ChapterReader />} />
           <Route path="/admin" element={<LayoutAdmin />}>
             <Route index element={<Dashboard />} />

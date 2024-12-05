@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/apiRequest';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import dayjs from 'dayjs';
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -34,14 +35,21 @@ const Register = () => {
             setPasswordError('');
         }
     }
+    // const formatBirthday = (birthday) => {
+    //     if (dayjs.isDayjs(birthday)) {
+    //         return birthday.format('DD/MM/YYYY');
+    //     }
+    
+    //     return "";
+    // };
+    
 
     const handleRegister = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) return;
-
         setLoading(true); // Bắt đầu loading
-        const newUser = { username, email, birthday, password, sex , phone};
-
+        const newUser = { username, email, birthday, password, sex, phone };
+    
         try {
             await registerUser(newUser, navigate);
         } catch (error) {
@@ -53,6 +61,10 @@ const Register = () => {
 
     const onChangeSex = ({ target: { value } }) => {
         setSex(value);
+    };
+    const disabledDate = (current) => {
+        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
+        return current && (current > startDate);
     };
 
     return (
@@ -98,7 +110,9 @@ const Register = () => {
                     <div>
                         <label className="text-gray-300 text-sm block"><span className='text-red-600 text-lg'>*</span> Ngày sinh</label>
                         <DatePicker
-                            onChange={(date) => setBirthday(date)}
+                            onChange={(dateString) => setBirthday(dateString)}
+                            value={birthday}
+                            disabledDate={disabledDate}
                             className="w-full bg-gray-700 rounded-lg px-4 py-3 text-white mt-1 text-base"
                             placeholder="Chọn ngày sinh"
                             format="DD/MM/YYYY"
