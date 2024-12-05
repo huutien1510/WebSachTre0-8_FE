@@ -37,13 +37,21 @@ import FreeBook from "./Components/FreeBook/FreeBook.jsx";
 import FeeBook from "./Components/FeeBook/FeeBook.jsx";
 import UserOrder from "./page/UserOrder/UserOrder.jsx"
 import UserOrderDetail from "./page/UserOrder/UserOrderDetail.jsx"
+import ContestManager from "./Components/Admin/Contest/ContestManager.jsx";
+import AddContest from "./Components/Admin/Contest/AddContest.jsx";
+import ContestDetail from "./Components/Admin/Contest/ContestDetail.jsx";
+import UpdateContest from "./Components/Admin/Contest/UpdateContest.jsx";
+import Contest from "./Components/Contest/UserContest.jsx";
+import UserContest from "./Components/Contest/UserContest.jsx";
+import UserContestDetail from "./Components/Contest/UserContestDetail.jsx";
+import UserBlog from "./Components/Blog/UserBlog.jsx";
 
 
 
 
 function App() {
   return (
-    <div className="bg-black">
+    <div className="flex flex-col min-h-screen bg-black">
       <ToastContainer />
       <BrowserRouter>
         <Header />
@@ -57,6 +65,14 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/contests" element={<div> <Outlet /> </div>} >
+            <Route index element={<UserContest />} />
+            <Route path="contestDetail/:contestID" element={<UserContestDetail />} />
+          </Route>
+          <Route path="/blogs" element={<div> <Outlet /> </div>} >
+            <Route index element={<UserBlog />} />
+            <Route path="blogDetail/:blogID" element={<UserContestDetail />} />
+          </Route>
           <Route path="/book/:bookID" element={<BookDetail />} />
           <Route path="/book/:bookID/chaptercontent/:chapter_number" element={<ChapterReader />} />
           <Route path="/admin" element={<LayoutAdmin />}>
@@ -72,11 +88,18 @@ function App() {
               <Route index element={<OrderManager />} />
               <Route path="updateOrder/:orderID" element={<UpdateOrder />} />
             </Route>
-            <Route path="chapter" element={<div><Outlet /></div>}>
+            <Route path="chapters" element={<div><Outlet /></div>}>
               <Route index element={<ChapterAdmin />} />
               <Route path="book/:bookId" element={<ChapterBookAdmin />} />
               <Route path="addChapter/:bookID/:newChapterNumber" element={<ChapterAddAdmin />} />
               <Route path="editChapter/:chapterID" element={<ChapterEditAdmin />}
+              />
+            </Route>
+            <Route path="contests" element={<div><Outlet /></div>}>
+              <Route index element={<ContestManager />} />
+              <Route path="addContest" element={<AddContest />} />
+              <Route path="contestDetail/:contestID" element={<ContestDetail />} />
+              <Route path="editContest" element={<UpdateContest />}
               />
             </Route>
           </Route>

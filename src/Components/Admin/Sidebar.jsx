@@ -88,6 +88,41 @@ export default function Sidebar() {
         </li>
         <li>
           <NavLink
+            to="/admin/chapters"
+            className={({ isActive }) =>
+              `flex items-center space-x-2 px-2 py-2 rounded ${isActive ? "bg-[#2A2A2B] text-[#18B088]" : "hover:bg-[#2A2A2B]"
+              }`
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 4h14c.6 0 1 .4 1 1v14c0 .6-.4 1-1 1H5c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 9h14"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13h14"
+              />
+            </svg>
+            <span>Chapters</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/admin/ratings"
             className={({ isActive }) =>
               `flex items-center space-x-2 px-2 py-2 rounded ${isActive ? "bg-[#2A2A2B] text-[#18B088]" : "hover:bg-[#2A2A2B]"
@@ -109,31 +144,6 @@ export default function Sidebar() {
               />
             </svg>
             <span>Ratings</span>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/admin/chapter"
-            className={({ isActive }) =>
-              `flex items-center space-x-2 px-2 py-2 rounded ${isActive ? "bg-[#2A2A2B] text-[#18B088]" : "hover:bg-[#2A2A2B]"
-              }`
-            }
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-              />
-            </svg>
-            <span>Chapter</span>
           </NavLink>
         </li>
         <li>
@@ -172,6 +182,31 @@ export default function Sidebar() {
               </g>
             </svg>
             <span>Orders</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/contests"
+            className={({ isActive }) =>
+              `flex items-center space-x-2 px-2 py-2 rounded ${isActive ? "bg-[#2A2A2B] text-[#18B088]" : "hover:bg-[#2A2A2B]"
+              }`
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16 3.5H8c-1.1 0-2 .9-2 2v2a5.5 5.5 0 0 0 4 5.288V17H8.75a.75.75 0 0 0-.75.75v.5c0 .415.336.75.75.75h6.5a.75.75 0 0 0 .75-.75v-.5a.75.75 0 0 0-.75-.75H14v-4.212a5.5 5.5 0 0 0 4-5.288V5.5c0-1.1-.9-2-2-2Zm0 2.25v1.806a3.25 3.25 0 0 1-2 3.048V5.75h2ZM10 5.75v4.854a3.25 3.25 0 0 1-2-3.048V5.75h2Z"
+              />
+            </svg>
+            <span>Contest</span>
           </NavLink>
         </li>
       </ul>

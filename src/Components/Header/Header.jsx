@@ -25,6 +25,8 @@ const Header = () => {
     { name: "Thể loại ", subMenu: genre },
     { name: "Sách miễn phí", href: "/free-book" },
     { name: "Sách tính phí", href: "/fee-book" },
+    { name: "Cuộc thi", href: "/contests" },
+    { name: "Tin tức", href: "/blogs" },
   ];
 
   return (

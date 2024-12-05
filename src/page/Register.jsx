@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/apiRequest';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import dayjs from 'dayjs';
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +27,11 @@ const Register = () => {
         setPassword(e.target.value);
     }
 
+    const disabledDate = (current) => {
+        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
+        return current && (current > startDate);
+    };
+
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
         if (e.target.value !== password) {
@@ -40,7 +46,7 @@ const Register = () => {
         if (password !== confirmPassword) return;
 
         setLoading(true); // Bắt đầu loading
-        const newUser = { username, email, birthday, password, sex , phone};
+        const newUser = { username, email, birthday, password, sex, phone };
 
         try {
             await registerUser(newUser, navigate);
@@ -98,7 +104,9 @@ const Register = () => {
                     <div>
                         <label className="text-gray-300 text-sm block"><span className='text-red-600 text-lg'>*</span> Ngày sinh</label>
                         <DatePicker
-                            onChange={(date) => setBirthday(date)}
+                            onChange={(dateString) => setBirthday(dateString)}
+                            value={birthday}
+                            disabledDate={disabledDate}
                             className="w-full bg-gray-700 rounded-lg px-4 py-3 text-white mt-1 text-base"
                             placeholder="Chọn ngày sinh"
                             format="DD/MM/YYYY"

@@ -40,7 +40,7 @@ function ChapterAdmin() {
         {/* Tiêu đề */}
         <div className="flex justify-between items-center mb-4">
           <span className="text-[#18B088] text-lg font-semibold">
-            Tất cả sách
+            Tất cả sách online
           </span>
         </div>
         <div className="space-y-4">
