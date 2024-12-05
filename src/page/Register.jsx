@@ -27,6 +27,11 @@ const Register = () => {
         setPassword(e.target.value);
     }
 
+    const disabledDate = (current) => {
+        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
+        return current && (current > startDate);
+    };
+
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
         if (e.target.value !== password) {
@@ -49,7 +54,6 @@ const Register = () => {
         if (password !== confirmPassword) return;
         setLoading(true); // Bắt đầu loading
         const newUser = { username, email, birthday, password, sex, phone };
-    
         try {
             await registerUser(newUser, navigate);
         } catch (error) {

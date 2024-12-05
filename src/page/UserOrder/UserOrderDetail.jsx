@@ -8,7 +8,7 @@ function UserOrderDetail() {
     const orderID = useParams().orderID
     const location = useLocation();
     const navigate = useNavigate()
-    const [order, setOrder] = useState(location.state.order)
+    const [order, setOrder] = useState(location.state?.order)
     const [paymentUrl, setPaymentUrl] = useState(null)
 
     useEffect(() => {
@@ -43,14 +43,10 @@ function UserOrderDetail() {
     }, [order]);
 
 
+
     if (!(order)) {
         return <p className="absolute top-16" >Không có đơn hàng này</p>
     }
-    console.log(new Date(order.date).toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    }))
 
     return (
         <div className="bg-[#121212] text-white min-h-screen p-8">
@@ -159,7 +155,8 @@ function UserOrderDetail() {
                         <div className="w-1/3">
                             <label className="block mb-1">Sản phẩm:</label>
                             {order?.orderDetails?.map(
-                                (orderDetail) => <OrderDetailCard orderDetail={orderDetail}></OrderDetailCard>
+                                (orderDetail) =>
+                                    <OrderDetailCard key={orderDetail.bookID} orderDetail={orderDetail}></OrderDetailCard>
                             )}
                         </div>
                     </form>

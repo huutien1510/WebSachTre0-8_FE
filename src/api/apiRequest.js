@@ -384,7 +384,6 @@ export const addToFavorites = async (
         },
       }
     );
-    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error checking favorite status:", error);
@@ -442,6 +441,7 @@ export const getFavoriteBooks = async (
 export const createChapter = async (
   bookID,
   chapterTitle,
+  newChapterNumber,
   dispatch,
   user,
   accessToken
@@ -449,12 +449,12 @@ export const createChapter = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
     const response = await axiosInstance.post(
-      `/chapter/create`,
+      `/chapters/addChapter`,
       {
         bookID: bookID,
-        chapter_title: chapterTitle,
-        publish_date: new Date().toISOString(),
-        chapter_view: 0,
+        title: chapterTitle,
+        pushlishDate: new Date().toISOString(),
+        chapterNumber: newChapterNumber,
       },
       {
         headers: {
@@ -468,9 +468,8 @@ export const createChapter = async (
     throw error;
   }
 };
-export const updateChapter = async (
-  bookID,
-  chapterNumber,
+export const updateChapterTitle = async (
+  chapterID,
   chapterTitle,
   dispatch,
   user,
@@ -478,14 +477,10 @@ export const updateChapter = async (
 ) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const response = await axiosInstance.post(
-      `/chapter/update`,
+    const response = await axiosInstance.patch(
+      `http://localhost:8080/chapters/updateChapter/${chapterID}`,
       {
-        bookID: bookID,
-        chapter_number: chapterNumber,
-        chapter_title: chapterTitle,
-        publish_date: new Date().toISOString(),
-        chapter_view: 0,
+        title: chapterTitle,
       },
       {
         headers: {
@@ -511,10 +506,10 @@ export const createChapterContent = async (
 
   try {
     const response = await axiosInstance.post(
-      `/chaptercontent/create`,
+      `/chaptercontents/addContent`,
       {
         chapterID: chapterID,
-        content_number: contentNumber,
+        contentNumber: contentNumber,
         content: content,
       },
       {
@@ -563,7 +558,7 @@ export const updateChapterContent = async (
 export const deleteChapter = async (chapterID, dispatch, user, accessToken) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const response = await axiosInstance.delete(`/chapter/${chapterID}`, {
+    const response = await axiosInstance.delete(`/chapters/deleteChapter/${chapterID}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

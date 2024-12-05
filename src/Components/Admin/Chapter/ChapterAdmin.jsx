@@ -7,8 +7,8 @@ import { useState, useEffect, useRef } from "react";
 
 function ChapterAdmin() {
   const navigate = useNavigate();
-  const handleEditBook = (bookId) => {
-    navigate(`book/${bookId}`);
+  const handleEditBook = (book) => {
+    navigate(`book/${book.id}`, { state: { book: book } });
   };
   const [books, setBook] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,11 +19,11 @@ function ChapterAdmin() {
       try {
         if (inputRef.current) inputRef.current.value = page;
         const response = await fetch(
-          `http://localhost:3000/api/books?page=${page}&limit=15`
+          `http://localhost:8080/books/getAll?page=${page - 1}&limit=15`
         );
         const json = await response.json();
-        setBook(json.data);
-        setTotalPages(json.totalPages);
+        setBook(json.data.content);
+        setTotalPages(json.data.totalPages);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -40,13 +40,13 @@ function ChapterAdmin() {
         {/* Tiêu đề */}
         <div className="flex justify-between items-center mb-4">
           <span className="text-[#18B088] text-lg font-semibold">
-            Tất cả sách
+            Tất cả sách online
           </span>
         </div>
         <div className="space-y-4">
           {books?.map((book) => (
             <div
-              key={book._id}
+              key={book.id}
               className="flex items-center bg-gray-800 p-3 rounded-md shadow-md hover:shadow-lg transition duration-200"
             >
               <img
@@ -63,17 +63,14 @@ function ChapterAdmin() {
                 <p className="text-gray-400 text-sm line-clamp-1">
                   Tác giả: {book.author}
                 </p>
-                <p className="text-gray-500 text-xs">
-                  Ngày tạo: {format(new Date(book.createdAt), "dd/MM/yyyy")}
-                </p>
-                <p className="text-gray-500 text-xs mt-1 line-clamp-1">
+                <p className="text-gray-500 text-xs mt-1 line-clamp-2">
                   {book.description}
                 </p>
               </div>
 
               <button
                 className="flex items-center mb-4 justify-center mt-1 text-white px-5 py-2.5 rounded-lg text-lg font-bold transition-colors bg-[#18B088] hover:bg-[#148F70]"
-                onClick={() => handleEditBook(book.bookId)}
+                onClick={() => handleEditBook(book)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

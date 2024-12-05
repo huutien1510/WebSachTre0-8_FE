@@ -20,7 +20,6 @@ const RatingAdmin = () => {
             if (res.success) {
                 setRatings(res.data.data);
             }
-            console.log(res)
         } catch (error) {
             console.log("Error: ", error);
         }
@@ -67,7 +66,7 @@ const RatingAdmin = () => {
                         </thead>
                         <tbody>
                             {ratings?.map((rating, index) => (
-                                <tr key={user._id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
+                                <tr key={rating.id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
                                     <td className="py-3 px-4 border-b text-gray-800">{index + 1}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{rating.accountName}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{rating.bookName}</td>
@@ -84,7 +83,7 @@ const RatingAdmin = () => {
                                     </td>
                                     <td className="py-3 px-4 border-b text-gray-800">{rating.content}</td>
                                     <td className="py-3 px-4 border-b flex space-x-2">
-                                        <button onClick={() => handleDeleteRating(rating.id)} className="text-red-500 hover:text-red-700 font-medium transition duration-150">Delete</button>
+                                        <button onClick={() => handleDeleteRating(rating.id)} className="text-red-500 hover:text-red-700 font-bold transition duration-150">Delete</button>
                                     </td>
                                 </tr>
                             ))}

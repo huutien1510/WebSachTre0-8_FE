@@ -1,35 +1,28 @@
-import { useSelector } from 'react-redux';
-import OrderCard from "./OrderCard";
-import { useState, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
-function OrderManager() {
-    const user = useSelector((state) => state.auth.login?.currentUser.data)
-    const [orders, setOrders] = useState(null);
+import React, { useEffect, useRef, useState } from 'react';
+import UserContestCard from './UserContestCard';
+import { NavLink, useLocation } from 'react-router-dom';
+
+const UserContest = () => {
+    const location = useLocation();
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const inputRef = useRef(null);
-    const location = useLocation();
+    const [contests, setContests] = useState(null);
 
     useEffect(() => {
-        const fecthOrder = async (page) => {
+        const fecthContest = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:8080/orders/getAll?page=${page}&limit=10`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        token: `Bearer ${user?.accessToken}`
-                    }
-                });
+                const response = await fetch(`http://localhost:8080/contests/getAll?page=${page - 1}&size=9`);
                 const json = await response.json();
-                setOrders(json.data);
-                setTotalPages(json.totalPages);
+                setContests(json.data.content);
+                setTotalPages(json.data.totalPages);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
-        fecthOrder(currentPage)
+        fecthContest(currentPage)
     }, [currentPage, location]);
 
     const handlePageChange = (page) => {
@@ -37,17 +30,19 @@ function OrderManager() {
     };
 
     return (
-        <div className="bg-main py-8 px-4 md:px-8">
-            <div className="container mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <span className="text-[#18B088] text-lg font-semibold">Tất cả đơn hàng</span>
-                </div>
-                <div >
-                    {orders?.map((order) => (
-                        <OrderCard key={order.id} order={order} />
+        <div className="bg-black py-8 px-4 md:px-8 ">
+            <div className="container mx-auto mt-12">
+
+                <h1 className='text-2xl md:text-3xl font-bold text-white mb-8'>Tất cả cuộc thi</h1>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {contests?.map((contest) => (
+                        <UserContestCard key={contest.id} contest={contest} />
                     ))}
                 </div>
             </div>
+
+            {/* Phân trang */}
             <div>
                 <div className="flex items-center justify-center mt-10 ">
                     <button
@@ -63,7 +58,7 @@ function OrderManager() {
                             className="mx-4 w-16 text-center p-1 w-10 border border-[#34D399] rounded"
                             ref={inputRef}
                             type="number"
-                            name="price"
+                            name="page"
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     const value = (e.target.value > totalPages) ? totalPages : ((e.target.value < 1) ? 1 : e.target.value)
@@ -83,6 +78,6 @@ function OrderManager() {
             </div>
         </div>
     );
-}
+};
 
-export default OrderManager;
+export default UserContest;

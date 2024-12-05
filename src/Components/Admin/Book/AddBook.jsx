@@ -278,7 +278,7 @@ function AddBook() {
                                 value={book.description}
                                 placeholder="Nhập mô tả truyện"
                                 onChange={handleChange}
-                                className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
+                                className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border h-40"
                             />
                         </div>
                         <div className="flex space-x-4">
@@ -300,7 +300,7 @@ function AddBook() {
 
                 <div className="w-1/3 flex flex-col items-center">
                     <div
-                        className="w-3/4 h-full bg-gradient-to-br from-teal-300 to-green-400 rounded-lg mb-4"
+                        className="w-3/4 h-96 bg-gradient-to-br from-teal-300 to-green-400 rounded-lg mt-12 mb-4"
                         onClick={() => fileInputRef.current?.click()}
                         style={{
                             backgroundImage: `url(${book.thumbnail})`,

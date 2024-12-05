@@ -32,12 +32,12 @@ function BookManager() {
   };
 
   return (
-    <div className="bg-black py-8 px-4 md:px-8">
+    <div className="bg-main py-8 px-4 md:px-8">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-[#18B088] text-lg font-semibold">Tất cả sách</span>
+        <div className="flex justify-between items-center mb-7">
+          <span className="text-[#18B088] text-xl font-semibold">Tất cả sách</span>
           <NavLink to={'/admin/books/addBook'} >
-            <button className="bg-[#18B088] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#128067] transition duration-200">
+            <button className="bg-[#18B088] text-white text-xl px-4 py-2 rounded-lg font-semibold hover:bg-[#128067] transition duration-200">
               Thêm sách
             </button>
           </NavLink>
