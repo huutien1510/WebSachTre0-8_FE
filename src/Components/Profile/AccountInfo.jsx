@@ -27,17 +27,17 @@ function AccountInfo() {
 
   const formatbirthday = (birthday) => {
     if (!birthday) return ""; // Trả về chuỗi rỗng nếu không có ngày
-  
+
     if (typeof birthday === "string") {
       // Chuỗi dạng dd/MM/yyyy
       const [day, month, year] = birthday.split("/");
       return `${year}-${month}-${day}`; // Định dạng thành yyyy-MM-dd cho input[type="date"]
     }
-  
+
     if (birthday instanceof Date) {
       return birthday.toISOString().split("T")[0];
     }
-  
+
     return "";
   };
 
@@ -68,7 +68,7 @@ function AccountInfo() {
       toast.error("Thông tin xác thực không hợp lệ!");
       return;
     }
-  
+
     setIsUpdating(true);
     try {
       const updateData = {
@@ -80,7 +80,7 @@ function AccountInfo() {
         phone: user.phone,
         avatar: user.avatar,
       };
-  
+
       const result = await updateUser(
         currentUser,
         id,
@@ -88,7 +88,7 @@ function AccountInfo() {
         dispatch,
         updateData
       );
-  
+
       if (result.success) {
         toast.success("Cập nhật thông tin thành công!");
         // setTimeout(() => window.location.reload(), 1500);
@@ -101,7 +101,7 @@ function AccountInfo() {
       setIsUpdating(false);
     }
   };
-  
+
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];

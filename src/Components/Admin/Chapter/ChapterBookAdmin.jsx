@@ -40,11 +40,11 @@ function ChapterBookAdmin() {
       },
       0
     );
-    navigate(`/admin/chapter/addChapter/${bookID}/${maxChapterNumber + 1}`, { state: { book: book } });
+    navigate(`/admin/chapters/addChapter/${bookID}/${maxChapterNumber + 1}`, { state: { book: book } });
   };
 
   const handleEditChapter = (chapterID) => {
-    navigate(`/admin/chapter/editChapter/${chapterID}`, { state: { book: book } });
+    navigate(`/admin/chapters/editChapter/${chapterID}`, { state: { book: book } });
   };
 
   const handleDeleteChapter = async (chapterId) => {

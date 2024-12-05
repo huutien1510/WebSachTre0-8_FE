@@ -30,7 +30,6 @@ const BookOverlay = ({ book }) => {
   }
 
   const openModal = (id) => {
-    console.log(id);
     setBookIDToDelete(id);
     setIsModalOpen(true);
   };
