@@ -111,13 +111,19 @@ const Order = () => {
     // Process the data as needed
   };
   const handleCheckOut = async () => {
-    const province = locations.provinces.find((p) => p.Id === formData.province);
-    const district = locations.districts.find((d) => d.Id === formData.district);
-    const ward = locations.wards.find((w) => w.Id === formData.ward);
+    let province = null;
+    let district = null;
+    let ward = null;
+    if (firstType === "Sach cung") {
+      province = locations.provinces.find((p) => p.Id === formData.province);
+      district = locations.districts.find((d) => d.Id === formData.district);
+      ward = locations.wards.find((w) => w.Id === formData.ward);
+    }
+
     const date = new Date();
     const newOrder = {
       totalPrice: toTalprice,
-      address: `${formData.address}, ${ward.Name}, ${district.Name}, ${province.Name}`,
+      address: `${formData.address}, ${ward?.Name}, ${district?.Name}, ${province?.Name}`,
       date: format(new Date(date), "dd/MM/yyyy"),
       paymentMethod: formData.paymentMethod,
       account: user.id,
@@ -134,8 +140,13 @@ const Order = () => {
       if (response.code === 1000) {
         toast.success(response.message);
         const orders = response.data;
-        for (let product of selectedProducts) {
-          await removeBookToCart(id, product.id, dispatch, user1, accessToken);
+        console.log(response)
+        if (firstType === "Sach cung")
+          for (let product of selectedProducts) {
+            await removeBookToCart(id, product.id, dispatch, user1, accessToken);
+          }
+        else {
+          window.location.href = response.data.momoPayUrl;
         }
 
         if (response.data.paymentMethod === "cod") {

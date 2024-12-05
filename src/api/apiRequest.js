@@ -629,6 +629,7 @@ export const checkOut = async (
   accessToken
 ) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
+  console.log(JSON.stringify(order))
 
   try {
     const response = await axiosInstance.post(`http://localhost:8080/orders`,order,
@@ -641,7 +642,7 @@ export const checkOut = async (
     console.log("Response: ", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error removing from favorites:", error);
+    console.error("Error create orders:", error);
     throw error;
   }
 };

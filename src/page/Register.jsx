@@ -44,10 +44,10 @@ const Register = () => {
     //     if (dayjs.isDayjs(birthday)) {
     //         return birthday.format('DD/MM/YYYY');
     //     }
-    
+
     //     return "";
     // };
-    
+
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -66,7 +66,6 @@ const Register = () => {
     const onChangeSex = ({ target: { value } }) => {
         setSex(value);
     };
-    
 
     return (
         <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 pt-28">
