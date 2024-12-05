@@ -48,6 +48,8 @@ import Contest from "./Components/Contest/UserContest.jsx";
 import UserContest from "./Components/Contest/UserContest.jsx";
 import UserContestDetail from "./Components/Contest/UserContestDetail.jsx";
 import UserBlog from "./Components/Blog/UserBlog.jsx";
+import BlogAdmin from "./Components/Admin/Blog/BlogAdmin.jsx";
+import AddBlog from "./Components/Admin/Blog/AddBlog.jsx";
 
 
 function App() {
@@ -92,6 +94,7 @@ function App() {
               <Route index element={<OrderManager />} />
               <Route path="updateOrder/:orderID" element={<UpdateOrder />} />
             </Route>
+
             <Route path="chapters" element={<div><Outlet /></div>}>
               <Route index element={<ChapterAdmin />} />
               <Route path="book/:bookId" element={<ChapterBookAdmin />} />
@@ -105,6 +108,10 @@ function App() {
               <Route path="contestDetail/:contestID" element={<ContestDetail />} />
               <Route path="editContest" element={<UpdateContest />}
               />
+            </Route>
+            <Route path="blogs" element={<div><Outlet/></div>} >
+              <Route index element={<BlogAdmin />} />
+              <Route path="addBlog" element={<AddBlog />} />
             </Route>
           </Route>
           <Route path="*" element={<Page404 />} />

@@ -66,10 +66,7 @@ const Register = () => {
     const onChangeSex = ({ target: { value } }) => {
         setSex(value);
     };
-    const disabledDate = (current) => {
-        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
-        return current && (current > startDate);
-    };
+    
 
     return (
         <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 pt-28">
