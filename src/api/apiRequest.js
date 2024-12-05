@@ -17,6 +17,7 @@ import {
 } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import jwt_decode from "jwt-decode";
+import { addToCart, clearCart, loginCart } from "../redux/cartSlice";
 
 const baseURL = "http://localhost:8080";
 
@@ -82,6 +83,8 @@ export const loginUser = async (user, dispatch, navigate) => {
   try {
     const res = await axios.post("http://localhost:8080/auth/login", user, { withCredentials: true });
     dispatch(loginSuccess(res.data));
+
+    dispatch(loginCart(res.data.data?.account?.carts?.books));
     
     if (res.data.data.account.roles[0] === "ADMIN") {
       navigate("/admin/");
@@ -145,6 +148,7 @@ export const logout = async (dispatch, navigate, token, user) => {
       }
     );
     dispatch(logoutSuccess());
+    dispatch(clearCart());
     navigate("/login");
   } catch (err) {
     dispatch(logoutFailed());
@@ -562,6 +566,82 @@ export const deleteChapter = async (chapterID, dispatch, user, accessToken) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting chapter:", error);
+    throw error;
+  }
+};
+
+export const addBookToCart = async (
+  accountId,
+  bookId,
+  dispatch,
+  user,
+  accessToken
+) => {
+  const axiosInstance = createAxiosInstance(user, dispatch);
+
+  try {
+    const response = await axiosInstance.post(`http://localhost:8080/carts/addBookToCart/${accountId}/${bookId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    
+    console.log("Response: ", response.data);
+    dispatch(addToCart(response.data?.data?.carts?.books));
+    return response.data?.data?.carts?.books;
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    throw error;
+  }
+};
+
+export const removeBookToCart = async (
+  accountId,
+  bookId,
+  dispatch,
+  user,
+  accessToken
+) => {
+  const axiosInstance = createAxiosInstance(user, dispatch);
+
+  try {
+    const response = await axiosInstance.post(`http://localhost:8080/carts/removeBookFromCart/${accountId}/${bookId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    
+    console.log("Response: ", response.data);
+    dispatch(addToCart(response.data?.data?.carts?.books));
+    return response.data?.data?.carts?.books;
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    throw error;
+  }
+};
+
+export const checkOut = async (
+  dispatch,
+  user,
+  order,
+  accessToken
+) => {
+  const axiosInstance = createAxiosInstance(user, dispatch);
+
+  try {
+    const response = await axiosInstance.post(`http://localhost:8080/orders`,order,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    
+    console.log("Response: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
     throw error;
   }
 };

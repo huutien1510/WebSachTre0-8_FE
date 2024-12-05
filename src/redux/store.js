@@ -1,6 +1,7 @@
-import { configureStore,combineReducers } from "@reduxjs/toolkit"
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authReducer from './authSlice';
 import userReducer from './userSlice';
+import cartReducer from './cartSlice';
 import {
     persistStore,
     persistReducer,
@@ -10,19 +11,23 @@ import {
     PERSIST,
     PURGE,
     REGISTER,
-} from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-const rootReducer=combineReducers({auth: authReducer,
-    users: userReducer})
+const rootReducer = combineReducers({
+  auth: authReducer,
+  cart: cartReducer,
+  users: userReducer,
+  
+});
 
 const persistConfig = {
     key: 'root',
     version: 1,
     storage,
-}
+};
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -32,16 +37,23 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-})
+});
 
-export let persistor = persistStore(store)
+export let persistor = persistStore(store);
+
+// Add a listener to log state changes
+store.subscribe(() => {
+  console.log('State after REHYDRATE:', store.getState());
+});
 // import {configureStore} from '@reduxjs/toolkit';
 // import authReducer from './authSlice';
 // import userReducer from './userSlice';
+// import cartReducer from './cartSlice';
 
 // export const store = configureStore({
 //     reducer: {
 //         auth: authReducer,
-//         users: userReducer
+//         users: userReducer,
+//         cart : cartReducer
 //     },
 // });

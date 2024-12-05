@@ -37,6 +37,9 @@ import FreeBook from "./Components/FreeBook/FreeBook.jsx";
 import FeeBook from "./Components/FeeBook/FeeBook.jsx";
 import UserOrder from "./page/UserOrder/UserOrder.jsx"
 import UserOrderDetail from "./page/UserOrder/UserOrderDetail.jsx"
+import Cart from "./Components/Cart/Cart.jsx";
+import Order from "./Components/Order/Order.jsx";
+import OrderSuccess from "./Components/Order/OrderSuccess.jsx";
 import ContestManager from "./Components/Admin/Contest/ContestManager.jsx";
 import AddContest from "./Components/Admin/Contest/AddContest.jsx";
 import ContestDetail from "./Components/Admin/Contest/ContestDetail.jsx";
@@ -45,8 +48,6 @@ import Contest from "./Components/Contest/UserContest.jsx";
 import UserContest from "./Components/Contest/UserContest.jsx";
 import UserContestDetail from "./Components/Contest/UserContestDetail.jsx";
 import UserBlog from "./Components/Blog/UserBlog.jsx";
-
-
 
 
 function App() {
@@ -74,6 +75,9 @@ function App() {
             <Route path="blogDetail/:blogID" element={<UserContestDetail />} />
           </Route>
           <Route path="/book/:bookID" element={<BookDetail />} />
+          <Route path="/cart" element={<Cart/>} />
+          <Route path="/ordersuccess" element={<OrderSuccess/>} />
+          <Route path="/checkout" element={<Order/>}/>
           <Route path="/book/:bookID/chaptercontent/:chapter_number" element={<ChapterReader />} />
           <Route path="/admin" element={<LayoutAdmin />}>
             <Route index element={<Dashboard />} />

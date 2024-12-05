@@ -40,14 +40,20 @@ const Register = () => {
             setPasswordError('');
         }
     }
+    // const formatBirthday = (birthday) => {
+    //     if (dayjs.isDayjs(birthday)) {
+    //         return birthday.format('DD/MM/YYYY');
+    //     }
+    
+    //     return "";
+    // };
+    
 
     const handleRegister = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) return;
-
         setLoading(true); // Bắt đầu loading
         const newUser = { username, email, birthday, password, sex, phone };
-
         try {
             await registerUser(newUser, navigate);
         } catch (error) {
@@ -59,6 +65,10 @@ const Register = () => {
 
     const onChangeSex = ({ target: { value } }) => {
         setSex(value);
+    };
+    const disabledDate = (current) => {
+        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
+        return current && (current > startDate);
     };
 
     return (

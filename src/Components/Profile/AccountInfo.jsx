@@ -127,6 +127,7 @@ function AccountInfo() {
         "https://api.cloudinary.com/v1_1/dqlb6zx2q/image/upload",
         formData
       );
+      console.log(response.data.secure_url);
 
       setUser((prev) => ({
         ...prev,
