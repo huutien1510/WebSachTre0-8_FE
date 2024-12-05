@@ -15,7 +15,7 @@ function PaymentReturn() {
     const params = new URLSearchParams(query);
     const updateOrderStatus = async () => {
         try {
-            await fetch(`http://localhost:3000/api/order/momo_return?${params.toString()}`)
+            await fetch(`http://localhost:8080/orders/momo_return?${params.toString()}`)
             navigate("/");
         } catch (error) {
             console.log(error)

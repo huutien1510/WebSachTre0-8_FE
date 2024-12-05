@@ -16,9 +16,9 @@ const Cart = () => {
   const id = useSelector(
     (state) => state.auth.login.currentUser?.data.account.id
   );
-  const cartItemsCount = useSelector(state => state.cart.carts.cartItems.length);
+  const cartItemsCount = useSelector(state => state?.cart?.carts?.cartItems?.length);
   useEffect(() => {
-    const initializedProducts = cartItems.map(product => ({
+    const initializedProducts = cartItems?.map(product => ({
       ...product,
       selected: true,
       quantity: 1
@@ -41,7 +41,7 @@ const Cart = () => {
   const handleOrder = () => {
     const selectedProducts = products.filter(p => p.selected);
     navigate('/checkout', { state: { selectedProducts } });
-};
+  };
 
 
   const toggleSelect = (id) => {
@@ -51,13 +51,12 @@ const Cart = () => {
   };
 
   const updateQuantity = (id, delta) => {
-    setProducts(products.map(p =>
+    setProducts(products?.map(p =>
       p.id === id ? { ...p, quantity: Math.max(1, p.quantity + delta) } : p
     ));
   };
 
-  const totalAmount = products
-    .filter(p => p.selected)
+  const totalAmount = products?.filter(p => p.selected)
     .reduce((sum, p) => sum + p.price * p.quantity, 0);
 
   return (
@@ -65,23 +64,23 @@ const Cart = () => {
       <h1 className=" font-bold text-xl text-white mb-6">GIỎ HÀNG</h1>
       {cartItemsCount === 0 ? (
         <div className="flex flex-col justify-center items-center text-gray-500 gap-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-14 h-14"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-          />
-        </svg>
-        <p className="text-2xl font-bold">Giỏ hàng trống</p>
-        <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm!</p>
-      </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-14 h-14"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+            />
+          </svg>
+          <p className="text-2xl font-bold">Giỏ hàng trống</p>
+          <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm!</p>
+        </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-2/3">
@@ -94,13 +93,13 @@ const Cart = () => {
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
-                          checked={products.every(p => p.selected)}
+                          checked={products?.every(p => p.selected)}
                           onChange={() => {
                             const allSelected = products.every(p => p.selected);
                             setProducts(products.map(p => ({ ...p, selected: !allSelected })));
                           }}
                         />
-                        Tất cả ({products.length} sản phẩm)
+                        Tất cả ({products?.length} sản phẩm)
                       </label>
                     </th>
                     <th className="w-[150px] p-4 text-center">Đơn giá</th>
@@ -109,7 +108,7 @@ const Cart = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map(product => (
+                  {products?.map(product => (
                     <tr key={product.id} className="border-b">
                       <td className="p-4">
                         <div className="flex items-start gap-4">
@@ -178,17 +177,17 @@ const Cart = () => {
             <div className="bg-white p-4 rounded-lg">
               <div className="flex justify-between mb-4">
                 <span className="text-gray-500">Tổng tiền hàng</span>
-                <span>{totalAmount.toLocaleString()}đ</span>
+                <span>{totalAmount?.toLocaleString()}đ</span>
               </div>
               <div className="flex justify-between mb-4 text-lg font-medium">
                 <span>Tổng tiền thanh toán</span>
-                <span className="text-red-500">{totalAmount.toLocaleString()}đ</span>
+                <span className="text-red-500">{totalAmount?.toLocaleString()}đ</span>
               </div>
               <p className="text-sm text-gray-500 text-right mb-4">
                 (Đã bao gồm VAT nếu có)
               </p>
-              <button onClick={handleOrder} className={`w-full  text-white py-3 rounded-lg ${products.filter(p => p.selected).length == 0 ? "bg-red-300" : "bg-red-500"}`} disabled= {products.filter(p => p.selected).length == 0} >
-                Mua Hàng ({products.filter(p => p.selected).length})
+              <button onClick={handleOrder} className={`w-full  text-white py-3 rounded-lg ${products?.filter(p => p.selected).length == 0 ? "bg-red-300" : "bg-red-500"}`} disabled={products?.filter(p => p.selected).length == 0} >
+                Mua Hàng ({products?.filter(p => p.selected).length})
               </button>
             </div>
           </div>

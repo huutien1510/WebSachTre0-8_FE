@@ -44,10 +44,10 @@ const Register = () => {
     //     if (dayjs.isDayjs(birthday)) {
     //         return birthday.format('DD/MM/YYYY');
     //     }
-    
+
     //     return "";
     // };
-    
+
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -65,10 +65,6 @@ const Register = () => {
 
     const onChangeSex = ({ target: { value } }) => {
         setSex(value);
-    };
-    const disabledDate = (current) => {
-        const startDate = dayjs().startOf('day'); // Ngày bắt đầu
-        return current && (current > startDate);
     };
 
     return (
