@@ -52,6 +52,9 @@ import BlogAdmin from "./Components/Admin/Blog/BlogAdmin.jsx";
 import AddBlog from "./Components/Admin/Blog/AddBlog.jsx";
 import DiscountAdmin from "./Components/Admin/Discount/Discount.jsx";
 import AddDiscount from "./Components/Admin/Discount/AddDiscount.jsx";
+import UserBlogDetails from "./Components/Blog/UserBlogDetails.jsx";
+import BlogDetails from "./Components/Admin/Blog/BlogDetails.jsx";
+import EditBlog from "./Components/Admin/Blog/EditBlog.jsx";
 
 
 function App() {
@@ -76,7 +79,7 @@ function App() {
           </Route>
           <Route path="/blogs" element={<div> <Outlet /> </div>} >
             <Route index element={<UserBlog />} />
-            <Route path="blogDetail/:blogID" element={<UserContestDetail />} />
+            <Route path="blogDetails/:articleID" element={<UserBlogDetails />} />
           </Route>
           <Route path="/book/:bookID" element={<BookDetail />} />
           <Route path="/cart" element={<Cart />} />
@@ -114,6 +117,8 @@ function App() {
             <Route path="blogs" element={<div><Outlet /></div>} >
               <Route index element={<BlogAdmin />} />
               <Route path="addBlog" element={<AddBlog />} />
+              <Route path="blogDetails/:articleID" element={<BlogDetails />} />
+              <Route path="editBlog/:articleID" element={<EditBlog />} />
             </Route>
             <Route path="discounts" element={<div><Outlet /></div>}>
               <Route index element={<DiscountAdmin />} />

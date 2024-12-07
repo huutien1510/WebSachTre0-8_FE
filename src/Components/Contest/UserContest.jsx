@@ -30,12 +30,12 @@ const UserContest = () => {
     };
 
     return (
-        <div className="bg-black py-8 px-4 md:px-8 ">
-            <div className="container mx-auto mt-12">
+        <div className="bg-black py-8 px-4 md:px-8 mt-16 mx-auto">
+            <div className="container mx-auto">
 
-                <h1 className='text-2xl md:text-3xl font-bold text-white mb-8'>Tất cả cuộc thi</h1>
+                <h1 className='text-2xl md:text-3xl font-bold text-white mb-10'>Tất cả cuộc thi</h1>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                     {contests?.map((contest) => (
                         <UserContestCard key={contest.id} contest={contest} />
                     ))}
@@ -44,7 +44,7 @@ const UserContest = () => {
 
             {/* Phân trang */}
             <div>
-                <div className="flex items-center justify-center mt-10 ">
+                <div className="flex items-center justify-center mt-10 mb-10">
                     <button
                         className="px-4 py-2 bg-[#34D399] text-black font-bold rounded-lg hover:bg-[#34D399]/90 transition-all duration-300 shadow-lg hover:shadow-[#34D399]/50"
                         onClick={() => handlePageChange(currentPage - 1)}

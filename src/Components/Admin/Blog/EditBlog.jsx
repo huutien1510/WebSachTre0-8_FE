@@ -1,30 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import defaultAvatar from "../../../image/default-avatar.png";
 import axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
 import { format } from 'date-fns';
 
-const AddBlog = () => {
+const EditBlog = () => {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
-    const [genre, setGenre] = useState([])
-    const priceInputRef = useRef(null);
     const fileInputRef = useRef(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [blog, setBlog] = useState({
-        title: "",
-        author: "",
-        content: "",
-        image: defaultAvatar,
-        date: "",
-    });
+    const [article, setArticle] = useState(null);
+    const articleID = useParams().articleID;
+
+    useEffect(() => {
+        const fecthArticle = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/articles/${articleID}`);
+                const json = await response.json();
+                setArticle(json.data);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fecthArticle()
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setBlog({ ...blog, [name]: value });
+        setArticle({ ...article, [name]: value });
 
     };
 
@@ -56,7 +63,7 @@ const AddBlog = () => {
             );
 
 
-            setBlog((prev) => ({
+            setArticle((prev) => ({
                 ...prev,
                 image: response.data.secure_url,
             }));
@@ -71,7 +78,7 @@ const AddBlog = () => {
     const handleRemoveThumbnail = (e) => {
         e.preventDefault();
         fileInputRef.current.value = "";
-        setBlog((prev) => ({
+        setArticle((prev) => ({
             ...prev,
             image: defaultAvatar,
         }))
@@ -81,21 +88,21 @@ const AddBlog = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!blog.title || !blog.content || !blog.author || !blog.image) {
+        if (!article?.title || !article?.content || !article?.author || !article?.image) {
             toast.error("Thiếu dữ liệu !");
             return;
         }
 
-        const addBlog = async () => {
+        const editBlog = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/articles/addArticle`, {
-                    method: "POST",
+                const response = await fetch(`http://localhost:8080/articles/editArticle/${article.id}`, {
+                    method: "PATCH",
                     body: JSON.stringify({
-                        "title": blog.title,
-                        "author": blog.author,
-                        "content": blog.content,
-                        "image": blog.image,
-                        "date": new Date(),
+                        "title": article?.title,
+                        "author": article?.author,
+                        "content": article?.content,
+                        "image": article?.image,
+                        "date": new Date()
                     }),
                     headers: {
                         "Content-Type": "application/json",
@@ -104,28 +111,32 @@ const AddBlog = () => {
                 });
                 const json = await response.json();
                 if (json.code === 200) {
-                    toast.success("Thêm bài viết thành công");
-                    navigate("/admin/blogs")
+                    toast.success("Cập nhật bài viết thành công");
+                    navigate(-1)
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
-        addBlog();
+        editBlog();
 
     };
 
+    if (!article) return (
+        <div className='text-white'> Không có bài viết này</div>
+    )
+
     return (
         <div className="bg-[#121212] text-white min-h-screen p-8">
-            <h1 className="text-3xl font-bold mb-6 text-white">Thông tin bài viết</h1>
+            <h1 className="text-3xl font-bold mb-6">Thông tin bài viết</h1>
 
             <div className="w-full flex flex-col items-center mb-8">
                 <div
                     className="w-2/3 h-96 bg-gradient-to-br from-teal-300 to-green-400 rounded-lg mb-4"
                     onClick={() => fileInputRef.current?.click()}
                     style={{
-                        backgroundImage: `url(${blog.image})`,
+                        backgroundImage: `url(${article?.image})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
@@ -161,7 +172,7 @@ const AddBlog = () => {
                         <input
                             type="text"
                             name="title"
-                            value={blog.name}
+                            value={article?.title}
                             placeholder="Nhập tiêu đề bài viết"
                             onChange={handleChange}
                             className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
@@ -173,7 +184,7 @@ const AddBlog = () => {
                             <input
                                 type="text"
                                 name="author"
-                                value={blog.author}
+                                value={article?.author}
                                 placeholder="Nhập tên tác giả"
                                 onChange={handleChange}
                                 className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
@@ -205,8 +216,8 @@ const AddBlog = () => {
                                 ],
                                 ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
                             }}
-                            initialValue="Welcome to TinyMCE!"
-                            onEditorChange={(content) => setBlog((prev) => ({ ...prev, content: content }))}
+                            initialValue={article?.content}
+                            onEditorChange={(content) => setArticle((prev) => ({ ...prev, content: content }))}
                         />
 
 
@@ -216,7 +227,7 @@ const AddBlog = () => {
                             type="submit"
                             className="bg-gradient-to-br from-teal-500 to-green-600 text-white py-2 px-4 rounded-lg"
                         >
-                            Thêm bài viết
+                            Cập nhật
                         </button>
                         <button
                             onClick={() => navigate(-1)}
@@ -234,4 +245,4 @@ const AddBlog = () => {
     )
 }
 
-export default AddBlog
+export default EditBlog
