@@ -8,15 +8,20 @@ function OrderCard({ order }) {
     const [orderIDToDelete, setOrderIDToDelete] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
+    const typeBook = order?.orderDetails[0]?.bookType;
 
     const getStatusColor = () => {
         switch (order.status) {
             case "Đã thanh toán":
                 return "bg-gradient-to-br from-teal-500 to-green-600";
+            case "Đã giao hàng":
+                return "bg-gradient-to-br from-teal-500 to-green-600";    
             case "Chờ thanh toán":
                 return "bg-gradient-to-br from-red-400 to-red-500 ";
             case "Đã hủy":
                 return "bg-red-500";
+            case "Chờ giao hàng":
+                return "bg-red-500";    
             default:
                 return "bg-gray-500";
         }
@@ -62,6 +67,7 @@ function OrderCard({ order }) {
         <div className="flex items-center w-full max-w-full bg-gray-200 border border-gray-200 rounded-lg shadow-md p-4 mb-4">
             {/* Nội dung thông tin */}
             <div className="ml-4 flex flex-col justify-between w-full">
+                <h3 className="text-lg font-semibold text-gray-800">Đơn hàng: {typeBook == "Sach mem" ? "Sách điện tử" : "Sách giấy"}</h3>
                 {/* Tên sách và trạng thái */}
                 <div className="flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800">Mã đơn hàng: #{order?.id}</h3>

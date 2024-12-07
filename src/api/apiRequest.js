@@ -639,7 +639,6 @@ export const checkOut = async (
         },
     });
     
-    console.log("Response: ", response.data);
     return response.data;
   } catch (error) {
     console.error("Error create orders:", error);

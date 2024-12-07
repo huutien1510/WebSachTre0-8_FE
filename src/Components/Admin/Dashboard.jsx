@@ -30,7 +30,7 @@ const Dashboard = () => {
         fetchView()
         const fetchPrice = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/order/getPriceAll')
+                const response = await fetch('http://localhost:8080/orders/totalPrice')
                 const data = await response.json()
                 setPrice(data.data)
             } catch (error) {

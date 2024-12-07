@@ -1,10 +1,14 @@
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function PaymentReturn() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const navigate = useNavigate()
+    const accessToken = useSelector(
+    (state) => state.auth?.login?.currentUser?.data.accessToken
+  );
 
     // Lấy giá trị của các tham số từ URL
     const query = {
@@ -15,10 +19,14 @@ function PaymentReturn() {
     const params = new URLSearchParams(query);
     const updateOrderStatus = async () => {
         try {
-            await fetch(`http://localhost:8080/orders/momo_return?${params.toString()}`)
-            navigate("/");
+            const response = await fetch(`http://localhost:8080/orders/momo-return?${params.toString()}`, {
+                method: "GET",
+            });
+            const data = await response.json() ;
+            const orders = data.data;
+            navigate(`/ordersuccess`, { state: {orders} });
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
     updateOrderStatus();

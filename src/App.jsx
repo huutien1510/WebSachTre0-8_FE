@@ -50,6 +50,8 @@ import UserContestDetail from "./Components/Contest/UserContestDetail.jsx";
 import UserBlog from "./Components/Blog/UserBlog.jsx";
 import BlogAdmin from "./Components/Admin/Blog/BlogAdmin.jsx";
 import AddBlog from "./Components/Admin/Blog/AddBlog.jsx";
+import DiscountAdmin from "./Components/Admin/Discount/Discount.jsx";
+import AddDiscount from "./Components/Admin/Discount/AddDiscount.jsx";
 import UserBlogDetails from "./Components/Blog/UserBlogDetails.jsx";
 import BlogDetails from "./Components/Admin/Blog/BlogDetails.jsx";
 import EditBlog from "./Components/Admin/Blog/EditBlog.jsx";
@@ -117,6 +119,10 @@ function App() {
               <Route path="addBlog" element={<AddBlog />} />
               <Route path="blogDetails/:articleID" element={<BlogDetails />} />
               <Route path="editBlog/:articleID" element={<EditBlog />} />
+            </Route>
+            <Route path="discounts" element={<div><Outlet /></div>}>
+              <Route index element={<DiscountAdmin />} />
+              <Route path="addDiscount" element={<AddDiscount />} />
             </Route>
           </Route>
           <Route path="*" element={<Page404 />} />
