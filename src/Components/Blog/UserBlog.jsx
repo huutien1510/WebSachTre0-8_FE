@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { MdOutlineDateRange } from 'react-icons/md';
@@ -11,10 +12,10 @@ function UserBlog() {
     const [listArticles, setListArticles] = useState([]);
 
     useEffect(() => {
-        const fecthContest = async (page) => {
+        const fecthBlog = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:8080/articles/getAll?page=${page - 1}&size=9`);
+                const response = await fetch(`http://localhost:8080/articles/getAll?page=${page - 1}&size=10`);
                 const json = await response.json();
                 setListArticles(json.data.content);
                 setTotalPages(json.data.totalPages);
@@ -23,7 +24,7 @@ function UserBlog() {
                 console.error('Error fetching data:', error);
             }
         };
-        fecthContest(currentPage)
+        fecthBlog(currentPage)
     }, [currentPage, location]);
 
     const handlePageChange = (page) => {
@@ -31,45 +32,45 @@ function UserBlog() {
     };
 
     return (
-        <div className="bg-black py-8 px-4 md:px-8 ">
-            <div className="container mx-auto mt-12">
+        <div className="bg-black py-8 px-4 md:px-8 mt-12">
+            <div className="container mx-auto">
                 {/* Header Navigation */}
-                <h1 className='text-2xl md:text-3xl font-bold text-white mb-8'>Tin mới nhất</h1>
+                <h1 className='text-2xl md:text-3xl font-bold text-white mb-4'>Tin mới nhất</h1>
                 {/* Main Content */}
                 <main className="container mx-auto pt-8">
                     {/* hàng 1 */}
                     <div className="flex justify-center gap-8">
                         {/* khung lớn */}
                         {listArticles[0] && (
-                            <div className="w-[90%]">
+                            <div className="w-[90%] bg-main rounded-xl">
                                 <NavLink
-                                    // // to={`/tin-tuc/${formatTitleForUrl(posts[0].title)}`}
+                                    to={`/blogs/blogDetails/${listArticles[0].id}`}
                                     // state={{ postId: posts[0].postId }}
                                     className="cursor-pointer"
                                 >
                                     <div className="w-full h-[374px] max-h-[374px]">
                                         <img
-                                            // src={`${IMAGE_URL}${posts[0].image}`}
+                                            src={listArticles[0].image}
                                             alt={listArticles[0].title}
-                                            className="w-0 h-0 min-w-full max-w-full min-h-full max-h-full object-cover rounded-2xl"
+                                            className="w-0 h-0 min-w-full max-w-full min-h-full max-h-full object-cover rounded-t-xl"
                                             loading="lazy"
                                         />
                                     </div>
-                                    <div className="mt-12 flex flex-col gap-4">
-                                        <h2 className="text-5xl font-bold">{listArticles[0].title}</h2>
+                                    <div className="mt-8 ml-7 mr-7 flex flex-col gap-4">
+                                        <h2 className="text-5xl font-bold text-white ">{listArticles[0].title}hi</h2>
                                         <p
-                                            className="line-clamp-3 overflow-hidden text-ellipsis"
+                                            className="line-clamp-3 text-gray-400 overflow-hidden text-ellipsis"
                                             dangerouslySetInnerHTML={{ __html: listArticles[0].content }}
                                         ></p>
 
-                                        <span className="flex items-center font-semibold gap-2">
+                                        <span className="flex items-center text-gray-400 font-semibold gap-2">
                                             <MdOutlineDateRange />
-                                            <span>{22 / 11 / 2020}</span>
+                                            <span>{format(listArticles[0].date, "dd/MM/yyyy")}</span>
                                             <span> - </span>
-                                            <span>Bài</span>
+                                            <span>{listArticles[0].author}</span>
                                         </span>
                                     </div>
-                                    <button className="flex items-center text-3xl mt-4 font-semibold text-blue-500">
+                                    <button className="ml-7 mr-7 flex items-center text-3xl mt-4 font-semibold text-blue-500">
                                         Xem tiếp
                                         <FaArrowRightLong className="ml-2" />
                                     </button>
@@ -89,19 +90,19 @@ function UserBlog() {
                                         <div className="flex gap-4">
                                             <div className="min-w-[160px] min-h-[100px]">
                                                 <img
-                                                    // src={`${IMAGE_URL}${post.image}`}
+                                                    src={articles.image}
                                                     alt={articles.title}
                                                     className="w-0 h-0 min-w-full max-w-full min-h-full max-h-full object-cover rounded-2xl"
                                                     loading="lazy"
                                                 />
                                             </div>
-                                            <div className="flex flex-col gap-2 font-semibold">
-                                                <h3>{articles.title}</h3>
-                                                <p className="flex items-center text-xl gap-2">
+                                            <div className="flex flex-col gap-2">
+                                                <h3 className='text-white font-bold'>{articles.title}</h3>
+                                                <p className="flex items-center gap-2 text-gray-400">
                                                     <MdOutlineDateRange />
-                                                    <span>{22 / 22 / 2222}</span>
+                                                    <span>{format(articles.date, "dd/MM/yyyy")}</span>
                                                     <span>-</span>
-                                                    <span>MANGACOMIC</span>
+                                                    <span>{articles.author}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -123,21 +124,21 @@ function UserBlog() {
                                     <div className="flex flex-col gap-4">
                                         <div className="w-[320px] h-[200px] overflow-hidden">
                                             <img
-                                                // src={`${IMAGE_URL}${post.image}`}
+                                                src={articles.image}
                                                 alt={articles.title}
                                                 className="w-full h-full object-cover rounded-2xl"
                                                 loading="lazy"
                                             />
                                         </div>
                                         <div className="flex flex-col gap-2 mt-4">
-                                            <h3 className="text-3xl font-bold">{articles.title}</h3>
+                                            <h3 className="text-3xl text-white font-bold">{articles.title}</h3>
                                             <p
-                                                className="line-clamp-2 overflow-hidden text-ellipsis"
+                                                className="line-clamp-2 overflow-hidden text-gray-400 text-ellipsis"
                                                 dangerouslySetInnerHTML={{ __html: articles.content }}
                                             ></p>
-                                            <p className="flex items-center text-xl gap-2">
+                                            <p className="flex items-center gap-2 text-gray-400">
                                                 <MdOutlineDateRange />
-                                                <span>{articles.date}</span>
+                                                <span>{format(articles.date, "dd/MM/yyyy")}</span>
                                                 <span> - </span>
                                                 <span>MANGACOMIC</span>
                                             </p>

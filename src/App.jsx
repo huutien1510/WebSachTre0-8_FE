@@ -50,6 +50,9 @@ import UserContestDetail from "./Components/Contest/UserContestDetail.jsx";
 import UserBlog from "./Components/Blog/UserBlog.jsx";
 import BlogAdmin from "./Components/Admin/Blog/BlogAdmin.jsx";
 import AddBlog from "./Components/Admin/Blog/AddBlog.jsx";
+import UserBlogDetails from "./Components/Blog/UserBlogDetails.jsx";
+import BlogDetails from "./Components/Admin/Blog/BlogDetails.jsx";
+import EditBlog from "./Components/Admin/Blog/EditBlog.jsx";
 
 
 function App() {
@@ -74,12 +77,12 @@ function App() {
           </Route>
           <Route path="/blogs" element={<div> <Outlet /> </div>} >
             <Route index element={<UserBlog />} />
-            <Route path="blogDetail/:blogID" element={<UserContestDetail />} />
+            <Route path="blogDetails/:articleID" element={<UserBlogDetails />} />
           </Route>
           <Route path="/book/:bookID" element={<BookDetail />} />
-          <Route path="/cart" element={<Cart/>} />
-          <Route path="/ordersuccess" element={<OrderSuccess/>} />
-          <Route path="/checkout" element={<Order/>}/>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/ordersuccess" element={<OrderSuccess />} />
+          <Route path="/checkout" element={<Order />} />
           <Route path="/book/:bookID/chaptercontent/:chapter_number" element={<ChapterReader />} />
           <Route path="/admin" element={<LayoutAdmin />}>
             <Route index element={<Dashboard />} />
@@ -109,9 +112,11 @@ function App() {
               <Route path="editContest" element={<UpdateContest />}
               />
             </Route>
-            <Route path="blogs" element={<div><Outlet/></div>} >
+            <Route path="blogs" element={<div><Outlet /></div>} >
               <Route index element={<BlogAdmin />} />
               <Route path="addBlog" element={<AddBlog />} />
+              <Route path="blogDetails/:articleID" element={<BlogDetails />} />
+              <Route path="editBlog/:articleID" element={<EditBlog />} />
             </Route>
           </Route>
           <Route path="*" element={<Page404 />} />

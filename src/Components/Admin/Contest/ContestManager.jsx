@@ -33,7 +33,7 @@ const ContestManagement = () => {
         <div className="bg-main py-8 px-4 md:px-8 ">
             <div className="container mx-auto ">
                 <div className='flex justify-between items-center mb-6'>
-                    <h1 className="text-[#18B088] text-xl font-semibold">Quản lý cuộc thi</h1>
+                    <span className="text-[#18B088] text-lg font-semibold">Quản lý cuộc thi</span>
 
                     <div className="flex justify-between mb-4">
                         <NavLink to={"/admin/contests/addContest"} >
