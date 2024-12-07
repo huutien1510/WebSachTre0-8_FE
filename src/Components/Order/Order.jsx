@@ -8,6 +8,7 @@ import { checkOut, removeBookToCart } from "../../api/apiRequest";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const Order = () => {
   const user = useSelector((state) => state.auth?.login?.currentUser?.data?.account);
   const user1 = useSelector((state) => state.auth?.login?.currentUser);
@@ -17,6 +18,7 @@ const Order = () => {
   const id = useSelector(
     (state) => state.auth.login.currentUser?.data.account.id
   );
+  const [paymentUrl, setPaymentUrl] = useState(null);
   const cartItems = useSelector((state) => state.cart.carts.cartItems)
   const [formData, setFormData] = useState({
     fullName: user?.name || "",
@@ -26,13 +28,19 @@ const Order = () => {
     district: "",
     ward: "",
     address: "",
-    paymentMethod: "MoMo"
+    paymentMethod: "momo"
   });
   const location = useLocation();
   const { selectedProducts } = location.state || { selectedProducts: [] };
-  const [firstType] = selectedProducts.map((product) => product.type);
+  let [firstType] = selectedProducts.map((product) => product.type) ;
+  
+  const cartItem = useSelector((state) => state.cart.carts.cartItems);
 
-  const toTalprice = selectedProducts.reduce((acc, product) => acc + product.price * product.quantity, 0);
+
+  const toTalprice = Math.round(
+    selectedProducts.reduce((acc, product) => acc + product.price * product.quantity, 0)
+  );
+
 
   const [locations, setLocations] = useState({
     provinces: [],
@@ -111,46 +119,51 @@ const Order = () => {
     // Process the data as needed
   };
   const handleCheckOut = async () => {
-    let province = null;
-    let district = null;
-    let ward = null;
+    if (firstType === null){
+      firstType = "Sach mem";
+    }
+    let addressOrder = "";
     if (firstType === "Sach cung") {
-      province = locations.provinces.find((p) => p.Id === formData.province);
-      district = locations.districts.find((d) => d.Id === formData.district);
-      ward = locations.wards.find((w) => w.Id === formData.ward);
-    }
-
+      const province = locations.provinces.find((p) => p.Id === formData.province);
+      const district = locations.districts.find((d) => d.Id === formData.district);
+      const ward = locations.wards.find((w) => w.Id === formData.ward);
+      addressOrder = `${formData.address}, ${ward.Name}, ${district.Name}, ${province.Name}`;
+    } 
     const date = new Date();
-    const newOrder = {
-      totalPrice: toTalprice,
-      address: `${formData.address}, ${ward?.Name}, ${district?.Name}, ${province?.Name}`,
-      date: format(new Date(date), "dd/MM/yyyy"),
-      paymentMethod: formData.paymentMethod,
-      account: user.id,
-      orderDetails: selectedProducts.map((product) => {
-        return {
-          bookID: product.id,
-          quantity: product.quantity
-        }
-      })
-    }
+    const formattedDate = format(new Date(date), "dd/MM/yyyy HH:mm:ss");
+      const newOrder = {
+        totalPrice: toTalprice,
+        address: addressOrder,
+        date: formattedDate,
+        paymentMethod: formData.paymentMethod,
+        account: user.id,
+        orderDetails: selectedProducts.map((product) => {
+          return {
+            bookID: product.id,
+            quantity: product.quantity
+          }
+        })
+      }
     try {
       const response = await checkOut(dispatch, user1, newOrder, accessToken);
-      console.log("Checkout response:", response);
       if (response.code === 1000) {
         toast.success(response.message);
         const orders = response.data;
-        console.log(response)
-        if (firstType === "Sach cung")
-          for (let product of selectedProducts) {
+        setPaymentUrl(response.data.momoPayUrl);
+        for (let product of selectedProducts) {
+
+          const isProductInCart = cartItem.some((item) => item.id === product.id);
+
+          if (isProductInCart) {
             await removeBookToCart(id, product.id, dispatch, user1, accessToken);
           }
-        else {
-          window.location.href = response.data.momoPayUrl;
         }
 
         if (response.data.paymentMethod === "cod") {
           navigate(`/ordersuccess`, { state: { orders } });
+        }
+        else {
+          window.location.href = orders.momoPayUrl;
         }
       }
     }
@@ -328,7 +341,7 @@ const Order = () => {
           <div className="bg-zinc-900 p-6 rounded-lg">
             <div className="space-y-4">
               <button
-                onClick={() => handlePaymentMethodSelect('MoMo')}
+                onClick={() => handlePaymentMethodSelect('momo')}
                 className={`relative w-full flex items-center space-x-4 p-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors ${formData.paymentMethod === 'ewallet' ? 'border-2 border-emerald-500' : 'border-2 border-zinc-800'
                   }`}
               >
@@ -336,7 +349,7 @@ const Order = () => {
                 <div className="text-left">
                   <div className="font-medium">MoMo</div>
                 </div>
-                {formData.paymentMethod === 'MoMo' && (
+                {formData.paymentMethod === 'momo' && (
                   <div className="ml-auto absolute right-3">
                     <svg
                       className="w-6 h-6 text-emerald-500"

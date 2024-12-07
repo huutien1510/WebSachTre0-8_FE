@@ -108,6 +108,17 @@ function UpdateOrder() {
                                     className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
                                 />
                             </div>
+                            <div className="mb-4">
+                                <label className="block mb-1">Địa chỉ:</label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={order.address}
+                                    placeholder="Nhập địa chỉ"
+                                    onChange={handleChange}
+                                    className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
+                                />
+                            </div>
                             <div className="flex space-x-4">
                                 <div className="mb-4 w-1/2">
                                     <label className="block mb-1">Phương thức thanh toán:</label>
@@ -120,9 +131,8 @@ function UpdateOrder() {
                                         <option value="" disabled>
                                             Chọn phương thức thanh toán
                                         </option>
-                                        <option value="MOMO">MOMO</option>
-                                        <option value="Credit Card">Credit Card</option>
-                                        <option value="Visa">Visa</option>
+                                        <option value="momo">MOMO</option>
+                                        <option value="cod">Thanh toán khi nhận hàng</option>
                                     </select>
                                 </div>
                                 <div className="mb-4 w-1/2">
@@ -139,6 +149,8 @@ function UpdateOrder() {
                                         <option value="Đã thanh toán">Đã thanh toán</option>
                                         <option value="Chờ thanh toán">Chờ thanh toán</option>
                                         <option value="Đã hủy">Đã hủy</option>
+                                        <option value="Chờ giao hàng">Chờ giao hàng</option>
+                                        <option value="Đã giao hàng">Đã giao hàng</option>
                                     </select>
                                 </div>
                             </div>

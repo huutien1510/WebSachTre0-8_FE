@@ -16,6 +16,10 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (!username || !password) {
+            setMessage("Vui lòng điền đầy đủ thông tin");
+            return;
+        }
         const newUser = {
             username: username,
             password: password

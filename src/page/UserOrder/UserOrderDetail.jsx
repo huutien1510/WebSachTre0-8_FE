@@ -105,7 +105,7 @@ function UserOrderDetail() {
                                     <input
                                         type="text"
                                         name="method"
-                                        value={order.paymentMethod}
+                                        value={order.paymentMethod === "cod" ? "Thanh toán khi nhận hàng" : "MoMo"}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                         disabled
                                     />

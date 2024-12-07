@@ -10,10 +10,14 @@ function UserOrderCard({ order }) {
         switch (order.status) {
             case "Đã thanh toán":
                 return "bg-gradient-to-br from-teal-500 to-green-600";
+            case "Đã giao hàng":
+                return "bg-gradient-to-br from-teal-500 to-green-600";    
             case "Chờ thanh toán":
                 return "bg-gradient-to-br from-red-400 to-red-500 ";
             case "Đã hủy":
                 return "bg-red-500";
+            case "Chờ giao hàng":
+                return "bg-red-500";    
             default:
                 return "bg-gray-500";
         }
