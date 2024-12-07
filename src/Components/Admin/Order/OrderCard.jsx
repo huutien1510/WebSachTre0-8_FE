@@ -103,7 +103,7 @@ function OrderCard({ order }) {
                 </NavLink>
 
                 {/* buttonDelete */}
-                <button onClick={() => openModal(order?.id)}
+                {/* <button onClick={() => openModal(order?.id)}
                     className="flex items-center justify-center mt-1 text-white px-5 py-2.5 rounded-lg text-lg font-bold bg-red-500  hover:bg-red-700 transition-colors">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +116,7 @@ function OrderCard({ order }) {
                         <path d="M6 8v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V8H6zm2.75  2.5h1.5v6h-1.5v-6zm2.75 0h1.5v6h-1.5v-6zm2.75 0h1.5v6h-1.5v-6z" />
                     </svg>
                     Delete
-                </button>
+                </button> */}
             </div>
 
             {/* Confirm Delete Modal */}
