@@ -42,9 +42,7 @@ export const store = configureStore({
 export let persistor = persistStore(store);
 
 // Add a listener to log state changes
-store.subscribe(() => {
-  console.log('State after REHYDRATE:', store.getState());
-});
+
 // import {configureStore} from '@reduxjs/toolkit';
 // import authReducer from './authSlice';
 // import userReducer from './userSlice';

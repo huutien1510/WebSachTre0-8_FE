@@ -3,7 +3,7 @@ import axios from "axios";
 import { QrCode, CreditCard, Wallet, Package } from 'lucide-react'
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import { checkOut, removeBookToCart } from "../../api/apiRequest";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,13 +13,14 @@ const Order = () => {
   const user = useSelector((state) => state.auth?.login?.currentUser?.data?.account);
   const user1 = useSelector((state) => state.auth?.login?.currentUser);
   const accessToken = useSelector(
-    (state) => state.auth?.login?.currentUser?.data.accessToken
+    (state) => state.auth?.login?.currentUser?.data?.accessToken
   );
   const id = useSelector(
-    (state) => state.auth.login.currentUser?.data.account.id
+    (state) => state.auth?.login?.currentUser?.data?.account.id
   );
   const [paymentUrl, setPaymentUrl] = useState(null);
-  const cartItems = useSelector((state) => state.cart.carts.cartItems)
+  const cartItems = useSelector((state) => state.cart?.carts?.cartItems)
+  const [usediscount, setUseDiscount] = useState(false);
   const [formData, setFormData] = useState({
     fullName: user?.name || "",
     phone: user?.phone || "",
@@ -28,18 +29,19 @@ const Order = () => {
     district: "",
     ward: "",
     address: "",
-    paymentMethod: "momo"
+    paymentMethod: "momo",
+    discount: ""
   });
   const location = useLocation();
   const { selectedProducts } = location.state || { selectedProducts: [] };
-  let [firstType] = selectedProducts.map((product) => product.type) ;
-  
+  let [firstType] = selectedProducts.map((product) => product.type);
+
   const cartItem = useSelector((state) => state.cart.carts.cartItems);
 
 
-  const toTalprice = Math.round(
+  const [toTalprice, setToTalPrice] = useState(Math.round(
     selectedProducts.reduce((acc, product) => acc + product.price * product.quantity, 0)
-  );
+  ));
 
 
   const [locations, setLocations] = useState({
@@ -115,35 +117,39 @@ const Order = () => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Order Details:", formData);
-    // Process the data as needed
   };
   const handleCheckOut = async () => {
-    if (firstType === null){
+    if (firstType === null) {
       firstType = "Sach mem";
     }
+    
     let addressOrder = "";
     if (firstType === "Sach cung") {
+      if (!formData.fullName || !formData.phone || !formData.email || !formData.province || !formData.district || !formData.ward || !formData.address) {
+        toast.error("Vui lòng điền đầy đủ thông tin!");
+        return;
+      }
       const province = locations.provinces.find((p) => p.Id === formData.province);
       const district = locations.districts.find((d) => d.Id === formData.district);
       const ward = locations.wards.find((w) => w.Id === formData.ward);
       addressOrder = `${formData.address}, ${ward.Name}, ${district.Name}, ${province.Name}`;
-    } 
+    }
     const date = new Date();
     const formattedDate = format(new Date(date), "dd/MM/yyyy HH:mm:ss");
-      const newOrder = {
-        totalPrice: toTalprice,
-        address: addressOrder,
-        date: formattedDate,
-        paymentMethod: formData.paymentMethod,
-        account: user.id,
-        orderDetails: selectedProducts.map((product) => {
-          return {
-            bookID: product.id,
-            quantity: product.quantity
-          }
-        })
-      }
+    const newOrder = {
+      totalPrice: toTalprice,
+      address: addressOrder,
+      date: formattedDate,
+      paymentMethod: formData.paymentMethod,
+      account: user.id,
+      orderDetails: selectedProducts.map((product) => {
+        return {
+          bookID: product.id,
+          quantity: product.quantity
+        }
+      }),
+      discountCode: formData.discount
+    }
     try {
       const response = await checkOut(dispatch, user1, newOrder, accessToken);
       if (response.code === 1000) {
@@ -170,6 +176,37 @@ const Order = () => {
     catch (error) {
       console.error("Error checking out:", error);
       toast.error("Đã có lỗi xảy ra, vui lòng thử lại sau!");
+    }
+  }
+
+  const handleDiscount = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/discounts/checkDiscount`, {
+        method: "POST",
+        body: JSON.stringify({
+          "code": formData.discount,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const json = await response.json();
+      console.log("json", json);
+      if (json.code === 1000) {
+        setToTalPrice(toTalprice - json?.data.value );  
+        setUseDiscount(true);
+        toast.success("Cập nhật discount thành công");
+      }
+      else {
+        toast.error(json.message);
+        setFormData((prev) => ({
+          ...prev,
+          discount: ""
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error(error?.response?.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại sau!");
     }
   }
 
@@ -438,8 +475,9 @@ const Order = () => {
                   className="w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white"
                   value={formData.discount}
                   onChange={handleChange}
+                  disabled={usediscount}
                 />
-                <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4">
+                <button onClick={handleDiscount} className={`w-full bg-emerald-600  text-white font-bold py-2 px-4 rounded mt-4 ${usediscount ? "" :"hover:bg-emerald-700"} `} disabled={usediscount}>
                   Áp dụng
                 </button>
               </div>

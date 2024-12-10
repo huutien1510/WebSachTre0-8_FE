@@ -16,7 +16,7 @@ const OrderDetailCard = ({ orderDetail }) => {
             {/* Book Information */}
             <div className="flex flex-col">
                 <h3 className="text-lg font-semibold text-gray-400">{orderDetail.bookName}</h3>
-                <p className="text-sm text-gray-400 mt-1">Loại sách: {orderDetail.bookType}</p>
+                <p className="text-sm text-gray-400 mt-1">Loại sách: {orderDetail.bookType == "Sach cung" ? "Sách giấy" : "Sách điện tử"}</p>
                 <p className="text-sm text-gray-400 mt-1">Số lượng: x{orderDetail.quantity}</p>
             </div>
         </div>

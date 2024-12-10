@@ -55,6 +55,7 @@ import AddDiscount from "./Components/Admin/Discount/AddDiscount.jsx";
 import UserBlogDetails from "./Components/Blog/UserBlogDetails.jsx";
 import BlogDetails from "./Components/Admin/Blog/BlogDetails.jsx";
 import EditBlog from "./Components/Admin/Blog/EditBlog.jsx";
+import UpdateDiscount from "./Components/Admin/Discount/UpdateDiscount.jsx";
 
 
 function App() {
@@ -123,6 +124,7 @@ function App() {
             <Route path="discounts" element={<div><Outlet /></div>}>
               <Route index element={<DiscountAdmin />} />
               <Route path="addDiscount" element={<AddDiscount />} />
+              <Route path="updateDiscount/:discountID" element={<UpdateDiscount />} />
             </Route>
           </Route>
           <Route path="*" element={<Page404 />} />

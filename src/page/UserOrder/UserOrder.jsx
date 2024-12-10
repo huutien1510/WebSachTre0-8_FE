@@ -14,7 +14,7 @@ function OrderManager() {
         const fecthOrder = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:8080/orders/account/${user.account.id}?page=${page}&limit=10`, {
+                const response = await fetch(`http://localhost:8080/orders/account/${user.account.id}?page=${page-1}&size=10`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -22,8 +22,9 @@ function OrderManager() {
                     }
                 });
                 const json = await response.json();
-                setOrders(json.data);
-                setTotalPages(json.totalPages);
+                console.log("json", json);
+                setOrders(json.data.content);
+                setTotalPages(json?.data?.totalPages);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
