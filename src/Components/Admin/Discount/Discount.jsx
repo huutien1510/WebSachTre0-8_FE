@@ -1,21 +1,69 @@
-import { Discount } from '@mui/icons-material';
+
 import React, { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { LiaTimesCircle } from "react-icons/lia";
+import { CiCircleCheck } from "react-icons/ci";
+import { toast } from 'react-toastify';
+import DeleteDiscountConfirmModal from './DeleteDiscountConfirmModal';
 
 const DiscountAdmin = () => {
-  const [books, setBook] = useState(null);
+  const [discounts, setDiscount] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [dateNow, setDateNow] = useState(new Date());
   const inputRef = useRef(null);
   const location = useLocation();
+  const user = useSelector((state) => state.auth.login?.currentUser.data)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [discountIDToDelete, setDiscountIDToDelete] = useState(null);
+  const navigate = useNavigate();
+  const openModal = (id) => {
+    setDiscountIDToDelete(id);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setDiscountIDToDelete(null);
+  };
+  const confirmDelete = async () => {
+    if (discountIDToDelete) {
+        try {
+            const response = await fetch(`http://localhost:8080/discounts/delete/${discountIDToDelete}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${user?.accessToken}`
+                }
+            });
+            const json = await response.json();
+            if (json.code === 1000) {
+                toast.success("Xóa thành công")
+                navigate("/admin/discounts")
+            }
+            else toast.error("Xóa thất bại")
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
+    }
+    closeModal();
+};
+
+
+
 
   useEffect(() => {
-    const fecthBook = async (page) => {
+    const fecthDiscount = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:8080/discounts/getAll?page=${page - 1}&size=15`);
+        const response = await fetch(`http://localhost:8080/discounts/getAll?page=${page - 1}&size=10`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user?.accessToken}`
+          }
+        })
         const json = await response.json();
-        setBook(json.data.content);
+        setDiscount(json.data.content);
         setTotalPages(json.data.totalPages);
         console.log("json", json.data.content);
       }
@@ -23,7 +71,7 @@ const DiscountAdmin = () => {
         console.error('Error fetching data:', error);
       }
     };
-    fecthBook(currentPage)
+    fecthDiscount(currentPage)
   }, [currentPage, location]);
 
   const handlePageChange = (page) => {
@@ -41,7 +89,47 @@ const DiscountAdmin = () => {
           </NavLink>
         </div>
         <div >
-          
+          <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
+            <table className="min-w-full bg-white border border-emerald-500 rounded-lg">
+              <thead>
+                <tr className="bg-emerald-500 text-black">
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold text-black">STT</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Mã discount</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Loại</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Ngày bắt đầu</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Ngày kết thúc</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Số lượng</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Trạng thái</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {discounts?.map((discount, index) => (
+                  <tr key={discount.id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
+                    <td className="py-3 px-4 border-b text-gray-800">{index + 1}</td>
+                    <td className="py-3 px-4 border-b text-gray-800">{discount.code}</td>
+                    <td className="py-3 px-4 border-b text-gray-800">{discount.type == "PERCENT" ? "Giảm giá theo phần trăm" : "Giảm giá cố định"}</td>
+                    <td className="py-3 px-4 border-b text-gray-800">
+                      {new Date(discount.startDate).toLocaleDateString('vi-VN')}
+                    </td>
+                    <td className="py-3 px-4 border-b text-gray-800">
+                      {new Date(discount.endDate).toLocaleDateString('vi-VN')}
+                    </td>
+                    <td className="py-3 px-4 border-b text-gray-800">{discount.quantity}</td>
+                    <td className="py-3 px-4 border-b text-gray-800">
+                      {new Date(discount.endDate) > new Date() ?
+                        <div className='text-emerald-400 text-3xl text-center'><CiCircleCheck /></div>
+                        : <div className='text-red-700 text-3xl'><LiaTimesCircle /></div>}
+                    </td>
+                    <td className="py-3 px-4 border-b flex space-x-4">
+                      <NavLink to={`/admin/discounts/updateDiscount/${discount?.id}`} state={{discount : discount}}  className="text-blue-500 hover:text-blue-700 font-bold transition duration-150">Update</NavLink>
+                      <button onClick={() => openModal(discount.id)} className={`text-red-500 hover:text-red-700 font-bold transition duration-150 `} >Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <div>
@@ -77,6 +165,11 @@ const DiscountAdmin = () => {
           </button>
         </div>
       </div>
+      <DeleteDiscountConfirmModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

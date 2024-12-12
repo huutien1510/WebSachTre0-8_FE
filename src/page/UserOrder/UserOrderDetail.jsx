@@ -1,43 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams, useLocation, NavLink } from 'react-router-dom';
 import OrderDetailCard from './OrderDetailCard';
+import { checkOut } from '../../api/apiRequest';
+import { format } from 'date-fns';
 function UserOrderDetail() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
+    const user1 = useSelector((state) => state.auth?.login?.currentUser);
+    const accessToken = useSelector(
+        (state) => state.auth?.login?.currentUser?.data?.accessToken
+    );
+    const id = useSelector(
+        (state) => state.auth?.login?.currentUser?.data?.account.id
+    );
     const orderID = useParams().orderID
     const location = useLocation();
     const navigate = useNavigate()
     const [order, setOrder] = useState(location.state?.order)
     const [paymentUrl, setPaymentUrl] = useState(null)
+    const book = order?.orderDetails[0]
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const buyBook = async () => {
             try {
-                const response3 = await fetch(
-                    "http://localhost:3000/api/order/buybook",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            bookID: book.bookId, // ID của sách, kiểu Number
-                            id: user.account.id, // ID của tài khoản, kiểu Number
-                            price: book.price, // Giá trị của đơn hàng, kiểu Number (tùy chọn, có giá trị mặc định là 0)
-                            method: "MOMO", // Phương thức thanh toán, kiểu String
-                            status: "Chờ thanh toán", // Trạng thái của đơn hàng, kiểu String
-                            date: new Date(), // Ngày đặt hàng, kiểu Date
-                        }),
-                        headers: {
-                            "Content-Type": "application/json",
-                            token: `Bearer ${user?.accessToken}`,
-                        },
-                    })
-                const json3 = await response3.json();
-                setPaymentUrl(json3.paymentUrl);
+                const response = await fetch(`http://localhost:8080/orders/retryOrder/${order.id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+                const data = await response.json(); 
+                setPaymentUrl(data?.data?.momoPayUrl)                   
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-
 
         if (order?.status === "Chờ thanh toán") buyBook();
     }, [order]);
@@ -72,7 +72,7 @@ function UserOrderDetail() {
                                     <input
                                         type="text"
                                         name="id"
-                                        value={order.id}
+                                        value={order.accountID}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                         disabled
                                     />
@@ -138,6 +138,12 @@ function UserOrderDetail() {
                                     className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                 />
                             </div>
+                            {book?.bookType === "Sach cung" && (
+                                <div className='mb-4'>
+                                    <label className='block mb-1 w-full'>Địa chỉ</label>
+                                    <input type="text" name="address" disabled value={order.address} className='w-full  bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed' />
+                                </div>
+                            )}
                             <NavLink
                                 to={(paymentUrl || -1)}
                                 className="flex space-x-4">

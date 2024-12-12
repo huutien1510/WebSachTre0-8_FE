@@ -11,17 +11,33 @@ function UserOrderCard({ order }) {
             case "Đã thanh toán":
                 return "bg-gradient-to-br from-teal-500 to-green-600";
             case "Đã giao hàng":
-                return "bg-gradient-to-br from-teal-500 to-green-600";    
+                return "bg-gradient-to-br from-teal-500 to-green-600";
             case "Chờ thanh toán":
                 return "bg-gradient-to-br from-red-400 to-red-500 ";
             case "Đã hủy":
                 return "bg-red-500";
             case "Chờ giao hàng":
-                return "bg-red-500";    
+                return "bg-red-500";
             default:
                 return "bg-gray-500";
         }
     };
+    const handleCancle = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/orders/cancelOrder/${order.id}`, {
+                    method: "GET",
+                });
+                console.log("response", response);
+                if (response.status === 200) {
+                    toast.success("Cập nhật thành công!")
+                    navigate("/account/orders", { replace: true });
+                } else {
+                    toast.error("Cập nhật thất bại!")
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+    }
 
     return (
         <div className="flex items-center w-full max-w-full bg-gray-200 border border-gray-200 rounded-lg shadow-md p-4 mb-4">
@@ -35,9 +51,14 @@ function UserOrderCard({ order }) {
                     </span>
                 </div>
 
-                <p className="text-lg text-gray-500">
-                    <span className="font-medium">Người mua:</span> {order.accountName}
-                </p>
+                <div className="flex justify-between items-center">
+                    <p className="text-lg text-gray-500">
+                        <span className="font-medium">Người mua:</span> {order.accountName}
+                    </p>
+                    {order.paymentMethod === "cod" && order.status == "Chờ giao hàng" ? (<button onClick={handleCancle} className={`flex items-center mt-2 mr-20 justify-center bg-red-500 text-white px-3 py-2 rounded-lg`}>
+                        Hủy đơn hàng
+                    </button>) : (<span></span>)}
+                </div>
 
                 {/* Giá và ngày mua */}
                 <div className="flex justify-between items-center mt-2">

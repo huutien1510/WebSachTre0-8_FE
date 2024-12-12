@@ -1,81 +1,71 @@
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { DatePicker } from 'antd';
 import { CalendarTodayOutlined } from '@mui/icons-material';
 import dayjs from 'dayjs';
 
-const AddDiscount = () => {
-    const user = useSelector((state) => state.auth.login?.currentUser.data)
-    const navigate = useNavigate();
 
-    const [discount, setDiscount] = useState({
-        code: "",
-        type: 'PERCENT',
-        value: "",
-        startDate: "",
-        endDate: "",
-        quantity: "",
-    });
+function UpdateDiscount() {
+    const user = useSelector((state) => state.auth.login?.currentUser.data)
+    const discountID = useParams().discountID
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [discount, setDiscount] = useState(location.state?.discount);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setDiscount({ ...discount, [name]: value });
+        setDiscount((prev) => ({
+            ...prev,
+            [name]: value
+        }))
+    }
 
+
+    const UpdateDiscount = async () => {
+        try {
+            const date = new Date();
+            const response = await fetch(`http://localhost:8080/discounts/update/${discountID}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    "code": discount.code,
+                    "type": discount.type,
+                    "value": discount.value,
+                    "startDate": dayjs(discount.startDate).format("YYYY-MM-DD"),
+                    "endDate": dayjs(discount.endDate).format("YYYY-MM-DD"),
+                    "quantity": discount.quantity,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${user?.accessToken}`
+                }
+            });
+            const json = await response.json();
+            if (json.code === 1000) {
+                toast.success("Cập nhật discount thành công");
+                navigate("/admin/discounts")
+            }else{
+                toast.error(json.message);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error.message);
+        }
     };
 
-
-
-
+    const disabledEndDate = (current) => {
+        return current && current < dayjs(discount.startDate);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("discount", discount);
-
-        if (!discount.code || !discount.endDate || !discount.quantity || !discount.startDate || !discount.type || !discount.value) {
-            toast.error("Thiếu dữ liệu !");
-            return;
-        }
-
-        const adddiscount = async () => {
-            try {
-                const date = new Date();
-                const response = await fetch(`http://localhost:8080/discounts/add`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        "code": discount.code,
-                        "type": discount.type,
-                        "value": discount.value,
-                        "startDate": dayjs(discount.startDate).format("YYYY-MM-DD"),
-                        "endDate": dayjs(discount.endDate).format("YYYY-MM-DD"),
-                        "quantity": discount.quantity,
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${user?.accessToken}`
-                    }
-                });
-                const json = await response.json();
-                if (json.code === 1000) {
-                    toast.success("Thêm discount thành công");
-                    navigate("/admin/discounts")
-                }else{
-                    toast.error(json.message);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error.message);
-            }
-        };
-
-        adddiscount();
+        UpdateDiscount();
 
     };
-    const disabledEndDate = (current) => {
-        const startDate = dayjs(discount.startDate).startOf('day'); // Ngày bắt đầu
-        return current && (current < startDate);
-    };
+
+    if (!(discount)) {
+        return <p className="absolute top-16" >Không có đơn hàng này</p>
+    }
 
     return (
         <div className="bg-[#121212] text-white min-h-screen p-8">
@@ -205,7 +195,7 @@ const AddDiscount = () => {
                                 type="submit"
                                 className="bg-gradient-to-br from-teal-500 to-green-600 text-white py-2 px-4 rounded-lg"
                             >
-                                Thêm Discount
+                                Update Discount
                             </button>
                             <button
                                 onClick={() => navigate(-1)}
@@ -219,7 +209,7 @@ const AddDiscount = () => {
 
             </div>
         </div>
-    )
+    );
 }
 
-export default AddDiscount
+export default UpdateDiscount;
