@@ -88,6 +88,10 @@ const UserContestDetail = () => {
 
     const handleRegister = async () => {
         try {
+            if (contest.currentParticipants >= contest.maxParticipants) {
+                toast.error("Đã vượt quá số lượng dự thi")
+                return
+            }
             const response = await fetch(
                 `http://localhost:8080/contestants/register/${user.account.id}/${contestID}`, {
                 method: "POST",

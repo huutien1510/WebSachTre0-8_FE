@@ -54,7 +54,7 @@ const ContestManagement = () => {
 
             {/* Phân trang */}
             <div>
-                <div className="flex items-center justify-center mt-10 ">
+                <div className="flex items-center justify-center mt-10 mb-10 ">
                     <button
                         className="px-4 py-2 bg-[#34D399] text-black font-bold rounded-lg hover:bg-[#34D399]/90 transition-all duration-300 shadow-lg hover:shadow-[#34D399]/50"
                         onClick={() => handlePageChange(currentPage - 1)}
