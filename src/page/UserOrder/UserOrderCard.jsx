@@ -63,7 +63,7 @@ function UserOrderCard({ order }) {
                 {/* Giá và ngày mua */}
                 <div className="flex justify-between items-center mt-2">
                     <p className="text-xl font-bold text-green-600">Tổng tiền: {order.totalPrice.toLocaleString("vi-VN")}₫</p>
-                    <p className="text-base w-1/3 text-gray-400">Ngày mua: {new Date(order.date).toLocaleString('vi-VN')}</p>
+                    <p className="text-base w-1/3 text-gray-400">Ngày mua: {order.date}</p>
                 </div>
             </div>
             <div className="justify-center gap-2 p-4">
