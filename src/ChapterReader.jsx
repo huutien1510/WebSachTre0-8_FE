@@ -22,8 +22,56 @@ function ChapterReader() {
   const [chapter_index, setChapterIndex] = useState(null);
   const [image, setImage] = useState();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [booksoftbought, setBookSoftBought] = useState(false);
+  const [book, setBook] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBook = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/books/${bookID}`
+            );
+            const json = await response.json();
+            if (json.code != 500)
+                setBook(json.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    fetchBook();
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 200);
+}, []);
+
+
+  useEffect(() => {
+    const fetchingBookSoftBought = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`,
+        );
+        const json = await response.json();
+        console.log("json", json);
+        if (json.code != 500)
+          setBookSoftBought(json.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchingBookSoftBought();
+  }, [booksoftbought]);
+
+  if (!user) {
+    navigate("/login");
+  }
+
+  if (booksoftbought == false  && book?.price > 0) {
+    navigate(`/book/${bookID}`);
+  }
 
   useEffect(() => {
     const checkFavoriteStatus = async () => {
@@ -44,6 +92,8 @@ function ChapterReader() {
     }
     checkFavoriteStatus();
   }, [user?.account?.id, bookID]);
+
+
 
 
   useEffect(() => {

@@ -52,6 +52,10 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) return;
+        if (!username || !email || !phone || !birthday || !password || !confirmPassword) {
+            setMessage('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
         setLoading(true); // Bắt đầu loading
         const newUser = { username, email, birthday, password, sex, phone };
         try {

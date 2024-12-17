@@ -159,13 +159,7 @@ function UpdateOrder() {
                                 <input
                                     type="datetime"
                                     name="date"
-                                    value={new Date(order.date).toLocaleDateString("vi-VN", {
-                                        year: "numeric",
-                                        month: "2-digit",
-                                        day: "2-digit",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                    })}
+                                    value={order.date}
                                     disabled
                                     className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border opacity-50 cursor-not-allowed"
                                 />
