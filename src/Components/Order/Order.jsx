@@ -193,7 +193,12 @@ const Order = () => {
       const json = await response.json();
       console.log("json", json);
       if (json.code === 1000) {
-        setToTalPrice(toTalprice - json?.data.value );  
+        if (json.data.type === "PERCENT") {
+          setToTalPrice(toTalprice - (toTalprice * json?.data.value / 100));
+        }
+        else {
+        setToTalPrice(toTalprice - json?.data.value ); 
+        } 
         setUseDiscount(true);
         toast.success("Cập nhật discount thành công");
       }
@@ -358,7 +363,7 @@ const Order = () => {
                         />
                         <div>
                           <h3 className="font-medium">{product.name}</h3>
-                          <p className="mt-1">{product.price.toLocaleString()}đ</p>
+                          <p className="mt-1">{product?.price?.toLocaleString()}đ</p>
                         </div>
                       </div>
                     </td>
@@ -367,7 +372,7 @@ const Order = () => {
                         <span className="w-16 text-center bg-zinc-800 border border-zinc-700 rounded p-1">{product.quantity}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">{(product.price * product.quantity).toLocaleString()}đ</td>
+                    <td className="px-6 py-4 text-right">{(product?.price * product?.quantity)?.toLocaleString()}đ</td>
                   </tr>
                 ))}
               </tbody>
@@ -448,7 +453,7 @@ const Order = () => {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span>Thành tiền</span>
-                  <span>{toTalprice.toLocaleString()}đ</span>
+                  <span>{toTalprice?.toLocaleString()}đ</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Phí vận chuyển</span>
@@ -457,7 +462,7 @@ const Order = () => {
                 <div className="border-t border-zinc-700 pt-4">
                   <div className="flex justify-between font-bold">
                     <span>Tổng số tiền</span>
-                    <span>{toTalprice.toLocaleString()}đ</span>
+                    <span>{toTalprice?.toLocaleString()}đ</span>
                   </div>
                 </div>
                 <button className={`w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded mt-4 `}

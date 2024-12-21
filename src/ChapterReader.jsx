@@ -28,42 +28,38 @@ function ChapterReader() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBook = async () => {
-        try {
-            const response = await fetch(
-                `http://localhost:8080/books/${bookID}`
-            );
-            const json = await response.json();
-            if (json.code != 500)
-                setBook(json.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-
-    fetchBook();
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 200);
-}, []);
-
-
-  useEffect(() => {
     const fetchingBookSoftBought = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`,
+          `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`
         );
         const json = await response.json();
-        console.log("json", json);
-        if (json.code != 500)
+        if (json.code !== 500) {
           setBookSoftBought(json.data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchingBookSoftBought();
-  }, [booksoftbought]);
+  }, [id, bookID]); // Ensure the dependency array is correct
+  
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/books/${bookID}`
+        );
+        const json = await response.json();
+        if (json.code !== 500) {
+          setBook(json.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchBook();
+  }, [bookID]); // Ensure the dependency array is correct
 
   if (!user) {
     navigate("/login");
