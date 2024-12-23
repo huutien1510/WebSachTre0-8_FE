@@ -14,10 +14,12 @@ import {
   getUsersFailure,
   getUsersStart,
   getUsersSuccess,
+  UserLogout,
 } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import jwt_decode from "jwt-decode";
 import { addToCart, clearCart, loginCart } from "../redux/cartSlice";
+import { User } from "lucide-react";
 
 const baseURL = "http://localhost:8080";
 
@@ -149,6 +151,7 @@ export const logout = async (dispatch, navigate, token, user) => {
     );
     dispatch(logoutSuccess());
     dispatch(clearCart());
+    dispatch(UserLogout());
     navigate("/login");
   } catch (err) {
     dispatch(logoutFailed());

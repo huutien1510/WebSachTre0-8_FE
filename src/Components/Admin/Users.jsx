@@ -64,7 +64,6 @@ export default function Users() {
         getAllUsers(user?.data.accessToken, dispatch, user);
     };
 
-    console.log(user.data)
 
     return (
         <>

@@ -185,7 +185,7 @@ const AddBlog = () => {
                     <div className="mb-4 ">
                         <label className="block mb-1 w-full">Nội dung</label>
                         <Editor
-                            apiKey='rvi50sp60yxewwbykge5zhz6bjbwityoo7cisogsk5fxkxpa'
+                            apiKey='vnc87op3km3umpbq10q142ct9m7n5p60gbodr8pb71dspl7t'
                             init={{
                                 plugins: [
                                     // Core editing features

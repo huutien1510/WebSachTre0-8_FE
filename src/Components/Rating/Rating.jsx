@@ -54,7 +54,6 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
     const [isModalOpen, setIsModalOpen] = useState(false);
     return (
         <>
-            <ToastContainer />
             <div className='bg-[#1C1C1E] rounded-2xl p-5'>
                 <div className="flex items-center justify-around space-x-2 my-4">
                     <div>

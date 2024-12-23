@@ -65,6 +65,9 @@ const BookOverlay = ({ book }) => {
         {book.author && (
           <p className="text-[#18B088] text-sm mb-2">{book.author}</p>
         )}
+        {book.type && (
+          <p className="text-white text-sm mb-2 p-2 border border-spacing-0 inline-block">{book.type == "Sach mem" ? "Sách điện tử" : "Sách giấy"}</p>
+        )}
         {book.description && (
           <p className="text-white/80 text-sm line-clamp-4">{book.description}</p>
         )}

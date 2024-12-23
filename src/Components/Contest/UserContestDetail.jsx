@@ -101,10 +101,11 @@ const UserContestDetail = () => {
                 }
             });
             const json = await response.json();
-            console.log(json)
             if (json.code === 200) {
                 setIsRegister(true);
                 toast.success("Đăng ký dự thi thành công");
+                window.location.reload();
+                
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -151,7 +152,7 @@ const UserContestDetail = () => {
             if (json.code == 200) {
                 setContestant(json.data)
                 setIsSubmit(true);
-                toast.success("Submit successfully!");
+                toast.success("Nộp bài thành công!");
             }
         } catch (error) {
             setIsSelectFile(false);
@@ -300,22 +301,34 @@ const UserContestDetail = () => {
                     :
                     (
                         !isRegister ?
-                            (<button
-                                onClick={handleRegister}
-                                className="flex items-center justify-center h-16 text-white text-2xl font-bold px-3 py-2 gap-3
-                                rounded-xl bg-gradient-to-br from-teal-600 to-green-500  hover:bg-emerald-700 transition-colors w-1/4 mx-auto">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    width="24"
-                                    height="24"
-                                >
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                    <path d="M19 8h-2v2h-2v2h2v2h2v-2h2v-2h-2V8z" />
-                                </svg>
-                                Đăng ký
-                            </button>
+                            (
+                                user ? (
+                                    <button
+                                        onClick={handleRegister}
+                                        className="flex items-center justify-center h-16 text-white text-2xl font-bold px-3 py-2 gap-3
+                                        rounded-xl bg-gradient-to-br from-teal-600 to-green-500 hover:bg-emerald-700 transition-colors w-1/4 mx-auto"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="currentColor"
+                                            width="24"
+                                            height="24"
+                                        >
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                            <path d="M19 8h-2v2h-2v2h2v2h2v-2h2v-2h-2V8z" />
+                                        </svg>
+                                        Đăng ký
+                                    </button>
+                                ) : (
+                                    <NavLink
+                                        to="/login"
+                                        className="flex items-center justify-center h-16 text-white text-2xl font-bold px-3 py-2 gap-3
+                                        rounded-xl bg-gradient-to-br from-teal-600 to-green-500 hover:bg-emerald-700 transition-colors w-1/4 mx-auto"
+                                    >
+                                        Đăng nhập
+                                    </NavLink>
+                                )
                             )
                             :
                             (

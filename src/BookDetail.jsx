@@ -14,8 +14,7 @@ import {
     removeFromFavorites,
     addBookToCart,
 } from "./api/apiRequest";
-import { addToCart } from "./redux/cartSlice";
-import { Toast } from "bootstrap";
+
 
 function BookDetail() {
     const user = useSelector((state) => state.auth?.login?.currentUser);
@@ -104,10 +103,9 @@ function BookDetail() {
                     `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`,
                 );
                 const json = await response.json();
-                console.log("json", json);
                 if (json.code != 500)
                     setBookSoftBought(json.data);
-            }catch (error) {
+            } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
@@ -116,10 +114,9 @@ function BookDetail() {
 
     const handleAddtoCart = async () => {
         try {
-            console.log("accountID: ", accessToken);
             await addBookToCart(id, bookID, dispatch, user, accessToken);
             toast.success("Thêm vào giỏ hàng thành công");
-            } 
+        }
         catch (error) {
             console.error("Error updating favorite status:", error);
             toast.error(error.response?.data?.message);
@@ -160,9 +157,18 @@ function BookDetail() {
     if (!book) {
         return <p className="absolute top-16">Không có sách này</p>;
     }
+    
     return (
         <div className="book_detail_page">
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+            <ToastContainer
+                autoClose={3000}
+                hideProgressBar={false}
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="light"
+                position="top-right"
+            />
             <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 mt-16">
                 {/* Book Image */}
                 <div className="book_thumbnail">
@@ -230,30 +236,31 @@ function BookDetail() {
                     </div>
                     {book?.type === "Sach cung" &&
                         <div className="flex items-center space-x-2">
-                        <span className="text-white font-bold">Số lượng:</span>
-                        <div className="flex items-center border border-gray-300 rounded-md">
-                            <button
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="w-8 h-8 flex items-center justify-center text-gray-500 "
-                            >
-                                −
-                            </button>
-                            <input
-                                type="number"
-                                min="1"
-                                value={quantity}
-                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                className="w-12 h-8 text-center text-black border-0 outline-none appearance-none"
-                            />
+                            <span className="text-white font-bold">Số lượng:</span>
+                            <div className="flex items-center border border-gray-300 rounded-md">
+                                <button
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-8 h-8 flex items-center justify-center text-gray-500 "
+                                >
+                                    −
+                                </button>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max={book?.quantity}
+                                    value={quantity > book?.quantity ? book?.quantity : quantity}
+                                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                    className="w-12 h-8 text-center text-black border-0 outline-none appearance-none"
+                                />
 
-                            <button
-                                onClick={() => setQuantity(quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center text-gray-500 "
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>}
+                                <button
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="w-8 h-8 flex items-center justify-center text-gray-500 "
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>}
 
                     <div className="flex items-center space-x-4 mt-4">
                         {(book?.type === "Sach mem" || book?.type == null) ? (
@@ -269,16 +276,16 @@ function BookDetail() {
                                             {book?.price == 0 ? "Đọc sách" : "Mua sách"}
                                         </button>
                                     </NavLink>
-                                ) : (  
-                                        <button
-                                            className={`${ booksoftbought || book?.price == 0
-                                                ? "bg-gradient-to-br from-teal-600 to-green-500"
-                                                : "bg-gradient-to-br from-red-400 to-red-500"
-                                                } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
-                                            onClick={(booksoftbought || book?.price == 0) ? handleFreeBook : handleBuySoftBook}
-                                        >
-                                            {(booksoftbought || book?.price == 0) ? "Đọc sách" : "Mua sách"}
-                                        </button>
+                                ) : (
+                                    <button
+                                        className={`${booksoftbought || book?.price == 0
+                                            ? "bg-gradient-to-br from-teal-600 to-green-500"
+                                            : "bg-gradient-to-br from-red-400 to-red-500"
+                                            } text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
+                                        onClick={(booksoftbought || book?.price == 0) ? handleFreeBook : handleBuySoftBook}
+                                    >
+                                        {(booksoftbought || book?.price == 0) ? "Đọc sách" : "Mua sách"}
+                                    </button>
                                 )}
                             </>
                         )
@@ -293,10 +300,11 @@ function BookDetail() {
                                         </button>
                                         <button
                                             className={`bg-gradient-to-br from-red-400 to-red-500 text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
+                                            
                                         >
                                             Mua sách
                                         </button>
-                                        
+
                                     </NavLink>
                                 ) : (
                                     <>
@@ -309,6 +317,7 @@ function BookDetail() {
                                         <button
                                             onClick={handleBuyHardBook}
                                             className={`bg-gradient-to-br from-red-400 to-red-500 text-white px-5 py-2.5 rounded-lg text-lg font-bold hover:bg-emerald-700 transition-colors`}
+                                            disabled={book?.quantity == 0}
                                         >
                                             Mua sách
                                         </button>
