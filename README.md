@@ -1,51 +1,84 @@
-Xây dựng website đọc, bán sách MangaComic sử dụng công nghệ ReactJS & SpringBoot
+# MangaComic - Online Manga Reading & Bookstore
 
-Giới thiệu chung
-Nhằm đáp ứng nhu cầu đọc và sở hữu mọi lúc, mọi nơi, việc xây dựng một website đọc và bán sách Manga Comic trực tuyến là vô cùng cần thiết. Website này không chỉ giúp người dùng tiếp cận kho tàng sách phong phú một cách nhanh chóng và thuận tiện, mà còn cung cấp các công cụ hỗ trợ trong việc tìm kiếm và lựa chọn sách phù hợp với sở thích cá nhân, theo dõi tiến độ đọc, và tạo ra một môi trường đọc sách trực tuyến dễ dàng, thú vị. Không chỉ mang lại lợi ích trực tiếp cho người đọc, website còn là một nền tảng giúp kết nối cộng đồng yêu thích sách, chia sẻ những bộ sách yêu thích, và khám phá những tác phẩm mới. Đây là một giải pháp tối ưu cho những ai đam mê sách và muốn sở hữu những bộ sách yêu thích một cách dễ dàng, tiện lợi.
+## 📖 Overview
+To meet the demand for reading and owning books anytime, anywhere, the **MangaComic** website was developed as an online platform for reading and purchasing manga books. This website not only allows users to access a rich collection of books quickly and conveniently but also provides tools for book search, personalized recommendations, reading progress tracking, and a seamless online reading experience.
 
-🛠 Công nghệ sử dụng  
-- **Front-end:** ReactJS, HTML, CSS, JS, Tailwind
-- **Back-end:** Spring Boot, JWT  
-- **Database:** SQL Server  
+Beyond benefiting individual readers, **MangaComic** serves as a community hub for book lovers to share favorite books and discover new ones. It is an ideal solution for manga enthusiasts who want an easy and convenient way to own their favorite collections.
 
+## 🛠 Technologies Used
+### **Frontend**
+- ReactJS
+- HTML, CSS, JavaScript
+- Tailwind CSS
 
-Website bao gồm các chức năng chính:
-Chức năng chung:
-- Đăng ký
-- Đăng nhập 
-- Quên mật khẩu 
-- Tìm kiếm sách
-- Xem chi tiết sách 
-Chức năng của khách hàng:
-- Đọc sách online 
-- Đánh giá sách 
-- Bình luận 
-- Mua sách 
-- Thanh toán 
-- Xem lịch sử mua sách 
-- Quản lý thông tin tài khoản 
-- Quản lý lịch sử đọc
-- Thêm vào danh sách yêu thích 
-- Quản lý giỏ hàng 
-- Tham gia cuộc thi về sách 
-- Đọc bài viết 
-Chức năng của quản trị viên:
-- Quản lý tài khoản khách hàng 
-- Quản lý sách 
-- Quản lý chapter 
-- Quản lý đơn hàng 
-- Quản lý khuyến mãi 
-- Tổ chức cuộc thi về sách 
-- Đăng bài viết 
+### **Backend**
+- Spring Boot
+- JWT Authentication
 
+### **Database**
+- SQL Server
 
-Contributors
-Nguyễn Đăng Trường
-Nguyễn Hữu Tiến
+## 🔥 Key Features
 
+### **General Features**
+- User Registration
+- Login & Authentication
+- Password Recovery
+- Book Search
+- View Book Details
 
-Get Started
-# install dependencies
+### **Customer Features**
+- Read Books Online
+- Rate Books
+- Comment on Books
+- Purchase Books
+- Online Payment
+- View Purchase History
+- Manage Account Information
+- Track Reading History
+- Add Books to Favorites
+- Manage Shopping Cart
+- Participate in Book-related Contests
+- Read Blog Posts
+
+### **Admin Features**
+- Manage Customer Accounts
+- Manage Books & Chapters
+- Manage Orders
+- Manage Promotions
+- Organize Book Contests
+- Publish Blog Posts
+
+## 🎨 UI Previews
+Here are some screenshots of the website UI:
+
+### **Homepage**
+![Homepage Screenshot](public/homepage.jpg)
+
+### **Book Details Page**
+![Book Details Screenshot](public/detailbook.jpg)
+
+### **Login Page**
+![Login Page Screenshot](public/login.jpg)
+
+### **Reading Book Page**
+![Reading Book Page Screenshot](public/readingbook.jpg)
+
+### **Admin Page**
+![Admin Page Screenshot](public/admin.jpg)
+
+## 🚀 Get Started
+
+### **Install Dependencies**
+```sh
 npm install
-# run project
+```
+
+### **Run Project**
+```sh
 npm start
+```
+
+## 👥 Contributors
+- **Nguyễn Đăng Trường**
+- **Nguyễn Hữu Tiến**
