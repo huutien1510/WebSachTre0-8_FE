@@ -216,7 +216,7 @@ export default function Sidebar() {
                 ></path>
               </g>
             </svg>
-            <span>Discount</span>
+            <span>Voucher</span>
           </NavLink>
         </li>
         <li>

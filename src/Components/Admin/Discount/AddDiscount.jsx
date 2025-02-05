@@ -79,18 +79,18 @@ const AddDiscount = () => {
 
     return (
         <div className="bg-[#121212] text-white min-h-screen p-8">
-            <h1 className="text-3xl font-bold mb-6">THÔNG TIN DISCOUNT</h1>
+            <h1 className="text-3xl font-bold mb-6">THÔNG TIN VOUCHER</h1>
 
             <div className="flex">
                 <div className="w-2/3">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label className="block mb-1">Mã Discount</label>
+                            <label className="block mb-1">Mã Voucher</label>
                             <input
                                 type="text"
                                 name="code"
                                 value={discount.code}
-                                placeholder="Nhập mã Discount"
+                                placeholder="Nhập mã Voucher"
                                 onChange={handleChange}
                                 className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
                             />

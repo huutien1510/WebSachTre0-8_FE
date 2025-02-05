@@ -18,6 +18,7 @@ const RatingAdmin = () => {
         try {
             const res = await getAllRating(user?.data.accessToken, dispatch, user);
             if (res.success) {
+                console.log("Ratings: ", res.data.data);
                 setRatings(res.data.data);
             }
         } catch (error) {
