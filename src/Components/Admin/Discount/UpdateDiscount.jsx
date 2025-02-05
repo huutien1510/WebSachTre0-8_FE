@@ -43,7 +43,7 @@ function UpdateDiscount() {
             });
             const json = await response.json();
             if (json.code === 1000) {
-                toast.success("Cập nhật discount thành công");
+                toast.success("Cập nhật voucher thành công");
                 navigate("/admin/discounts")
             }else{
                 toast.error(json.message);

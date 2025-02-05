@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 const BookOverlay = ({ book }) => {
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const accessToken = useSelector(
-    (state) => state.auth?.login?.currentUser?.data.accessToken
+    (state) => state.auth?.login?.currentUser?.data?.accessToken
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const id = useSelector(
-    (state) => state.auth.login.currentUser?.data.account.id
+    (state) => state.auth.login.currentUser?.data?.account?.id
   );
   useEffect(() => {
     const checkFavoriteStatus = async () => {

@@ -13,7 +13,7 @@ const DesktopMenu = ({ menuItems }) => {
   const cartItemsCount = useSelector(state => state?.cart?.carts?.cartItems?.length);
 
   const accessToken = useSelector(
-    (state) => state.auth.login.currentUser?.data.accessToken
+    (state) => state.auth.login.currentUser?.data?.accessToken
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -205,7 +205,7 @@ const DesktopMenu = ({ menuItems }) => {
       {user ? (
         <>
           <Link to="/account/profile" className="text-emerald-500 text-sm">
-            Hi, <span>{user.data.account.username}</span>
+            Hi, <span>{user?.data?.account?.username}</span>
           </Link>
           <NavLink
             className="bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-emerald-600 transition-colors"

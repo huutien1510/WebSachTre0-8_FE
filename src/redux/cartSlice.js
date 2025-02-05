@@ -5,7 +5,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     carts : {
-      cartItems: null,
+      cartItems: [],
       showMiniCart: false,
     },
     msg: "",

@@ -81,10 +81,10 @@ const DiscountAdmin = () => {
     <div className="bg-main py-8 px-4 md:px-8">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <span className="text-[#18B088] text-lg font-semibold">Tất cả Discount</span>
+          <span className="text-[#18B088] text-lg font-semibold">Tất cả Voucher</span>
           <NavLink to={'/admin/discounts/addDiscount'} >
             <button className="bg-[#18B088] text-white text-xl px-4 py-2 rounded-lg font-semibold hover:bg-[#128067] transition duration-200">
-              Thêm Discount
+              Thêm Voucher
             </button>
           </NavLink>
         </div>
@@ -94,7 +94,7 @@ const DiscountAdmin = () => {
               <thead>
                 <tr className="bg-emerald-500 text-black">
                   <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold text-black">STT</th>
-                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Mã discount</th>
+                  <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Mã voucher</th>
                   <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Loại</th>
                   <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Ngày bắt đầu</th>
                   <th className="py-3 px-4 border-b border-gray-300 text-left font-semibold ">Ngày kết thúc</th>
@@ -123,7 +123,7 @@ const DiscountAdmin = () => {
                     </td>
                     <td className="py-3 px-4 border-b flex space-x-4">
                       <NavLink to={`/admin/discounts/updateDiscount/${discount?.id}`} state={{discount : discount}}  className="text-blue-500 hover:text-blue-700 font-bold transition duration-150">Update</NavLink>
-                      <button onClick={() => openModal(discount.id)} className={`text-red-500 hover:text-red-700 font-bold transition duration-150 `} >Delete</button>
+                      {/* <button onClick={() => openModal(discount.id)} className={`text-red-500 hover:text-red-700 font-bold transition duration-150 `} >Delete</button> */}
                     </td>
                   </tr>
                 ))}
@@ -165,11 +165,11 @@ const DiscountAdmin = () => {
           </button>
         </div>
       </div>
-      <DeleteDiscountConfirmModal
+      {/* <DeleteDiscountConfirmModal
         isOpen={isModalOpen}
         onClose={closeModal}
         onConfirm={confirmDelete}
-      />
+      /> */}
     </div>
   )
 }
