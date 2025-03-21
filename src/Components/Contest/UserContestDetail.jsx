@@ -17,11 +17,12 @@ const UserContestDetail = () => {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [loading, setLoading] = useState(false);
     const [listContestant, setListContestant] = useState(null);
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const fetchContest = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/contests/${contestID}`
+                `${baseURL}/contests/${contestID}`
             );
             const json = await response.json();
             if (json.code === 200) setContest(json.data);
@@ -33,7 +34,7 @@ const UserContestDetail = () => {
     const fetchListContestants = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/contestants/getContestantByContest/${contestID}`
+                `${baseURL}/contestants/getContestantByContest/${contestID}`
             );
             const json = await response.json();
             if (json.code === 200)
@@ -47,7 +48,7 @@ const UserContestDetail = () => {
     const getContestant = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/contestants/getContestant/${user.account.id}/${contestID}`
+                `${baseURL}/contestants/getContestant/${user.account.id}/${contestID}`
             );
             const json = await response.json();
             if (json.code == 200) {
@@ -93,7 +94,7 @@ const UserContestDetail = () => {
                 return
             }
             const response = await fetch(
-                `http://localhost:8080/contestants/register/${user.account.id}/${contestID}`, {
+                `${baseURL}/contestants/register/${user.account.id}/${contestID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -135,7 +136,7 @@ const UserContestDetail = () => {
             const submissionUrl = await uploadToCloudinary(file);
             setUploadProgress(75);
             setContestant({ ...contestant, submissionName: file.name, submission: submissionUrl, submit_time: new Date() })
-            const response = await fetch(`http://localhost:8080/contestants/submitFile`, {
+            const response = await fetch(`${baseURL}/contestants/submitFile`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     "contestantID": contestant?.id,

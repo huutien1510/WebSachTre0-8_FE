@@ -7,11 +7,12 @@ const BlogDetails = () => {
 
     const [article, setArticle] = useState(null);
     const articleID = useParams().articleID;
+    const baseURL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fecthArticle = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/articles/${articleID}`);
+                const response = await fetch(`${baseURL}/articles/${articleID}`);
                 const json = await response.json();
                 setArticle(json.data);
             }

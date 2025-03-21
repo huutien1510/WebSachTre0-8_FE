@@ -21,10 +21,11 @@ import jwt_decode from "jwt-decode";
 import { addToCart, clearCart, loginCart } from "../redux/cartSlice";
 import { User } from "lucide-react";
 
-const baseURL = "http://localhost:8080";
+const baseURL = import.meta.env.VITE_API_URL;
+
 
 const axiosClient = axios.create({
-  baseURL: baseURL,
+  baseURL: `${baseURL}`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -35,7 +36,7 @@ const axiosClient = axios.create({
 const refreshToken = async () => {
   try {
     const res = await axios.post(
-      "http://localhost:8080/auth/refresh",
+      `${baseURL}/auth/refresh`,
       {},
       {
         withCredentials: true, // Cho phép gửi cookie
@@ -50,7 +51,7 @@ const refreshToken = async () => {
 
 export const createAxiosInstance = (user, dispatch) => {
   const axiosInstance = axios.create({
-    baseURL: baseURL,
+    baseURL: `${baseURL}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -83,7 +84,7 @@ export const createAxiosInstance = (user, dispatch) => {
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
   try {
-    const res = await axios.post("http://localhost:8080/auth/login", user, { withCredentials: true });
+    const res = await axios.post(`${baseURL}/auth/login`, user, { withCredentials: true });
     dispatch(loginSuccess(res.data));
 
     dispatch(loginCart(res.data.data?.account?.carts?.books));
@@ -106,7 +107,7 @@ export const loginUser = async (user, dispatch, navigate) => {
 export const getAllUsers = async (accessToken, dispatch) => {
   dispatch(getUsersStart());
   try {
-    const res = await axios.get("http://localhost:8080/user", {
+    const res = await axios.get(`${baseURL}/user`, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Đảm bảo header này
       },
@@ -123,7 +124,7 @@ export const deleteUser = async (id, accessToken, dispatch, user) => {
   dispatch(deleteUserStart());
   try {
     const res = await axiosInstance.delete(
-      `http://localhost:8080/user/account/${id}`,
+      `${baseURL}/user/account/${id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -141,7 +142,7 @@ export const logout = async (dispatch, navigate, token, user) => {
   try {
     const axiosInstance = createAxiosInstance(user, dispatch);
     await axiosInstance.post(
-      "http://localhost:8080/auth/logout",
+      `${baseURL}/auth/logout`,
       {},
       {
         headers: {
@@ -161,7 +162,7 @@ export const logout = async (dispatch, navigate, token, user) => {
 export const registerUser = async (user, navigate) => {
   try {
     const res = await axios.post(
-      "http://localhost:8080/auth/register",
+      `${baseURL}/auth/register`,
       user
     );
     
@@ -184,7 +185,7 @@ export const registerUser = async (user, navigate) => {
 export const updateUser = async (user, id, accessToken, dispatch, upUser) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const updateRes = await axiosInstance.put(`http://localhost:8080/user/account/my-info`, upUser, {
+    const updateRes = await axiosInstance.put(`${baseURL}/user/account/my-info`, upUser, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -233,7 +234,7 @@ export const updatebyAdmin = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
     const res = await axiosInstance.put(
-      `http://localhost:8080/user/account/${id}`,
+      `${baseURL}/user/account/${id}`,
       upUser,
       {
         headers: {
@@ -267,7 +268,7 @@ export const updatebyAdmin = async (
 export const createRating = async (rating, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.post("http://localhost:8080/ratings/add", rating, {
+    const res = await axiosInstance.post(`${baseURL}/ratings/add`, rating, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -288,7 +289,7 @@ export const createRating = async (rating, accessToken, user, dispatch) => {
 export const updateRating = async (id, rating, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.patch(`http://localhost:8080/ratings/update/${id}`, rating, {
+    const res = await axiosInstance.patch(`${baseURL}/ratings/update/${id}`, rating, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -308,7 +309,7 @@ export const updateRating = async (id, rating, accessToken, user, dispatch) => {
 export const getAllRating = async (accessToken, dispatch, user) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.get("http://localhost:8080/ratings/getAll?page=1&limit=15", {
+    const res = await axiosInstance.get(`${baseURL}/ratings/getAll?page=1&limit=15`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -328,7 +329,7 @@ export const getAllRating = async (accessToken, dispatch, user) => {
 export const deleteRating = async (id, accessToken, user, dispatch) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
-    const res = await axiosInstance.delete(`http://localhost:8080/ratings/delete/${id}`, {
+    const res = await axiosInstance.delete(`${baseURL}/ratings/delete/${id}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -356,7 +357,7 @@ export const getFavoriteStatus = async (
 
   try {
     const response = await axiosInstance.get(
-      `http://localhost:8080/favbooks/checkIsFavorites/${accountId}/${bookId}`,
+      `${baseURL}/favbooks/checkIsFavorites/${accountId}/${bookId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -380,7 +381,7 @@ export const addToFavorites = async (
 
   try {
     const response = await axiosInstance.post(
-      `http://localhost:8080/favbooks/addFavorite/${accountId}/${bookId}`,
+      `${baseURL}/favbooks/addFavorite/${accountId}/${bookId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -404,7 +405,7 @@ export const removeFromFavorites = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
 
   try {
-    const response = await axiosInstance.delete(`http://localhost:8080/favbooks/removeFavorite/${accountId}/${bookId}`,
+    const response = await axiosInstance.delete(`${baseURL}/favbooks/removeFavorite/${accountId}/${bookId}`,
       {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -428,7 +429,7 @@ export const getFavoriteBooks = async (
 
   try {
     const response = await axiosInstance.get(
-      `http://localhost:8080/favbooks/account/${accountId}?page=${page}&limit=${limit}`,
+      `${baseURL}/favbooks/account/${accountId}?page=${page}&limit=${limit}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -481,7 +482,7 @@ export const updateChapterTitle = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
   try {
     const response = await axiosInstance.patch(
-      `http://localhost:8080/chapters/updateChapter/${chapterID}`,
+      `${baseURL}/chapters/updateChapter/${chapterID}`,
       {
         title: chapterTitle,
       },
@@ -583,7 +584,7 @@ export const addBookToCart = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
 
   try {
-    const response = await axiosInstance.post(`http://localhost:8080/carts/addBookToCart/${accountId}/${bookId}`,
+    const response = await axiosInstance.post(`${baseURL}/carts/addBookToCart/${accountId}/${bookId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -609,7 +610,7 @@ export const removeBookToCart = async (
   const axiosInstance = createAxiosInstance(user, dispatch);
 
   try {
-    const response = await axiosInstance.post(`http://localhost:8080/carts/removeBookFromCart/${accountId}/${bookId}`,
+    const response = await axiosInstance.post(`${baseURL}/carts/removeBookFromCart/${accountId}/${bookId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -635,7 +636,7 @@ export const checkOut = async (
   console.log(JSON.stringify(order))
 
   try {
-    const response = await axiosInstance.post(`http://localhost:8080/orders`,order,
+    const response = await axiosInstance.post(`${baseURL}/orders`,order,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

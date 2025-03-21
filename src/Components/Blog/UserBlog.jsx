@@ -10,12 +10,13 @@ function UserBlog() {
     const [totalPages, setTotalPages] = useState(1);
     const inputRef = useRef(null);
     const [listArticles, setListArticles] = useState([]);
+    const baseURL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fecthBlog = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:8080/articles/getAll?page=${page - 1}&size=10`);
+                const response = await fetch(`${baseURL}/articles/getAll?page=${page - 1}&size=10`);
                 const json = await response.json();
                 setListArticles(json.data.content);
                 setTotalPages(json.data.totalPages);

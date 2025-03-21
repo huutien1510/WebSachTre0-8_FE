@@ -15,6 +15,7 @@ function Bookcase() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -33,7 +34,7 @@ function Bookcase() {
             // setTotalPages(response.data.pagination.totalPages);
           } else {
             try {
-              const response = await fetch(`http://localhost:8080/readinghistory/account/${accountId}`, {
+              const response = await fetch(`${baseURL}/readinghistory/account/${accountId}`, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",

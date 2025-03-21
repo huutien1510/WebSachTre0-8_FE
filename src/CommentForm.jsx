@@ -11,6 +11,7 @@ function CommentForm({ chapterID, fetchComment }) {
   const [comment, setComment] = useState('');
   const [cursorPosition, setCursorPosition] = useState()
   const user = useSelector((state) => state.auth?.login?.currentUser?.data)
+  const baseURL = import.meta.env.VITE_API_URL;
 
   const pickEmoji = (e) => {
     const emoji = e.emoji; // Lấy giá trị emoji được chọn
@@ -35,7 +36,7 @@ function CommentForm({ chapterID, fetchComment }) {
           toast.error("Thiếu bình luận");
           return;
         }
-        const response = await fetch(`http://localhost:8080/comments/post`, {
+        const response = await fetch(`${baseURL}/comments/post`, {
           method: "POST",
           body: JSON.stringify({
             "accountID": user.account.id,

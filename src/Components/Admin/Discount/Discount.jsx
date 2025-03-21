@@ -18,6 +18,7 @@ const DiscountAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [discountIDToDelete, setDiscountIDToDelete] = useState(null);
   const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_URL;
   const openModal = (id) => {
     setDiscountIDToDelete(id);
     setIsModalOpen(true);
@@ -30,7 +31,7 @@ const DiscountAdmin = () => {
   const confirmDelete = async () => {
     if (discountIDToDelete) {
         try {
-            const response = await fetch(`http://localhost:8080/discounts/delete/${discountIDToDelete}`, {
+            const response = await fetch(`${baseURL}/discounts/delete/${discountIDToDelete}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${user?.accessToken}`
@@ -56,7 +57,7 @@ const DiscountAdmin = () => {
     const fecthDiscount = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:8080/discounts/getAll?page=${page - 1}&size=10`, {
+        const response = await fetch(`${baseURL}/discounts/getAll?page=${page - 1}&size=10`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user?.accessToken}`

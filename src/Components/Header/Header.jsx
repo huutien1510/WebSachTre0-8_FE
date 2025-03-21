@@ -7,11 +7,12 @@ import { Description } from "@mui/icons-material";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [genre, setGenre] = useState([])
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchGenre = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/genres/getAll`);
+        const response = await fetch(`${baseURL}/genres/getAll`);
         const json = await response.json();
         setGenre(json.data);
       } catch (error) {

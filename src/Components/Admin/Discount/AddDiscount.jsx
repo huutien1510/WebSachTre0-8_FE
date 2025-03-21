@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 const AddDiscount = () => {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const [discount, setDiscount] = useState({
         code: "",
@@ -42,7 +43,7 @@ const AddDiscount = () => {
         const adddiscount = async () => {
             try {
                 const date = new Date();
-                const response = await fetch(`http://localhost:8080/discounts/add`, {
+                const response = await fetch(`${baseURL}/discounts/add`, {
                     method: "POST",
                     body: JSON.stringify({
                         "code": discount.code,

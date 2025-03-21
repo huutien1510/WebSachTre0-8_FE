@@ -25,6 +25,7 @@ function BookDetail() {
     const id = useSelector(
         (state) => state.auth.login.currentUser?.data.account.id
     );
+    const baseURL = import.meta.env.VITE_API_URL;
     const [quantity, setQuantity] = useState(1);
     const [isFavorite, setIsFavorite] = useState(false);
     const bookID = useParams().bookID;
@@ -80,7 +81,7 @@ function BookDetail() {
         const fetchBook = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:8080/books/${bookID}`
+                    `${baseURL}/books/${bookID}`
                 );
                 const json = await response.json();
                 if (json.code != 500)
@@ -100,7 +101,7 @@ function BookDetail() {
         const fetchingBookSoftBought = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`,
+                    `${baseURL}/orders/checkSoftBookBought/${id}/${bookID}`,
                 );
                 const json = await response.json();
                 if (json.code != 500)

@@ -9,12 +9,13 @@ const ForgotPassword = () => {
     const [loading, setLoading] = useState(false);
     const [state, setState] = useState(false);
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const handleEmail = async (e) => {
         e.preventDefault();
         setLoading(true); // Bắt đầu loading
         try {
-            const res = await axios.post('http://localhost:8080/auth/forgot-password', { email });
+            const res = await axios.post(`${baseURL}/auth/forgot-password`, { email });
             console.log(res);
             if (res.status === 200) {
                 setState(true);

@@ -10,6 +10,7 @@ function UpdateOrder() {
     const navigate = useNavigate();
     const location = useLocation();
     const [order, setOrder] = useState(location.state?.order)
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,7 +22,7 @@ function UpdateOrder() {
 
     const updateOrder = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/orders/updateOrder/${orderID}`, {
+            const response = await fetch(`${baseURL}/orders/updateOrder/${orderID}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     "totalPrice": order.totalPrice,

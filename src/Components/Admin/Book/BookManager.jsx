@@ -9,12 +9,13 @@ function BookManager() {
   const [totalPages, setTotalPages] = useState(1);
   const inputRef = useRef(null);
   const location = useLocation();
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fecthBook = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:8080/books/getAll?page=${page - 1}&size=15`);
+        const response = await fetch(`${baseURL}/books/getAll?page=${page - 1}&size=15`);
         const json = await response.json();
         setBook(json.data.content);
         setTotalPages(json.data.totalPages);

@@ -14,6 +14,7 @@ function UserOrderDetail() {
     const id = useSelector(
         (state) => state.auth?.login?.currentUser?.data?.account.id
     );
+    const baseURL = import.meta.env.VITE_API_URL;
     const orderID = useParams().orderID
     const location = useLocation();
     const navigate = useNavigate()
@@ -25,7 +26,7 @@ function UserOrderDetail() {
     useEffect(() => {
         const buyBook = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/orders/retryOrder/${order.id}`, {
+                const response = await fetch(`${baseURL}/orders/retryOrder/${order.id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

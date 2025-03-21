@@ -14,10 +14,11 @@ function UpdateBook() {
     const priceInputRef = useRef(null)
     const fileInputRef = useRef(null);
     const [isUploading, setIsUploading] = useState(false);
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const fetchGenre = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/genres/getAll`);
+            const response = await fetch(`${baseURL}/genres/getAll`);
             const json = await response.json();
             setGenre(json.data);
         } catch (error) {
@@ -27,7 +28,7 @@ function UpdateBook() {
 
     const fetchBook = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/books/${bookId}`);
+            const response = await fetch(`${baseURL}/books/${bookId}`);
             const json = await response.json();
             setBook(json.data);
             console.log("book", json.data);
@@ -121,7 +122,7 @@ function UpdateBook() {
 
     const updateBook = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/books/updateBook/${bookId}`, {
+            const response = await fetch(`${baseURL}/books/updateBook/${bookId}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     "name": book.name,

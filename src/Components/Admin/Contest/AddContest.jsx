@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 function AddContest() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
     const fileInputRef = useRef(null);
     const [isUploading, setIsUploading] = useState(false);
     const [contest, setContest] = useState({
@@ -93,7 +94,7 @@ function AddContest() {
 
         const addcontest = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/contests/addContest`, {
+                const response = await fetch(`${baseURL}/contests/addContest`, {
                     method: "POST",
                     body: JSON.stringify({
                         "name": contest.name,

@@ -6,10 +6,11 @@ import { useSelector } from "react-redux";
 function CommentSection({ chapterID }) {
   const [comments, setComments] = useState(null);
   const users = useSelector((state) => state.users.users?.allUsers?.data);
+  const baseURL = import.meta.env.VITE_API_URL;
   const fetchComment = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/comments/chapter/${chapterID}`
+        `${baseURL}/comments/chapter/${chapterID}`
       );
       const json = await response.json();
       setComments(json.data);

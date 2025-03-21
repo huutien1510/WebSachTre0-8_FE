@@ -10,6 +10,7 @@ const ContestDetail = () => {
     const [listContestant, setListContestant] = useState(null);
     const [scoringId, setScoringId] = React.useState(null); // Lưu ID thí sinh đang chấm điểm
     const [score, setScore] = React.useState(""); // Lưu điểm nhập
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const truncateText = (text, maxLength) => {
         if (text.length <= maxLength) {
@@ -21,7 +22,7 @@ const ContestDetail = () => {
 
     const submitScore = async (contestantID) => {
         try {
-            const response = await fetch(`http://localhost:8080/contestants/scoreContestant/${contestantID}`, {
+            const response = await fetch(`${baseURL}/contestants/scoreContestant/${contestantID}`, {
                 method: "PATCH",
                 body: JSON.stringify({ score }),
                 headers: { "Content-Type": "application/json" },
@@ -42,7 +43,7 @@ const ContestDetail = () => {
     const fetchContest = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/contests/${contestID}`
+                `${baseURL}/contests/${contestID}`
             );
             const json = await response.json();
             if (json.code === 200)
@@ -55,7 +56,7 @@ const ContestDetail = () => {
     const fetchContestants = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/contestants/getContestantByContest/${contestID}`
+                `${baseURL}/contestants/getContestantByContest/${contestID}`
             );
             const json = await response.json();
             if (json.code === 200)
