@@ -8,12 +8,13 @@ const UserContest = () => {
     const [totalPages, setTotalPages] = useState(1);
     const inputRef = useRef(null);
     const [contests, setContests] = useState(null);
+    const baseURL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fecthContest = async (page) => {
             try {
                 if (inputRef.current) inputRef.current.value = page;
-                const response = await fetch(`http://localhost:8080/contests/getAll?page=${page - 1}&size=9`);
+                const response = await fetch(`${baseURL}/contests/getAll?page=${page - 1}&size=9`);
                 const json = await response.json();
                 setContests(json.data.content);
                 setTotalPages(json.data.totalPages);

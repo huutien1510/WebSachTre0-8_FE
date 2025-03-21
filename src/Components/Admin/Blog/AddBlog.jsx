@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 const AddBlog = () => {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
     const [genre, setGenre] = useState([])
     const priceInputRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -88,7 +89,7 @@ const AddBlog = () => {
 
         const addBlog = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/articles/addArticle`, {
+                const response = await fetch(`${baseURL}/articles/addArticle`, {
                     method: "POST",
                     body: JSON.stringify({
                         "title": blog.title,

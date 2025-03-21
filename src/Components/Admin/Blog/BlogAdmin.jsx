@@ -11,6 +11,7 @@ const BlogAdmin = () => {
   const user = useSelector((state) => state.auth.login?.currentUser);
   const location = useLocation();
   const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_URL;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const inputRef = useRef(null);
@@ -20,7 +21,7 @@ const BlogAdmin = () => {
 
   const deleteArticle = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/articles/deleteArticle/${articleIDToDelete}`, {
+      const response = await fetch(`${baseURL}/articles/deleteArticle/${articleIDToDelete}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user?.data.accessToken}`
@@ -60,7 +61,7 @@ const BlogAdmin = () => {
     const fecthBlog = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:8080/articles/getAll?page=${page - 1}&size=9`);
+        const response = await fetch(`${baseURL}/articles/getAll?page=${page - 1}&size=9`);
         const json = await response.json();
         setListArticles(json.data.content);
         setTotalPages(json.data.totalPages);

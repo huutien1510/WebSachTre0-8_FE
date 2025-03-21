@@ -14,11 +14,12 @@ const EditBlog = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [article, setArticle] = useState(null);
     const articleID = useParams().articleID;
+    const baseURL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fecthArticle = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/articles/${articleID}`);
+                const response = await fetch(`${baseURL}/articles/${articleID}`);
                 const json = await response.json();
                 setArticle(json.data);
             }
@@ -95,7 +96,7 @@ const EditBlog = () => {
 
         const editBlog = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/articles/editArticle/${article.id}`, {
+                const response = await fetch(`${baseURL}/articles/editArticle/${article.id}`, {
                     method: "PATCH",
                     body: JSON.stringify({
                         "title": article?.title,

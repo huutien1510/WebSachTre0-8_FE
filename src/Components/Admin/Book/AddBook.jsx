@@ -8,6 +8,7 @@ import axios from 'axios';
 function AddBook() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
     const [genre, setGenre] = useState([])
     const priceInputRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -109,7 +110,7 @@ function AddBook() {
     useEffect(() => {
         const fetchGenre = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/genres/getAll`);
+                const response = await fetch(`${baseURL}/genres/getAll`);
                 const json = await response.json();
                 setGenre(json.data);
             } catch (error) {
@@ -130,7 +131,7 @@ function AddBook() {
 
         const addBook = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/books/addBook`, {
+                const response = await fetch(`${baseURL}/books/addBook`, {
                     method: "POST",
                     body: JSON.stringify({
                         "name": book.name,

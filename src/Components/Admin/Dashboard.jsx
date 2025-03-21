@@ -4,10 +4,11 @@ const Dashboard = () => {
     const [totalBooks, setTotalBooks] = useState(0)
     const [totalView, setTotalView] = useState(0)
     const [price, setPrice] = useState(0)
+    const baseURL = import.meta.env.VITE_API_URL;
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/books/total')
+                const response = await fetch(`${baseURL}/books/total`)
                 const data = await response.json()
                 setTotalBooks(data.data)
 
@@ -20,7 +21,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchView = async () => {
             try {
-                const response = await fetch('http://localhost:8080/chapters/totalView')
+                const response = await fetch(`${baseURL}/chapters/totalView`)
                 const data = await response.json()
                 setTotalView(data.data)
             } catch (error) {
@@ -30,7 +31,7 @@ const Dashboard = () => {
         fetchView()
         const fetchPrice = async () => {
             try {
-                const response = await fetch('http://localhost:8080/orders/totalPrice')
+                const response = await fetch(`${baseURL}/orders/totalPrice`)
                 const data = await response.json()
                 setPrice(data.data)
             } catch (error) {

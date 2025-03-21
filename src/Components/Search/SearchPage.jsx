@@ -10,12 +10,13 @@ const SearchPage = () => {
   const inputRef = useRef(null);
   const [searchResults, setSearchResults] = useState([]);
   const query = new URLSearchParams(location.search).get("keyword");
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchResults = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
-        const response = await fetch(`http://localhost:8080/books/search?keyword=${query}&page=${page - 1}&size=10`);
+        const response = await fetch(`${baseURL}/books/search?keyword=${query}&page=${page - 1}&size=10`);
         const data = await response.json();
         if (response.ok) {
           setSearchResults(data.data.content);

@@ -7,8 +7,9 @@ function PaymentReturn() {
     const queryParams = new URLSearchParams(location.search);
     const navigate = useNavigate()
     const accessToken = useSelector(
-    (state) => state.auth?.login?.currentUser?.data.accessToken
-  );
+        (state) => state.auth?.login?.currentUser?.data.accessToken
+    );
+    const baseURL = import.meta.env.VITE_API_URL;
 
     // Lấy giá trị của các tham số từ URL
     const query = {
@@ -19,12 +20,12 @@ function PaymentReturn() {
     const params = new URLSearchParams(query);
     const updateOrderStatus = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/orders/momo-return?${params.toString()}`, {
+            const response = await fetch(`${baseURL}/orders/momo-return?${params.toString()}`, {
                 method: "GET",
             });
-            const data = await response.json() ;
+            const data = await response.json();
             const orders = data.data;
-            navigate(`/ordersuccess`, { state: {orders} });
+            navigate(`/ordersuccess`, { state: { orders } });
         } catch (error) {
             console.log(error);
         }

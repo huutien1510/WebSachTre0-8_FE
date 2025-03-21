@@ -18,10 +18,12 @@ const RatingComponent = ({ bookId, avgRating, setAvgRating, ratings, setRatings 
     // const [avgRating, setAvgRating] = useState(0);
     const navigate = useNavigate();
 
+    const baseURL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/ratings/book/${bookId}`);
+                const response = await fetch(`${baseURL}/ratings/book/${bookId}`);
                 const json = await response.json();
                 setRatings(json.data);
                 if (json.data.length > 0) {

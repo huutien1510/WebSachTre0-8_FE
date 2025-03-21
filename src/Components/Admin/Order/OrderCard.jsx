@@ -9,6 +9,7 @@ function OrderCard({ order }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
     const typeBook = order?.orderDetails[0]?.bookType;
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const getStatusColor = () => {
         switch (order.status) {
@@ -29,7 +30,7 @@ function OrderCard({ order }) {
 
     const deleteOrder = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/orders/deleteOrder/${orderIDToDelete}`, {
+            const response = await fetch(`${baseURL}/orders/deleteOrder/${orderIDToDelete}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${user?.accessToken}`

@@ -8,6 +8,7 @@ const ResetPassword = () => {
     const [searchParams] = useSearchParams();
     const email = searchParams.get('email');
     const token = searchParams.get('token');
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +22,7 @@ const ResetPassword = () => {
     const handleReset = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/auth/reset-password', { email, token, newPassword: password });
+            const response = await axios.post(`${baseURL}/auth/reset-password`, { email, token, newPassword: password });
             setMessage(response.data.message);
             setTimeout(() => {
                 navigate("/login");

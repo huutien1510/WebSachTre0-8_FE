@@ -32,6 +32,8 @@ const Order = () => {
     paymentMethod: "momo",
     discount: ""
   });
+
+  const baseURL = import.meta.env.VITE_API_URL;
   const location = useLocation();
   const { selectedProducts } = location.state || { selectedProducts: [] };
   let [firstType] = selectedProducts.map((product) => product.type);
@@ -181,7 +183,7 @@ const Order = () => {
 
   const handleDiscount = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/discounts/checkDiscount`, {
+      const response = await fetch(`${baseURL}/discounts/checkDiscount`, {
         method: "POST",
         body: JSON.stringify({
           "code": formData.discount,

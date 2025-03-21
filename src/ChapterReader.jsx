@@ -13,6 +13,7 @@ function ChapterReader() {
   const accessToken = useSelector(
     (state) => state.auth?.login?.currentUser?.data.accessToken
   );
+  const baseURL = import.meta.env.VITE_API_URL;
   const localtion = useLocation();
   const bookID = useParams().bookID
   const chapter_number = useParams().chapter_number;
@@ -31,7 +32,7 @@ function ChapterReader() {
     const fetchingBookSoftBought = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/orders/checkSoftBookBought/${id}/${bookID}`
+          `${baseURL}/orders/checkSoftBookBought/${id}/${bookID}`
         );
         const json = await response.json();
         if (json.code !== 500) {
@@ -44,7 +45,7 @@ function ChapterReader() {
     const fetchBook = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/books/${bookID}`
+          `${baseURL}/books/${bookID}`
         );
         const json = await response.json();
         if (json.code !== 500) {
@@ -65,7 +66,7 @@ function ChapterReader() {
   //   const fetchBook = async () => {
   //     try {
   //       const response = await fetch(
-  //         `http://localhost:8080/books/${bookID}`
+  //         `${baseURL}/books/${bookID}`
   //       );
   //       const json = await response.json();
   //       if (json.code !== 500) {
@@ -112,7 +113,7 @@ function ChapterReader() {
   useEffect(() => {
     const fetchListChapter = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/chapters/${bookID}`);
+        const response = await fetch(`${baseURL}/chapters/${bookID}`);
         const json = await response.json()
         setListChapter(json.data)
         const index = json.data.findIndex((chapter) => chapter.chapterNumber == chapter_number);
@@ -145,7 +146,7 @@ function ChapterReader() {
 
   const handleAddReadBook = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/readinghistory`, {
+      const response = await fetch(`${baseURL}/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
           "accountID": user.account.id,
@@ -167,7 +168,7 @@ function ChapterReader() {
 
   const handleUpReadView = async (chapterID) => {
     try {
-      await fetch(`http://localhost:8080/chapters/upView/${chapterID}`, {
+      await fetch(`${baseURL}/chapters/upView/${chapterID}`, {
         method: "PATCH"
       });
     } catch (error) {
@@ -178,7 +179,7 @@ function ChapterReader() {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/chaptercontents/${this_chapter.id}`)
+        const response = await fetch(`${baseURL}/chaptercontents/${this_chapter.id}`)
         const json = await response.json()
         setImage(json.data);
       } catch (error) {

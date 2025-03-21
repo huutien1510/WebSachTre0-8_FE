@@ -13,6 +13,7 @@ function UpdateContest() {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
     const location = useLocation();
+    const baseURL = import.meta.env.VITE_API_URL;
     const fileInputRef = useRef(null);
     const [isUploading, setIsUploading] = useState(false);
     const [contest, setContest] = useState(location.state.contest);
@@ -87,7 +88,7 @@ function UpdateContest() {
 
         const addcontest = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/contests/updateContest/${contest.id}`, {
+                const response = await fetch(`${baseURL}/contests/updateContest/${contest.id}`, {
                     method: "PATCH",
                     body: JSON.stringify({
                         "name": contest?.name,

@@ -10,6 +10,7 @@ const ContestCard = ({ contest }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [contestIDToDelete, setContestIDToDelete] = useState(null);
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
     const openModal = (id) => {
         setContestIDToDelete(id);
         setIsModalOpen(true);
@@ -23,7 +24,7 @@ const ContestCard = ({ contest }) => {
     const confirmDelete = async () => {
         if (contestIDToDelete) {
             try {
-                const response = await fetch(`http://localhost:8080/contests/deleteContest/${contestIDToDelete}`, {
+                const response = await fetch(`${baseURL}/contests/deleteContest/${contestIDToDelete}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${user?.data.accessToken}`

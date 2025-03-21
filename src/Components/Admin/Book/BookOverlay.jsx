@@ -13,10 +13,11 @@ const BookOverlay = ({ book }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookIDToDelete, setBookIDToDelete] = useState(null);
+  const baseURL = import.meta.env.VITE_API_URL;
 
   const deleteBook = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/books/deleteBook/${bookIDToDelete}`, {
+      const response = await fetch(`${baseURL}/books/deleteBook/${bookIDToDelete}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user?.data.accessToken}`

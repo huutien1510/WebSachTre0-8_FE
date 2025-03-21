@@ -16,11 +16,12 @@ function ChapterBookAdmin() {
   const [book, setBook] = useState(location.state?.book);
   const [chapters, setChapters] = useState([]);
   const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_URL;
 
   const fetchData = async () => {
     try {
       const response2 = await fetch(
-        `http://localhost:8080/chapters/${bookID}`
+        `${baseURL}/chapters/${bookID}`
       );
       const chapterData = await response2.json();
       setChapters(chapterData.data);

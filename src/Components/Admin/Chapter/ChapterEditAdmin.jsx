@@ -11,6 +11,7 @@ function ChapterEditAdmin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const chapterID = useParams().chapterID;
+  const baseURL = import.meta.env.VITE_API_URL;
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.data.accessToken;
   const location = useLocation();
@@ -28,14 +29,14 @@ function ChapterEditAdmin() {
     const fetchData = async () => {
       try {
         const chapterResponse = await fetch(
-          `http://localhost:8080/chapters/chapter/${chapterID}`
+          `${baseURL}/chapters/chapter/${chapterID}`
         );
         const chapterData = await chapterResponse.json();
         setChapter(chapterData?.data);
         setChapterTitle(chapterData?.data?.title);
 
         const contentsResponse = await fetch(
-          `http://localhost:8080/chaptercontents/${chapterID}`
+          `${baseURL}/chaptercontents/${chapterID}`
         );
         const contentsData = await contentsResponse.json();
         setContentItems(contentsData?.data);
@@ -87,7 +88,7 @@ function ChapterEditAdmin() {
       const axiosInstance = createAxiosInstance(user, dispatch);
 
       const response = await axiosInstance.delete(
-        `http://localhost:8080/chaptercontents/deleteContent/${contentToDelete}`,
+        `${baseURL}/chaptercontents/deleteContent/${contentToDelete}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -14,12 +14,13 @@ function ChapterAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const inputRef = useRef(null);
+  const baseURL = import.meta.env.VITE_API_URL; 
   useEffect(() => {
     const fecthBook = async (page) => {
       try {
         if (inputRef.current) inputRef.current.value = page;
         const response = await fetch(
-          `http://localhost:8080/books/getAll?page=${page - 1}&limit=15`
+          `${baseURL}/books/getAll?page=${page - 1}&limit=15`
         );
         const json = await response.json();
         setBook(json.data.content);

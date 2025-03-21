@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 function UserOrderCard({ order }) {
     const user = useSelector((state) => state.auth.login?.currentUser.data)
     const navigate = useNavigate();
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const getStatusColor = () => {
         switch (order.status) {
@@ -24,7 +25,7 @@ function UserOrderCard({ order }) {
     };
     const handleCancle = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/orders/cancelOrder/${order.id}`, {
+                const response = await fetch(`${baseURL}/orders/cancelOrder/${order.id}`, {
                     method: "GET",
                 });
                 console.log("response", response);

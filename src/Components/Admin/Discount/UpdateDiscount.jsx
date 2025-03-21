@@ -13,6 +13,7 @@ function UpdateDiscount() {
     const navigate = useNavigate();
     const location = useLocation();
     const [discount, setDiscount] = useState(location.state?.discount);
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,7 +27,7 @@ function UpdateDiscount() {
     const UpdateDiscount = async () => {
         try {
             const date = new Date();
-            const response = await fetch(`http://localhost:8080/discounts/update/${discountID}`, {
+            const response = await fetch(`${baseURL}/discounts/update/${discountID}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     "code": discount.code,
