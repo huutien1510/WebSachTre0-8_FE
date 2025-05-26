@@ -1,9 +1,13 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../image/default-avatar.png";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 const AccountLayout = () => {
-  const user = useSelector((state) => state.auth.login.currentUser);
-
+  const user = useSelector((state) => state?.auth?.login?.currentUser);
+  const userID = user?.data?.account?.id;
+  const [point, setPoint] = useState(0);
+  const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_URL;
   const menuItems = [
     {
       path: "/account/profile",
@@ -101,6 +105,32 @@ const AccountLayout = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+    const fetchPoint = async () => {
+      try {
+        const response = await fetch(`${baseURL}/user/point/${userID}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user?.data?.accessToken}`
+          }
+        })
+        const json = await response.json();
+        setPoint(json.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        
+      }
+    };
+    fetchPoint();
+  },[])
+
+  const handleChangePoint = () => {
+    navigate("/changePoint", {state: { point }});
+  }
+
   return (
     <div className="min-h-screen bg-black">
       <div className="w-full pl-28 pr-0 pt-20 pb-10">
@@ -110,19 +140,20 @@ const AccountLayout = () => {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <img
-                  src={user?.data.account.avatar || defaultAvatar}
+                  src={user?.data?.account?.avatar || defaultAvatar}
                   alt="Avatar"
                   className="w-16 h-16 rounded-full"
                 />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">
-                  {user.data.account.username}
+                  {user?.data?.account?.username}
                 </h1>
-                {/* <div className="flex items-center gap-2 mt-1">
-                  <span className="text-yellow-500 font-medium">0</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-yellow-500 font-medium">{point}</span>
                   <span className="text-gray-400">điểm</span>
-                </div> */}
+                  <button onClick={handleChangePoint} className="bg-gradient-to-br from-teal-500 to-green-600 text-white font-medium py-2 px-4 rounded-3xl">Đổi điểm</button>
+                </div>
               </div>
             </div>
           </div>

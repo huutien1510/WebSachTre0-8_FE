@@ -30,7 +30,8 @@ const Order = () => {
     ward: "",
     address: "",
     paymentMethod: "momo",
-    discount: ""
+    discount: "",
+    itemExchangeHistoryId: "",
   });
 
   const baseURL = import.meta.env.VITE_API_URL;
@@ -54,6 +55,10 @@ const Order = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
+  const [myVouchers, setMyVouchers] = useState([]);
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
+
   const handlePaymentMethodSelect = (method) => {
     setFormData(prevState => ({
       ...prevState,
@@ -61,7 +66,23 @@ const Order = () => {
     }))
   }
 
-  // Fetch provinces data on mount
+  const fetchInventory = async () => {
+    try {
+      const response = await fetch(`${baseURL}/exchange/inventory/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const json = await response.json();
+      if (json.code === 200) {
+        setMyVouchers(json.data);
+      }
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
+
+
   useEffect(() => {
     axios
       .get(
@@ -74,6 +95,7 @@ const Order = () => {
         }));
       })
       .catch((error) => console.error("Error fetching location data:", error));
+    fetchInventory();
   }, []);
 
   // Handle input changes
@@ -124,7 +146,7 @@ const Order = () => {
     if (firstType === null) {
       firstType = "Sach mem";
     }
-    
+
     let addressOrder = "";
     if (firstType === "Sach cung") {
       if (!formData.fullName || !formData.phone || !formData.email || !formData.province || !formData.district || !formData.ward || !formData.address) {
@@ -150,7 +172,8 @@ const Order = () => {
           quantity: product.quantity
         }
       }),
-      discountCode: formData.discount
+      discountCode: formData.discount,
+      itemExchangeHistoryId: formData.itemExchangeHistoryId
     }
     try {
       const response = await checkOut(dispatch, user1, newOrder, accessToken);
@@ -181,27 +204,27 @@ const Order = () => {
     }
   }
 
-  const handleDiscount = async () => {
+  const handleDiscount = async (discountCode) => {
     try {
       const response = await fetch(`${baseURL}/discounts/checkDiscount`, {
         method: "POST",
         body: JSON.stringify({
-          "code": formData.discount,
+          "code": discountCode,
         }),
         headers: {
           "Content-Type": "application/json",
         }
       });
       const json = await response.json();
-      console.log("json", json);
       if (json.code === 1000) {
         if (json.data.type === "PERCENT") {
           setToTalPrice(toTalprice - (toTalprice * json?.data.value / 100));
         }
         else {
-        setToTalPrice(toTalprice - json?.data.value ); 
-        } 
+          setToTalPrice(toTalprice - json?.data.value);
+        }
         setUseDiscount(true);
+
         toast.success("Cập nhật discount thành công");
       }
       else {
@@ -216,6 +239,8 @@ const Order = () => {
       toast.error(error?.response?.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại sau!");
     }
   }
+
+
 
   return (
 
@@ -475,18 +500,94 @@ const Order = () => {
             </div>
             <div className="bg-zinc-900 p-6 rounded-lg mt-2">
               <div className="space-y-4">
-                <input
+                {/* <input
                   type="text"
                   name="discount"
                   placeholder="Nhập mã giảm giá"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white"
-                  value={formData.discount}
+                  value={formData.discount || ""}
                   onChange={handleChange}
                   disabled={usediscount}
                 />
-                <button onClick={handleDiscount} className={`w-full bg-emerald-600  text-white font-bold py-2 px-4 rounded mt-4 ${usediscount ? "" :"hover:bg-emerald-700"} `} disabled={usediscount}>
+                <button onClick={() => handleDiscount(formData.discount)} className={`w-full bg-emerald-600  text-white font-bold py-2 px-4 rounded mt-4 ${usediscount ? "" : "hover:bg-emerald-700"} `} disabled={usediscount}>
                   Áp dụng
+                </button> */}
+                {/* Nút mở modal chọn voucher */}
+                <button
+                  type="button"
+                  className="w-full mt-2 text-emerald-400 underline hover:text-emerald-300"
+                  onClick={() => setShowVoucherModal(true)}
+                  disabled={usediscount}
+                >
+                  Chọn từ kho voucher của tôi
                 </button>
+                {showVoucherModal && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-zinc-900 rounded-lg p-6 w-full max-w-md">
+                      <h2 className="text-lg font-bold mb-4 text-white">Kho voucher của bạn</h2>
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {myVouchers.length === 0 && (
+                          <div className="text-gray-400 text-center">Bạn chưa có voucher nào</div>
+                        )}
+                        {myVouchers.map((item) => (
+                          <div
+                            key={item.itemId}
+                            className="bg-[#4B4F4F] hover:border-[#2ee59d] border border-[#4B4F4F] rounded-xl p-6 text-center shadow-lg transition-all duration-200 relative w-full" onClick={() => {
+                              handleDiscount(item.codeVoucher);
+                              setFormData(prev => ({
+                                ...prev,
+                                discount: item.codeVoucher,
+                                itemExchangeHistoryId: item.id
+                              }));
+                              setAppliedDiscount(item);
+                              setShowVoucherModal(false);
+                            }}
+                          >
+                            <div className="absolute top-2 right-2 flex items-center justify-center bg-gradient-to-tr from-yellow-400 to-yellow-300 text-black px-3 py-1 rounded-full text-xs font-extrabold shadow-lg border-2 border-white min-w-[36px] min-h-[28px]">
+                              <span className="mr-1">X</span>
+                              {item.quantity}
+                            </div>
+
+                            <img
+                              src={item.itemImage}
+                              alt={item.itemName}
+                              className="w-20 h-20 mb-3 object-cover mx-auto rounded-full"
+                            />
+                            <div className="font-bold mb-1 text-white text-lg">{item.itemName}</div>
+                            <div className="font-bold mb-1 text-yellow-300 text-sm">Giảm {item.voucherValue.toLocaleString()
+                            } {item.voucherType === "PERCENT" ? "%" : "VNĐ"}</div>
+                            <div className="mb-3 text-gray-400 text-sm">{(() => {
+                              const [year, month, day] = item.voucherEndDate.split("-");
+                              return `${day}-${month}-${year}`;
+                            })()}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        className="w-full mt-4 bg-gray-700 text-white py-2 rounded hover:bg-gray-600"
+                        onClick={() => setShowVoucherModal(false)}
+                      >
+                        Đóng
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {appliedDiscount && (
+                  <>
+                    <div className="textsm font-bold">Voucher đã áp dụng: </div>
+                    <div className="bg-[#4B4F4F] border border-[#4B4F4F] rounded-xl p-6 text-center shadow-lg transition-all duration-200 relative w-full">
+                      <img
+                        src={appliedDiscount.itemImage}
+                        alt={appliedDiscount.itemName}
+                        className="w-20 h-20 mb-3 object-cover mx-auto rounded-full"
+                      />
+                      <div className="font-bold mb-1 text-white text-lg">{appliedDiscount.itemName}</div>
+                      <div className="font-bold mb-1 text-yellow-300 text-sm">
+                        Giảm {appliedDiscount.voucherValue.toLocaleString()} {appliedDiscount.voucherType === "PERCENT" ? "%" : "VNĐ"}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

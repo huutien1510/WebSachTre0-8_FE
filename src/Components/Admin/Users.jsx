@@ -87,7 +87,7 @@ export default function Users() {
                             </tr>
                         </thead>
                         <tbody>
-                            {users?.data.map((user) => (
+                            {users?.data?.map((user) => (
                                 <tr key={user.id} className={"bg-gray-200 hover:bg-gray-100 transition duration-200"}>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.id}</td>
                                     <td className="py-3 px-4 border-b text-gray-800">{user.username}</td>

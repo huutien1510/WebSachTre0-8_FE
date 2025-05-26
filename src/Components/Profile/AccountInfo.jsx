@@ -11,8 +11,8 @@ function AccountInfo() {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const currentUser = useSelector((state) => state.auth.login.currentUser);
-  const accessToken = currentUser?.data.accessToken;
-  const id = currentUser?.data.account.id;
+  const accessToken = currentUser?.data?.accessToken;
+  const id = currentUser?.data?.account?.id;
   const [user, setUser] = useState({
     username: "",
     id: "",

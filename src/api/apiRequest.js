@@ -89,7 +89,7 @@ export const loginUser = async (user, dispatch, navigate) => {
 
     dispatch(loginCart(res.data.data?.account?.carts?.books));
     
-    if (res.data.data.account.roles[0] === "ADMIN") {
+    if (res.data.data?.account?.roles[0] === "ADMIN") {
       navigate("/admin/");
       return;
     }
