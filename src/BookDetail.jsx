@@ -14,6 +14,7 @@ import {
     removeFromFavorites,
     addBookToCart,
 } from "./api/apiRequest";
+import Loading from "./Components/Loading/Loading";
 
 
 function BookDetail() {
@@ -35,6 +36,7 @@ function BookDetail() {
     const [booksoftbought, setBookSoftBought] = useState(false);
     const dispatch = useDispatch();
     const [book, setBook] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -78,6 +80,7 @@ function BookDetail() {
         }
     };
     useEffect(() => {
+        setLoading(true);
         const fetchBook = async () => {
             try {
                 const response = await fetch(
@@ -88,6 +91,8 @@ function BookDetail() {
                     setBook(json.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -99,6 +104,7 @@ function BookDetail() {
 
     useEffect(() => {
         const fetchingBookSoftBought = async () => {
+            setLoading(true);
             try {
                 const response = await fetch(
                     `${baseURL}/orders/checkSoftBookBought/${id}/${bookID}`,
@@ -108,6 +114,8 @@ function BookDetail() {
                     setBookSoftBought(json.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchingBookSoftBought();
@@ -124,6 +132,7 @@ function BookDetail() {
         }
     }
     const handleBuyHardBook = async () => {
+        setLoading(true);   
         try {
             const selectedProducts = [{
                 ...book,
@@ -134,9 +143,12 @@ function BookDetail() {
         catch (error) {
             console.error("Error updating favorite status:", error);
             toast.error(error.response?.data?.message);
+        } finally {
+            setLoading(false);
         }
     }
     const handleBuySoftBook = async () => {
+        setLoading(true);
         try {
             const selectedProducts = [{
                 ...book,
@@ -147,10 +159,15 @@ function BookDetail() {
         catch (error) {
             console.error("Error updating favorite status:", error);
             toast.error(error.response?.data?.message);
+        } finally {
+            setLoading(false);
         }
     }
     const handleFreeBook = async () => {
         navigate(`/book/${bookID}/chaptercontent/1`);
+    }
+    if (loading) {
+        return <Loading size="medium" />
     }
 
 

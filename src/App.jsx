@@ -56,6 +56,10 @@ import UserBlogDetails from "./Components/Blog/UserBlogDetails.jsx";
 import BlogDetails from "./Components/Admin/Blog/BlogDetails.jsx";
 import EditBlog from "./Components/Admin/Blog/EditBlog.jsx";
 import UpdateDiscount from "./Components/Admin/Discount/UpdateDiscount.jsx";
+import GiftManager from "./Components/Admin/Gift/GiftManager.jsx";
+import AddGift from "./Components/Admin/Gift/AddGift.jsx";
+import UpdateGift from "./Components/Admin/Gift/UpdateGift.jsx";
+import RedeemPage from "./Components/RedeemPage/RedeemPage.jsx";
 
 
 function App() {
@@ -71,6 +75,7 @@ function App() {
           <Route path="/free-book" element={<FreeBook />} />
           <Route path="/fee-book" element={<FeeBook />} />
           <Route path="/login" element={<Login />} />
+          <Route path="changePoint" element={<RedeemPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -125,6 +130,11 @@ function App() {
               <Route index element={<DiscountAdmin />} />
               <Route path="addDiscount" element={<AddDiscount />} />
               <Route path="updateDiscount/:discountID" element={<UpdateDiscount />} />
+            </Route>
+            <Route path="gifts" element={<div><Outlet/></div>} >
+              <Route index element={<GiftManager />} />
+              <Route path="addGift" element={<AddGift />} />
+              <Route path="updateGift/:giftID" element={<UpdateGift />} />
             </Route>
           </Route>
           <Route path="*" element={<Page404 />} />

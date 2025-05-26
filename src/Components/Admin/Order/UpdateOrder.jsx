@@ -12,6 +12,40 @@ function UpdateOrder() {
     const [order, setOrder] = useState(location.state?.order)
     const baseURL = import.meta.env.VITE_API_URL;
 
+
+    const getStatusOptions = (currentStatus) => {
+        switch (currentStatus) {
+            case "Chờ giao hàng":
+                return [
+                    { value: "Đã giao hàng", label: "Đã giao hàng" },
+                    { value: "Đã hủy", label: "Đã hủy" }
+                ];
+            case "Chờ thanh toán":
+                return [
+                    { value: "Đã thanh toán", label: "Đã thanh toán" },
+                    { value: "Đã hủy", label: "Đã hủy" }
+                ];
+            case "Đã thanh toán":
+                return [
+                    { value: "Chờ giao hàng", label: "Chờ giao hàng" },
+                    { value: "Đã hủy", label: "Đã hủy" }
+                ];
+            case "Đã giao hàng":
+            case "Đã hủy":
+                return [
+                    { value: currentStatus, label: currentStatus }
+                ];
+            default:
+                return [
+                    { value: "Đã thanh toán", label: "Đã thanh toán" },
+                    { value: "Chờ thanh toán", label: "Chờ thanh toán" },
+                    { value: "Đã hủy", label: "Đã hủy" },
+                    { value: "Chờ giao hàng", label: "Chờ giao hàng" },
+                    { value: "Đã giao hàng", label: "Đã giao hàng" }
+                ];
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setOrder((prevOrder) => ({
@@ -49,7 +83,6 @@ function UpdateOrder() {
     const handleSubmit = (e) => {
         e.preventDefault();
         updateOrder();
-
     };
 
     if (!(order)) {
@@ -143,15 +176,18 @@ function UpdateOrder() {
                                         value={order.status}
                                         onChange={handleChange}
                                         className="w-full bg-[#262626] p-3 rounded-lg border-gray-600 border"
+                                        disabled={order.status === "Đã giao hàng" || order.status === "Đã hủy"}
                                     >
-                                        <option value="" disabled>
-                                            Chọn trạng thái đơn hàng
+                                        <option value={order.status} disabled>
+                                            {order.status}
                                         </option>
-                                        <option value="Đã thanh toán">Đã thanh toán</option>
-                                        <option value="Chờ thanh toán">Chờ thanh toán</option>
-                                        <option value="Đã hủy">Đã hủy</option>
-                                        <option value="Chờ giao hàng">Chờ giao hàng</option>
-                                        <option value="Đã giao hàng">Đã giao hàng</option>
+                                        {getStatusOptions(order.status)
+                                            .filter(option => option.value !== order.status)
+                                            .map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
                             </div>

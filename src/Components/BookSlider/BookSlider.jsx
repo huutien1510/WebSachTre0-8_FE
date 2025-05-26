@@ -1,17 +1,19 @@
+import Loading from "../Loading/Loading.jsx";
 import BookCard from "./BookCard.jsx";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 function BookSlider() {
 
   const [books, setBook] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const inputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [inputPage, setInputPage] = useState(1);
   const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fecthBook = async (page) => {
       try {
-        if (inputRef.current) inputRef.current.value = page;
+        setLoading(true);
         const response = await fetch(`${baseURL}/books/getAll?page=${page - 1}&size=15`);
         const json = await response.json();
         setBook(json.data.content);
@@ -22,16 +24,25 @@ function BookSlider() {
       }
       catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fecthBook(currentPage)
-  }, [currentPage]);
+    fecthBook(currentPage);
+    setInputPage(currentPage);
+  }, [currentPage, baseURL]);
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      setInputPage(page);
+    }
   };
+
+  if (loading) {
+    return <Loading size="medium" />
+  }
 
   return (
     <div className="bg-black py-8 px-4 md:px-8">
@@ -62,12 +73,15 @@ function BookSlider() {
           Page
           <input
             className="mx-4 w-16 text-center p-1 w-10 border border-[#34D399] rounded"
-            ref={inputRef}
             type="number"
-            name="price"
-            onKeyDown={(e) => {
+            value={inputPage}
+            min={1}
+            max={totalPages}
+            onChange={e => setInputPage(Number(e.target.value))}
+            onKeyDown={e => {
               if (e.key === "Enter") {
-                const value = (e.target.value > totalPages) ? totalPages : ((e.target.value < 1) ? 1 : e.target.value)
+                let value = Number(e.target.value);
+                value = value > totalPages ? totalPages : value < 1 ? 1 : value;
                 handlePageChange(value);
               }
             }}
