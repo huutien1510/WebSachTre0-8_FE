@@ -39,15 +39,19 @@ const refreshToken = async () => {
       `${baseURL}/auth/refresh`,
       {},
       {
-        withCredentials: true, // Cho phép gửi cookie
+        withCredentials: true,
       }
     );
     return res.data.data;
   } catch (err) {
-    console.log(err);
+    // Nếu refresh token bị lỗi, đăng xuất user
+    dispatch(logoutSuccess());
+    dispatch(clearCart());
+    dispatch(UserLogout());
+    window.location.href = '/login';
+    throw err; // Throw error để interceptor có thể xử lý
   }
 };
-
 
 export const createAxiosInstance = (user, dispatch) => {
   const axiosInstance = axios.create({
@@ -60,21 +64,45 @@ export const createAxiosInstance = (user, dispatch) => {
 
   axiosInstance.interceptors.request.use(
     async (config) => {
-      let date = new Date();
-      const decodeToken = jwt_decode(user?.data.accessToken);
-      if (decodeToken.exp < date.getTime() / 1000) {
-        const data = await refreshToken();
-        const refreshUser = {
-          ...user,
-          accessToken: data.accessToken,
-        };
-        dispatch(loginSuccess(refreshUser));
-        config.headers["Authorization"] = "Bearer " + data.accessToken;
+      try {
+        let date = new Date();
+        const decodeToken = jwt_decode(user?.data.accessToken);
+        if (decodeToken.exp < date.getTime() / 1000) {
+          const data = await refreshToken();
+          const refreshUser = {
+            ...user,
+            accessToken: data.accessToken,
+          };
+          dispatch(loginSuccess(refreshUser));
+          config.headers["Authorization"] = "Bearer " + data.accessToken;
+        }
+        return config;
+      } catch (err) {
+        // Nếu có lỗi trong quá trình refresh, đăng xuất user
+        dispatch(logoutSuccess());
+        dispatch(clearCart());
+        dispatch(UserLogout());
+        window.location.href = '/login';
+        return Promise.reject(err);
       }
-      return config;
     },
     (err) => {
       return Promise.reject(err);
+    }
+  );
+
+  // Thêm response interceptor để xử lý lỗi 401
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        // Token hết hạn hoặc không hợp lệ
+        dispatch(logoutSuccess());
+        dispatch(clearCart());
+        dispatch(UserLogout());
+        window.location.href = '/login';
+      }
+      return Promise.reject(error);
     }
   );
 
