@@ -80,7 +80,7 @@ const DesktopMenu = ({ menuItems }) => {
   return (
     <div className="hidden md:flex items-center space-x-4 relative">
       {/* Wrapper for menu and search */}
-      <div className={`flex items-center transition-all duration-300 ${showSearch ? "mr-64" : "mr-0"}`}>
+      <div className={`flex items-center transition-all duration-300 ${showSearch ? "mr-56" : "mr-0"}`}>
         {/* Menu Items */}
         {
           menuItems.map((item) => (
@@ -88,7 +88,7 @@ const DesktopMenu = ({ menuItems }) => {
               {item.subMenu ? (
                 <div>
                   <button
-                    className="text-gray-300 hover:text-emerald-400 px-3 py-2 text-sm font-bold tracking-wide flex items-center"
+                    className="text-gray-300 hover:text-emerald-400 px-1 py-2 text-sm font-bold tracking-wide flex items-center"
                     onClick={() => toggleMenu(item.name)}
                   >
                     {item.name}

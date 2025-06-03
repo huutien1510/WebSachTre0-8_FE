@@ -18,6 +18,7 @@ const SearchPage = () => {
         if (inputRef.current) inputRef.current.value = page;
         const response = await fetch(`${baseURL}/books/search?keyword=${query}&page=${page - 1}&size=10`);
         const data = await response.json();
+        console.log("data", data);
         if (response.ok) {
           setSearchResults(data.data.content);
           setTotalPages(data.data.totalPages);
