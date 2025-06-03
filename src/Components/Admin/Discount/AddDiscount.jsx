@@ -206,7 +206,7 @@ const AddDiscount = () => {
                                 type="submit"
                                 className="bg-gradient-to-br from-teal-500 to-green-600 text-white py-2 px-4 rounded-lg"
                             >
-                                Thêm Discount
+                                Thêm Voucher
                             </button>
                             <button
                                 onClick={() => navigate(-1)}

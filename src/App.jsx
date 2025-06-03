@@ -60,14 +60,37 @@ import GiftManager from "./Components/Admin/Gift/GiftManager.jsx";
 import AddGift from "./Components/Admin/Gift/AddGift.jsx";
 import UpdateGift from "./Components/Admin/Gift/UpdateGift.jsx";
 import RedeemPage from "./Components/RedeemPage/RedeemPage.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import AttendanceModal from "./Components/ConfirmModal/AttendanceModal.jsx";
+import { fetchAttendanceStatus } from "./redux/attendanceSlice.js";
 
 
 function App() {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.login.currentUser);
+  const { checkedInToday } = useSelector((state) => state.attendance);
+  const [showAttendance, setShowAttendance] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchAttendanceStatus({
+        userId: user?.data?.account?.id,
+        accessToken: user?.data?.accessToken
+      }));
+      if (!checkedInToday) {
+        setShowAttendance(true);
+      }
+    } else {
+      setShowAttendance(false);
+    }
+  }, [user, dispatch, checkedInToday]);
   return (
     <div className="flex flex-col min-h-screen bg-black">
       <ToastContainer />
       <BrowserRouter>
         <Header />
+        <AttendanceModal open={showAttendance} onClose={() => setShowAttendance(false)} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchPage />} />
@@ -131,7 +154,7 @@ function App() {
               <Route path="addDiscount" element={<AddDiscount />} />
               <Route path="updateDiscount/:discountID" element={<UpdateDiscount />} />
             </Route>
-            <Route path="gifts" element={<div><Outlet/></div>} >
+            <Route path="gifts" element={<div><Outlet /></div>} >
               <Route index element={<GiftManager />} />
               <Route path="addGift" element={<AddGift />} />
               <Route path="updateGift/:giftID" element={<UpdateGift />} />

@@ -84,7 +84,7 @@ const GiftManager = () => {
           <span className="text-[#18B088] text-lg font-semibold">Tất cả Vật phẩm</span>
           <NavLink to={'/admin/gifts/addgift'} >
             <button className="bg-[#18B088] text-white text-xl px-4 py-2 rounded-lg font-semibold hover:bg-[#128067] transition duration-200">
-              Thêm Gift
+              Thêm vật phẩm
             </button>
           </NavLink>
         </div>

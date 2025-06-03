@@ -274,7 +274,7 @@ const UpdateGift = () => {
                                 type="submit"
                                 className="bg-gradient-to-br from-teal-500 to-green-600 text-white py-2 px-4 rounded-lg"
                             >
-                                Update vật phẩm
+                                Update
                             </button>
                             <button
                                 onClick={() => navigate(-1)}
