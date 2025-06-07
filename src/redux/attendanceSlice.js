@@ -32,6 +32,8 @@ const attendanceSlice = createSlice({
     checkedInToday: false,
     totalPoints: 0,
     streak: 0,
+    recoveryCount: 0,
+    isRecovery: false,
     loading: false,
     error: null,
   },
@@ -40,6 +42,10 @@ const attendanceSlice = createSlice({
       state.checkedInToday = false;
       state.totalPoints = 0;
       state.streak = 0;
+      state.recoveryCount = 0;
+      state.isRecovery = false;
+      state.firstCheckIn = false;
+      state.canRecover = false;
       state.error = null;
     },
   },
@@ -49,11 +55,16 @@ const attendanceSlice = createSlice({
       .addCase(fetchAttendanceStatus.pending, (state) => {
         state.loading = true;
       })
+      
       .addCase(fetchAttendanceStatus.fulfilled, (state, action) => {
         state.loading = false;
         state.checkedInToday = action.payload.checkedInToday;
         state.totalPoints = action.payload.totalPoints;
         state.streak = action.payload.streak;
+        state.recoveryCount = action.payload.remainingRecoveries;
+        state.isRecovery = action.payload.recovery;
+        state.firstCheckIn = action.payload.firstCheckIn;
+        state.canRecover = action.payload.canRecover;
       })
       .addCase(fetchAttendanceStatus.rejected, (state, action) => {
         state.loading = false;
@@ -66,6 +77,7 @@ const attendanceSlice = createSlice({
       .addCase(checkInAttendance.fulfilled, (state, action) => {
         state.loading = false;
         state.checkedInToday = true;
+        state.isRecovery = action.payload.recovery;
         state.totalPoints = action.payload.totalPoints;
         state.streak = action.payload.streak;
       })

@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import DesktopMenu from "./DesktopMenu";
+import React, { useEffect, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import { NavLink } from "react-router-dom";
-import { Description } from "@mui/icons-material";
 
-const Header = () => {
+const Header = ({ children }) => {  // Thêm children vào props
   const [isOpen, setIsOpen] = useState(false);
-  const [genre, setGenre] = useState([])
+  const [genre, setGenre] = useState([]);
   const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -40,7 +38,7 @@ const Header = () => {
           </NavLink>
 
           {/* Desktop Menu */}
-          <DesktopMenu menuItems={menuItems} />
+          {React.cloneElement(children, { menuItems })} 
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">

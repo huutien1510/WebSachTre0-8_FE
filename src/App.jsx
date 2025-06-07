@@ -64,6 +64,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import AttendanceModal from "./Components/ConfirmModal/AttendanceModal.jsx";
 import { fetchAttendanceStatus } from "./redux/attendanceSlice.js";
+import DesktopMenu from "./Components/Header/DesktopMenu.jsx";
 
 
 function App() {
@@ -89,7 +90,11 @@ function App() {
     <div className="flex flex-col min-h-screen bg-black">
       <ToastContainer />
       <BrowserRouter>
-        <Header />
+        <Header>
+          <DesktopMenu
+            openAttendanceModal={() => setShowAttendance(true)}
+          />
+        </Header>
         <AttendanceModal open={showAttendance} onClose={() => setShowAttendance(false)} />
         <Routes>
           <Route path="/" element={<Home />} />
