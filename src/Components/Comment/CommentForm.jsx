@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Emojis from './Emojis';
+import Emojis from '../Emoji/Emojis';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import { useSelector } from 'react-redux';
 import { toast, ToastContainer } from 'react-toastify';

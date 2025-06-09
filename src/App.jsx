@@ -1,10 +1,10 @@
-import BookDetail from "./BookDetail.jsx";
+import BookDetail from "./Components/Book/BookDetail/BookDetail.jsx";
 import Footer from "./Components/Footer/Footer.jsx";
 import Header from "./Components/Header/Header.jsx";
 import Home from "./page/Home.jsx";
 import Login from "./page/Login.jsx";
 import Register from "./page/Register.jsx";
-import ChapterReader from "./ChapterReader.jsx";
+import ChapterReader from "./Components/Chapter/ChapterReader.jsx";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LayoutAdmin from "./page/LayoutAdmin.jsx";
 import Dashboard from "./Components/Admin/Dashboard.jsx";
