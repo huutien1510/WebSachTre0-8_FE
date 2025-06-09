@@ -64,6 +64,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import AttendanceModal from "./Components/ConfirmModal/AttendanceModal.jsx";
 import { fetchAttendanceStatus } from "./redux/attendanceSlice.js";
+import ChatAI from "./Components/ChatAI/ChatAI.jsx";
 
 
 function App() {
@@ -99,6 +100,7 @@ function App() {
           <Route path="/fee-book" element={<FeeBook />} />
           <Route path="/login" element={<Login />} />
           <Route path="changePoint" element={<RedeemPage />} />
+          <Route path="/chatAI" element={<ChatAI />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -176,6 +178,7 @@ function App() {
           </Route>
           <Route path="payment_return" element={<PaymentReturn />} />
         </Routes>
+        <ChatAI></ChatAI>
         <Footer />
       </BrowserRouter >
     </div>
