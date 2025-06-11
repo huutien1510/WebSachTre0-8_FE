@@ -10,7 +10,6 @@ export const fetchAttendanceStatus = createAsyncThunk(
     const res = await axios.get(`${baseURL}/attendance/status?userId=${userId}`, {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    console.log("Attendance status response:", res.data);
     return res.data;
   }
 );
