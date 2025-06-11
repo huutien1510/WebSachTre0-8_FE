@@ -4,7 +4,7 @@ import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import RatingComponent from "./Components/Rating/Rating";
+import RatingComponent from "../../Rating/Rating";
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -13,8 +13,8 @@ import {
     addToFavorites,
     removeFromFavorites,
     addBookToCart,
-} from "./api/apiRequest";
-import Loading from "./Components/Loading/Loading";
+} from "../../../api/apiRequest";
+import Loading from "../../Loading/Loading";
 
 
 function BookDetail() {
