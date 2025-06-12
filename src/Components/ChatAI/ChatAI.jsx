@@ -145,7 +145,7 @@ const ChatAI = () => {
                     aria-label="Open chat"
                 >
                     <img
-                        src={"https://drive.google.com/file/d/1Avw_EWrXHhnWA6b2l8tAz7YIjHbUnyCF/view?usp=sharing"}
+                        src={botAvt}
                         alt="mgcChatAI"
                         className="w-8 h-8 rounded-full"
                     />
