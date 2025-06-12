@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { FiSend, FiSmile } from "react-icons/fi";
+import { FiImage, FiSend, FiSmile } from "react-icons/fi";
 import { BsCheckAll, BsCheck } from "react-icons/bs";
 import { v4 as uuidv4 } from "uuid"; // Import uuid for unique IDs
-import { ExceptionMap } from "antd/es/result";
+import ReactMarkdown from 'react-markdown'
+
 
 const ChatAI = () => {
     const [isStart, setIsStart] = useState(false)
@@ -11,6 +12,9 @@ const ChatAI = () => {
     const [isTyping, setIsTyping] = useState(false);
     const [isOpen, setIsOpen] = useState(false); // Control visibility of chat window
     const messagesEndRef = useRef(null);
+
+    const botAvt = "https://img.freepik.com/free-vector/ai-technology-robot-cute-design_24640-134420.jpg?semt=ais_hybrid&w=740";
+    const userAvt = "";
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,7 +32,7 @@ const ChatAI = () => {
                 sender: "self",
                 timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                 status: "sent",
-                avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
+                avatar: userAvt
             };
             setMessages((prevMessages) => [...prevMessages, userMessage]);
             setNewMessage("");
@@ -57,7 +61,7 @@ const ChatAI = () => {
                     sender: "other",
                     timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                     status: "read",
-                    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                    avatar: botAvt
                 };
                 setMessages((prevMessages) => [...prevMessages, botMessage]);
             }
@@ -69,7 +73,7 @@ const ChatAI = () => {
                 sender: "other",
                 timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                 status: "read",
-                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                avatar: botAvt
             };
             setMessages((prevMessages) => [...prevMessages, errorMessage]);
         } finally {
@@ -95,7 +99,7 @@ const ChatAI = () => {
                     sender: "other",
                     timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                     status: "read",
-                    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                    avatar: botAvt
                 };
                 setMessages((prevMessages) => [...prevMessages, botMessage]);
             }
@@ -107,7 +111,7 @@ const ChatAI = () => {
                 sender: "other",
                 timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                 status: "read",
-                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                avatar: botAvt
             };
             setMessages((prevMessages) => [...prevMessages, errorMessage]);
         } finally {
@@ -140,7 +144,11 @@ const ChatAI = () => {
                     className="fixed bottom-6 right-6 p-4 bg-blue-500 text-white rounded-full shadow-lg"
                     aria-label="Open chat"
                 >
-                    <FiSmile className="w-6 h-6" />
+                    <img
+                        src={"https://drive.google.com/file/d/1Avw_EWrXHhnWA6b2l8tAz7YIjHbUnyCF/view?usp=sharing"}
+                        alt="mgcChatAI"
+                        className="w-8 h-8 rounded-full"
+                    />
                 </button>
             )}
 
@@ -148,7 +156,9 @@ const ChatAI = () => {
             {isOpen && (
                 <div className="fixed bottom-20 right-6 w-96 h-[500px] bg-white shadow-xl rounded-lg flex flex-col">
                     <div className="bg-white p-4 border-b">
-                        <h2 className="text-lg font-semibold">Chatbot tư vấn sản phẩm</h2>
+                        <h2 className="text-lg font-semibold">
+                            CSKH - mgcChatAI
+                        </h2>
                         <button onClick={toggleChatWindow} className="absolute top-2 right-2 text-gray-600">
                             X
                         </button>
@@ -169,15 +179,13 @@ const ChatAI = () => {
                                             src={message.avatar}
                                             alt="avatar"
                                             className="w-8 h-8 rounded-full"
-                                            onError={(e) => {
-                                                e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde";
-                                            }}
+
                                         />
                                     )}
                                     <div
                                         className={`max-w-xs px-4 py-2 rounded-lg ${message.sender === "self" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}
                                     >
-                                        <p className="text-sm">{message.text}</p>
+                                        <ReactMarkdown>{message.text}</ReactMarkdown>
                                         <div className="flex items-center justify-end space-x-1 mt-1">
                                             <span className="text-xs opacity-75">{message.timestamp}</span>
                                             {message.sender === "self" && <MessageStatus status={message.status} />}
@@ -188,9 +196,6 @@ const ChatAI = () => {
                                             src={message.avatar}
                                             alt="avatar"
                                             className="w-8 h-8 rounded-full"
-                                            onError={(e) => {
-                                                e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde";
-                                            }}
                                         />
                                     )}
                                 </div>
@@ -210,12 +215,6 @@ const ChatAI = () => {
 
                     <div className="bg-white p-4 border-t">
                         <div className="flex items-center space-x-2">
-                            <button
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                                aria-label="Add emoji"
-                            >
-                                <FiSmile className="w-6 h-6 text-gray-500" />
-                            </button>
                             <textarea
                                 value={newMessage}
                                 onChange={(e) => {
