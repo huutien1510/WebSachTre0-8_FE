@@ -6,7 +6,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function AttendanceModal({ open, onClose }) {
     const dispatch = useDispatch();
-    const { checkedInToday, streak, loading } = useSelector((state) => state.attendance);
+    const { checkedInToday, streak, canRecover, recoveryCount, firstCheckIn, isRecovery, loading } = useSelector((state) => state.attendance);
 
     const user = useSelector((state) => state.auth?.login?.currentUser);
 
@@ -25,12 +25,33 @@ export default function AttendanceModal({ open, onClose }) {
     };
 
     let lottieSrc;
-    if (streak == 0) {
+    let title;
+    let description;
+    let buttonText;
+    if (firstCheckIn) {
         lottieSrc = "https://lottie.host/0d85714a-543f-4bef-89f7-8597043d72d8/771q3qbHEt.lottie";
-    } else if (!checkedInToday) {
+        title = "🥚 Một quả trứng bí ẩn đang chờ bạn đánh thức!";
+        description = "Chỉ cần một lần chạm để ấp nở ngọn lửa đầu tiên và bắt đầu hành trình của bạn!";
+    } else if (checkedInToday) {
         lottieSrc = "https://lottie.host/fd3c8293-f1ed-4c1f-801f-e3f0214d3e63/AumkMnaJx0.lottie";
-    } else {
+        title = "🎉 Tuyệt vời! Bạn đã điểm danh hôm nay rồi!";
+        description = "Hãy tiếp tục giữ vững streak của bạn để đạt được nhiều thành tích hơn nữa!";
+        buttonText = "Đóng";
+    } else if (streak > 0 && !isRecovery) {
         lottieSrc = "https://lottie.host/9bb9e096-c72d-4b24-884d-587ed4add25d/qcx2EyBlxo.lottie";
+        title = `🔥 Chuỗi ngày tuyệt vời! Bạn đang ở ngày thứ ${streak}!`;
+        description = "Bạn đang duy trì một streak ấn tượng – cứ thế này bạn sẽ sớm mở kho báu siêu hiếm!💪 Đừng bỏ lỡ hôm nay – chỉ một cú click để tiếp tục hành trình!";
+        buttonText = "👉 Điểm danh ngay bây giờ!";
+    } else if (canRecover) {
+        lottieSrc = "https://lottie.host/9bb9e096-c72d-4b24-884d-587ed4add25d/qcx2EyBlxo.lottie"; // Lottie cho khôi phục
+        title = "Bạn có thể khôi phục streak!";
+        description = `Bạn đã khôi phục streak của mình! Còn ${recoveryCount} lần khôi phục trong tháng này.`;
+        buttonText = "👉 Điểm danh ngay bây giờ!";
+    } else if (!canRecover) {
+        lottieSrc = "https://lottie.host/ec70dcb5-e1f1-4950-9eaf-cea4d40d5255/l8jMER0m9q.lottie"; 
+        title = "💔 Streak đã bị mất!";
+        description = "Đừng buồn! Hãy bắt đầu lại streak mới ngay hôm nay!";
+        buttonText = "👉 Bắt đầu lại hôm nay!";
     }
 
     if (!open) return null;
@@ -65,9 +86,9 @@ export default function AttendanceModal({ open, onClose }) {
 
                 {/* Tiêu đề và mô tả */}
                 <div className="text-center px-6 mb-4">
-                    <h2 className="text-white text-2xl font-bold mb-2">You've started a streak!</h2>
+                    <h2 className="text-white text-2xl font-bold mb-2">{title}</h2>
                     <p className="text-gray-300 text-base">
-                        Reach your goal every day to build your streak and get closer to your goals.
+                        {description}
                     </p>
                 </div>
 
@@ -79,14 +100,14 @@ export default function AttendanceModal({ open, onClose }) {
                         onClick={handleCheckIn}
                         disabled={loading}
                     >
-                        {loading ? "Đang điểm danh..." : "Check in now"}
+                        {loading ? "Đang điểm danh..." : buttonText}
                     </button>
                 ) : (
                     <button
                         className="mt-2 px-8 py-3 rounded-full bg-[#a259f7] text-white font-bold text-lg shadow-md hover:bg-[#7c3aed] transition"
                         onClick={onClose}
                     >
-                        CONTINUE
+                        Đóng
                     </button>
                 )}
             </motion.div>

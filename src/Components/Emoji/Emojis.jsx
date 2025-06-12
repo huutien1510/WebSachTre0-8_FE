@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { EmojisContainer, EmojiPickerContainer } from "./EmojisContainer";
+import { EmojisContainer, EmojiPickerContainer } from "./EmojisContainer.jsx";
 
 const Emojis = ({ pickEmoji }) => {
     return (
