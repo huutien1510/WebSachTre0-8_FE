@@ -1,81 +1,85 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ChapterImage from "./ChapterImage";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import CommentSection from "../Comment/CommentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavorites, getFavoriteStatus, removeFromFavorites } from "../../api/apiRequest";
 
-function ReadingProgressBar({ readingSeconds, isMissionCompleted }) {
+// Constants
+const SECONDS_PER_5_MINUTES = 300;  // 5 minutes in seconds
+const MAX_POINTS_PER_DAY = 20;
+const POINTS_PER_5_MINUTES = 5;
+
+// Helper function to get today's date in YYYY-MM-DD format
+const getToday = () => new Date().toISOString().split('T')[0];
+
+// Helper function to get localStorage key
+const getReadingProgressKey = (userId) => `reading_progress_${userId}_${getToday()}`;
+
+function ReadingProgressBar({ readingSeconds, totalPoints }) {
   const minutes = Math.floor(readingSeconds / 60);
   const seconds = readingSeconds % 60;
-  const percent = Math.min((minutes / 20) * 100, 100);
-  const milestones = [5, 10, 15, 20];
+  const progress = (totalPoints / MAX_POINTS_PER_DAY) * 100;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 84,
-        right: 12,
-        zIndex: 1000,
-        width: 260,
-        background: "#fff",
-        border: "1px solid #e5e7eb",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        padding: 16,
-      }}
-    >
-      <div className="font-semibold text-blue-600 mb-2 flex items-center justify-between">
-        <span>Thời gian đọc:</span>
-        <span>
+    <div className="fixed top-96 right-6 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
+      {/* Thời gian đọc */}
+      <div className="mb-3">
+        <div className="text-sm text-gray-500 mb-1">Thời gian đọc</div>
+        <div className="text-2xl font-bold text-blue-600">
           {minutes.toString().padStart(2, "0")}:
           {seconds.toString().padStart(2, "0")}
-        </span>
+        </div>
       </div>
-      <div className="relative h-4 bg-gray-200 rounded-full mb-2">
-        <div
-          className="absolute h-4 bg-blue-500 rounded-full transition-all duration-300"
-          style={{
-            width: `${percent}%`,
-            minWidth: "8px",
-            maxWidth: "100%",
-          }}
-        ></div>
-        {milestones.map((m) => (
+
+      {/* Progress bar */}
+      <div className="mb-3">
+        <div className="flex justify-between text-sm text-gray-500 mb-1">
+          <span>Tiến độ điểm</span>
+          <span>{totalPoints}/{MAX_POINTS_PER_DAY}</span>
+        </div>
+        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
           <div
-            key={m}
-            className="absolute top-5 text-xs text-gray-700"
-            style={{
-              left: `${(m / 20) * 100}%`,
-              transform: "translateX(-50%)",
-            }}
+            className="h-full bg-blue-500 transition-all duration-500 rounded-full"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Milestone markers */}
+      <div className="relative h-6 mt-1">
+        {[5, 10, 15, 20].map((points) => (
+          <div
+            key={points}
+            className={`absolute text-xs transform -translate-x-1/2 ${totalPoints >= points ? "text-blue-600" : "text-gray-400"
+              }`}
+            style={{ left: `${(points / MAX_POINTS_PER_DAY) * 100}%` }}
           >
-            {m}p
+            {points}
           </div>
         ))}
       </div>
-      <div className="text-sm text-center mt-8">
-        {isMissionCompleted ? (
-          <span className="text-green-600 font-bold">🎉 Đã hoàn thành 20 phút!</span>
-        ) : (
-          <span>
-            Đã đọc <span className="font-bold">{minutes}</span> phút / 20 phút
-          </span>
-        )}
+
+      {/* Điểm thưởng */}
+      <div className="text-center mt-2">
+        <div className="text-sm text-gray-500">
+          {totalPoints >= MAX_POINTS_PER_DAY ? (
+            <span className="text-green-600 font-medium">
+              🎉 Chúc mừng! Bạn đã đạt đủ điểm hôm nay
+            </span>
+          ) : (
+            <span>
+              Còn <span className="font-medium text-blue-600">{MAX_POINTS_PER_DAY - totalPoints}</span> điểm để hoàn thành
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// Hàm lấy key lưu localStorage theo user và ngày
-function getReadingLocalKey(userId) {
-  const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
-  return `reading_progress_${userId}_${today}`;
-}
-
 function ChapterReader() {
-  const user = useSelector((state) => state.auth?.login?.currentUser?.data)
+  const user = useSelector((state) => state.auth?.login?.currentUser?.data);
   const user1 = useSelector((state) => state.auth?.login?.currentUser);
   const id = useSelector(
     (state) => state.auth.login.currentUser?.data.account.id
@@ -85,9 +89,24 @@ function ChapterReader() {
   );
   const baseURL = import.meta.env.VITE_API_URL;
   const location = useLocation();
-  const bookID = useParams().bookID
+  const bookID = useParams().bookID;
   const chapter_number = useParams().chapter_number;
   const bookName = location?.state?.bookName;
+  const dispatch = useDispatch();
+
+  // States
+  const [readingSeconds, setReadingSeconds] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [isMissionCompleted, setIsMissionCompleted] = useState(false);
+  const [showRestNotice, setShowRestNotice] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  const progressRef = useRef({
+    totalSeconds: 0,
+    lastUpdated: Date.now(),
+    lastSyncedSeconds: 0
+  });
+
+  // Existing states for chapter functionality
   const [listChapter, setListChapter] = useState(null);
   const [this_chapter, setThisChapter] = useState(null);
   const [chapter_index, setChapterIndex] = useState(null);
@@ -96,158 +115,290 @@ function ChapterReader() {
   const [booksoftbought, setBookSoftBought] = useState(false);
   const [book, setBook] = useState(null);
 
-  // Thời gian đọc
-  const [readingSeconds, setReadingSeconds] = useState(0);
-  const [localSeconds, setLocalSeconds] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [isMissionCompleted, setIsMissionCompleted] = useState(false);
-  const [progressLoaded, setProgressLoaded] = useState(false);
-  const timerRef = useRef(null);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
+  // Load initial progress from localStorage and backend
   useEffect(() => {
     if (!user) return;
-    const fetchProgress = async () => {
+    setIsLoadingProgress(true);
+
+    const loadProgress = async () => {
       try {
-        const response = await fetch(
-          `${baseURL}/reading/progress?userId=${user?.account?.id}&secondsRead=0`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${user?.accessToken}`,
-            },
+        // Then fetch from backend first to get the latest data
+        const response = await fetch(`${baseURL}/reading/progress?userId=${id}`, {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
-        );
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        setReadingSeconds(data.data.totalSecondsToday);
-        setTotalPoints(data.data.totalPointsToday);
-        setIsMissionCompleted(data.data.isMissionCompleted);
-        setProgressLoaded(true);
-        // Reset localStorage và localSeconds
-        const localKey = getReadingLocalKey(user?.account?.id);
-        localStorage.removeItem(localKey);
-        setLocalSeconds(0);
-      } catch (error) {
-        console.error("Lỗi khi lấy tiến trình đọc:", error);
-      }
-    };
-    fetchProgress();
-    return () => setProgressLoaded(false);
-  }, [user]);
 
-  // Timer chỉ tăng localSeconds và lưu vào localStorage
-  useEffect(() => {
-    if (!progressLoaded) return;
-    function startTimer() {
-      if (!timerRef.current) {
-        timerRef.current = setInterval(() => {
-          setLocalSeconds((prev) => {
-            const next = prev + 1;
-            // Lưu vào localStorage mỗi giây
-            const localKey = getReadingLocalKey(user.account.id);
-            const today = new Date().toISOString().slice(0, 10);
-            localStorage.setItem(localKey, JSON.stringify({
-              date: today,
-              seconds: next,
-            }));
-            return next;
-          });
-        }, 1000);
-      }
-    }
-    function stopTimer() {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-    const handleVisibility = () => {
-      if (document.hidden) stopTimer();
-      else startTimer();
-    };
-    startTimer();
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => {
-      stopTimer();
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [progressLoaded]);
-
-  // Gửi backend mỗi 5 phút
-  useEffect(() => {
-    if (localSeconds > 0 && localSeconds % 300 === 0) {
-      const sendProgress = async () => {
-        try {
-          const response = await fetch(
-            `${baseURL}/reading/progress?userId=${user.account.id}&secondsRead=${localSeconds}`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${user?.accessToken}`,
-              },
-            }
-          );
-          const data = await response.json();
-          console.log("data", data)
-          // Reset localStorage và localSeconds
-          const localKey = getReadingLocalKey(user.account.id);
-          localStorage.removeItem(localKey);
-          setLocalSeconds(0);
+        if (data.code === 200) {
+          // Set the initial state from backend
           setReadingSeconds(data.data.totalSecondsToday);
           setTotalPoints(data.data.totalPointsToday);
           setIsMissionCompleted(data.data.isMissionCompleted);
-        } catch (error) {
-          console.error("Lỗi khi gửi tiến trình đọc:", error);
-        }
-      };
-      sendProgress();
-    }
-  }, [localSeconds]);
 
+          // Reset progress ref with backend data
+          progressRef.current = {
+            totalSeconds: data.data.totalSecondsToday,
+            lastSyncedSeconds: data.data.totalSecondsToday, // Important: set this to match total seconds
+            lastUpdated: Date.now()
+          };
+
+          // Update localStorage with fresh data
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy tiến trình đọc:", error);
+        // If backend fails, try to load from localStorage as fallback
+        const storedProgress = localStorage.getItem(getReadingProgressKey(id));
+        if (storedProgress) {
+          const progress = JSON.parse(storedProgress);
+          setReadingSeconds(progress.totalSeconds);
+          setTotalPoints(progress.totalPoints || 0); // Đảm bảo luôn set lại điểm
+          progressRef.current = {
+            ...progress,
+            lastSyncedSeconds: progress.totalSeconds // Ensure lastSyncedSeconds matches totalSeconds
+          };
+        }
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    loadProgress();
+  }, [user, id, accessToken, baseURL]);
+
+  // Timer and progress tracking
   useEffect(() => {
-    const fetchingBookSoftBought = async () => {
+    if (!user || isLoadingProgress) return;
+
+    let timer;
+    let isActive = true;
+
+    const updateToServer = async (secondsToSync) => {
+      if (secondsToSync <= 0) return;
+
       try {
-        const response = await fetch(
-          `${baseURL}/orders/checkSoftBookBought/${id}/${bookID}`
-        );
-        const json = await response.json();
-        if (json.code !== 500) {
-          setBookSoftBought(json.data);
+        const formData = new URLSearchParams();
+        formData.append('userId', id);
+        formData.append('secondsRead', secondsToSync);
+
+        const response = await fetch(`${baseURL}/reading/progress`, {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.code === 200) {
+          setTotalPoints(data.data.totalPointsToday);
+          setIsMissionCompleted(data.data.isMissionCompleted);
+          progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+          // Cập nhật localStorage sau khi sync thành công
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Lỗi khi cập nhật tiến trình:", error);
+        // Store failed update in localStorage for retry
+        const failedUpdates = JSON.parse(localStorage.getItem('failedReadingUpdates') || '[]');
+        failedUpdates.push({
+          timestamp: Date.now(),
+          userId: id,
+          secondsRead: secondsToSync
+        });
+        localStorage.setItem('failedReadingUpdates', JSON.stringify(failedUpdates));
       }
     };
-    const fetchBook = async () => {
-      try {
-        const response = await fetch(
-          `${baseURL}/books/${bookID}`
-        );
-        const json = await response.json();
-        if (json.code !== 500) {
-          setBook(json.data);
+
+    // Add retry mechanism for failed updates
+    const retryFailedUpdates = async () => {
+      const failedUpdates = JSON.parse(localStorage.getItem('failedReadingUpdates') || '[]');
+      if (failedUpdates.length === 0) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const todayUpdates = failedUpdates.filter(update =>
+        new Date(update.timestamp).toISOString().split('T')[0] === today
+      );
+
+      for (const update of todayUpdates) {
+        try {
+          await updateToServer(update.secondsRead);
+          // Remove successful update from failed list
+          const remaining = failedUpdates.filter(u => u.timestamp !== update.timestamp);
+          localStorage.setItem('failedReadingUpdates', JSON.stringify(remaining));
+        } catch (error) {
+          console.error("Retry failed for update:", update);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
     };
-    fetchingBookSoftBought();
 
-    setTimeout(() => {
-      fetchBook();
-    }, 2000);
-  }, [bookID]);
+    // Try to retry failed updates when component mounts
+    retryFailedUpdates();
 
-  if (!user) {
-    navigate("/login");
-  }
+    function tick() {
+      if (isActive) {
+        setReadingSeconds(prev => {
+          const newSeconds = prev + 1;
 
-  if (booksoftbought === false && book?.price > 0) {
-    navigate(`/book/${bookID}`);
-  }
+          // Update progress in memory
+          progressRef.current.totalSeconds = newSeconds;
+          progressRef.current.lastUpdated = Date.now();
 
+          // Nếu đạt đúng mốc 5, 10, 15, 20 phút thì sync ngay
+          if (newSeconds > 0 && newSeconds % SECONDS_PER_5_MINUTES === 0) {
+            const secondsSinceLastSync = newSeconds - progressRef.current.lastSyncedSeconds;
+            if (secondsSinceLastSync > 0) {
+              updateToServer(secondsSinceLastSync);
+            }
+          } else {
+            // Check if we need to sync with server (every 5 minutes or 300 seconds)
+            const secondsSinceLastSync = newSeconds - progressRef.current.lastSyncedSeconds;
+            if (secondsSinceLastSync >= SECONDS_PER_5_MINUTES) {
+              updateToServer(secondsSinceLastSync);
+            }
+          }
+
+          // Save to localStorage
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+
+          return newSeconds;
+        });
+        timer = setTimeout(tick, 1000);
+      }
+    }
+
+    function handleVisibility() {
+      if (document.hidden) {
+        isActive = false;
+        clearTimeout(timer);
+        // Sync ngay lập tức khi ẩn tab
+        const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+        if (secondsSinceLastSync > 0) {
+          // Sử dụng fetch POST để đảm bảo backend nhận đúng dữ liệu
+          const formData = new URLSearchParams();
+          formData.append('userId', id);
+          formData.append('secondsRead', secondsSinceLastSync);
+
+          fetch(`${baseURL}/reading/progress`, {
+            method: "POST",
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData
+          }).then(response => {
+            if (response.ok) return response.json();
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }).then(data => {
+            if (data.code === 200) {
+              setTotalPoints(data.data.totalPointsToday);
+              setIsMissionCompleted(data.data.isMissionCompleted);
+              progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+              localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+            }
+          }).catch(error => {
+            console.error("Lỗi khi cập nhật tiến trình khi ẩn tab:", error);
+          });
+        }
+      } else {
+        isActive = true;
+        tick();
+      }
+    }
+
+    // Xử lý khi rời trang
+    function handleBeforeUnload() {
+      const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+      if (secondsSinceLastSync > 0) {
+        const formData = new FormData();
+        formData.append('userId', id);
+        formData.append('secondsRead', secondsSinceLastSync);
+
+        // Sử dụng sendBeacon để đảm bảo request được gửi
+        navigator.sendBeacon(
+          `${baseURL}/reading/progress`,
+          formData
+        );
+      }
+    }
+
+    // Thêm event listeners
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Bắt đầu timer
+    tick();
+
+    // Cleanup
+    return () => {
+      isActive = false;
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+
+      // Sync lần cuối khi unmount
+      const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+      if (secondsSinceLastSync > 0) {
+        updateToServer(secondsSinceLastSync);
+      }
+    };
+  }, [user, isLoadingProgress, id, accessToken, baseURL]);
+
+  // Sync khi chuyển chapter
+  useEffect(() => {
+    if (!user || !this_chapter) return;
+
+    // Sync thời gian đọc khi chuyển chapter
+    const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+    if (secondsSinceLastSync > 0) {
+      const formData = new URLSearchParams();
+      formData.append('userId', id);
+      formData.append('secondsRead', secondsSinceLastSync);
+
+      fetch(`${baseURL}/reading/progress`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      }).then(response => {
+        if (response.ok) return response.json();
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }).then(data => {
+        if (data.code === 200) {
+          setTotalPoints(data.data.totalPointsToday);
+          setIsMissionCompleted(data.data.isMissionCompleted);
+          progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+        }
+      }).catch(error => {
+        console.error("Lỗi khi cập nhật tiến trình chuyển chapter:", error);
+      });
+    }
+  }, [this_chapter, user, id, accessToken, baseURL]);
+
+  // Rest notification
+  useEffect(() => {
+    if (readingSeconds >= 7200 && !showRestNotice) {
+      setShowRestNotice(true);
+    }
+  }, [readingSeconds, showRestNotice]);
+
+  // Kiểm tra trạng thái yêu thích
   useEffect(() => {
     const checkFavoriteStatus = async () => {
       if (user?.account?.id && bookID) {
@@ -261,31 +412,79 @@ function ChapterReader() {
           );
           setIsFavorite(status);
         } catch (error) {
-          console.error("Error checking favorite status:", error);
+          console.error("Lỗi khi kiểm tra trạng thái yêu thích:", error);
         }
       }
-    }
+    };
     checkFavoriteStatus();
-  }, [user?.account?.id, bookID]);
+  }, [user?.account?.id, bookID, dispatch, user1, user?.accessToken]);
 
+  // Lấy thông tin sách và trạng thái mua sách
+  useEffect(() => {
+    const fetchingBookSoftBought = async () => {
+      try {
+        const response = await fetch(
+          `${baseURL}/orders/checkSoftBookBought/${id}/${bookID}`
+        );
+        const json = await response.json();
+        if (json.code !== 500) {
+          setBookSoftBought(json.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sách đã mua:", error);
+      }
+    };
+
+    const fetchBook = async () => {
+      try {
+        const response = await fetch(
+          `${baseURL}/books/${bookID}`
+        );
+        const json = await response.json();
+        if (json.code !== 500) {
+          setBook(json.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sách:", error);
+      }
+    };
+
+    fetchingBookSoftBought();
+    setTimeout(() => {
+      fetchBook();
+    }, 2000);
+  }, [bookID, id, baseURL]);
+
+  // Chuyển hướng nếu chưa đăng nhập hoặc sách chưa mua
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
+
+  if (booksoftbought === false && book?.price > 0) {
+    navigate(`/book/${bookID}`);
+    return null;
+  }
+
+  // Lấy danh sách chương
   useEffect(() => {
     const fetchListChapter = async () => {
       try {
         const response = await fetch(`${baseURL}/chapters/${bookID}`);
-        const json = await response.json()
-        setListChapter(json.data)
+        const json = await response.json();
+        setListChapter(json.data);
         const index = json.data.findIndex((chapter) => chapter.chapterNumber == chapter_number);
-        setChapterIndex(index)
-        setThisChapter(json.data[index])
+        setChapterIndex(index);
+        setThisChapter(json.data[index]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Lỗi khi lấy danh sách chương:", error);
       }
     };
 
     fetchListChapter();
+  }, [bookID, chapter_number, baseURL]);
 
-  }, []);
-
+  // Xử lý yêu thích
   const handleFavoriteClick = async () => {
     try {
       if (isFavorite) {
@@ -295,18 +494,19 @@ function ChapterReader() {
       }
       setIsFavorite(!isFavorite);
     } catch (error) {
-      console.error("Error updating favorite status:", error);
-      alert("Có lỗi xảy ra khi cập nhật trạng thái yêu thích" + error);
+      console.error("Lỗi khi cập nhật trạng thái yêu thích:", error);
+      alert("Có lỗi xảy ra khi cập nhật trạng thái yêu thích: " + error);
     }
   };
 
+  // Cập nhật lịch sử đọc
   const handleAddReadBook = async () => {
     try {
       const response = await fetch(`${baseURL}/readinghistory`, {
         method: "POST",
         body: JSON.stringify({
-          "accountID": user.account.id,
-          "chapterID": this_chapter.id,
+          accountID: user.account.id,
+          chapterID: this_chapter.id,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -318,149 +518,89 @@ function ChapterReader() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Lỗi khi thêm sách:", error.message);
+      console.error("Lỗi khi thêm lịch sử đọc:", error.message);
     }
   };
 
+  // Cập nhật lượt xem chương
   const handleUpReadView = async (chapterID) => {
     try {
       await fetch(`${baseURL}/chapters/upView/${chapterID}`, {
-        method: "PATCH"
+        method: "PATCH",
       });
     } catch (error) {
-      console.error("Lỗi khi thêm sách:", error.message);
+      console.error("Lỗi khi cập nhật lượt xem:", error.message);
     }
   };
 
-  // Thêm hàm sendProgress để tái sử dụng
-  const sendProgress = async () => {
-    if (localSeconds > 0) {
-      try {
-        const response = await fetch(
-          `${baseURL}/reading/progress?userId=${user.account.id}&secondsRead=${localSeconds}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${user?.accessToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-        // Reset localStorage và localSeconds
-        const localKey = getReadingLocalKey(user.account.id);
-        localStorage.removeItem(localKey);
-        setLocalSeconds(0);
-        setReadingSeconds(data.data.totalSecondsToday);
-        setTotalPoints(data.data.totalPointsToday);
-        setIsMissionCompleted(data.data.isMissionCompleted);
-
-        // Kiểm tra và cập nhật trạng thái hoàn thành nhiệm vụ
-        const totalMinutes = Math.floor((data.data.totalSecondsToday) / 60);
-        if (totalMinutes >= 20 && !data.data.isMissionCompleted) {
-          try {
-            const missionResponse = await fetch(
-              `${baseURL}/reading/complete-mission`,
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${user?.accessToken}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  userId: user.account.id,
-                }),
-              }
-            );
-            const missionData = await missionResponse.json();
-            if (missionData.code === 200) {
-              setIsMissionCompleted(true);
-              // Có thể thêm thông báo thành công ở đây nếu cần
-            }
-          } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái nhiệm vụ:", error);
-          }
-        }
-      } catch (error) {
-        console.error("Lỗi khi gửi tiến trình đọc:", error);
-      }
-    }
-  };
-
+  // Lấy hình ảnh chương
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(`${baseURL}/chaptercontents/${this_chapter.id}`)
-        const json = await response.json()
+        const response = await fetch(`${baseURL}/chaptercontents/${this_chapter.id}`);
+        const json = await response.json();
         setImage(json.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Lỗi khi lấy hình ảnh chương:", error);
       }
     };
     if (this_chapter) {
-      sendProgress(); // Gửi thời gian đọc khi chuyển chapter
       fetchImage();
       handleUpReadView(this_chapter.id);
       handleAddReadBook();
     }
-  }, [this_chapter]);
+  }, [this_chapter, baseURL]);
 
-  // Cập nhật useEffect cho việc rời trang
-  useEffect(() => {
-    if (!progressLoaded) return;
-
-    const handlePause = () => {
-      if (document.hidden) {
-        sendProgress();
-      }
-    };
-
-    const handleBeforeUnload = (e) => {
-      // Đảm bảo gửi dữ liệu trước khi rời trang
-      sendProgress();
-      // Hiển thị thông báo xác nhận nếu cần
-      e.preventDefault();
-      e.returnValue = '';
-    };
-
-    const handleUnload = () => {
-      // Gửi dữ liệu một lần cuối khi rời trang
-      sendProgress();
-    };
-
-    document.addEventListener("visibilitychange", handlePause);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("unload", handleUnload);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handlePause);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("unload", handleUnload);
-      // Gửi dữ liệu khi component unmount
-      sendProgress();
-    };
-  }, [progressLoaded, user, baseURL, localSeconds]);
-
-  if (!(image)) {
-    return <h1 className="mt-16">Chưa có chương này</h1>
+  // Render
+  if (isLoadingProgress || !image || !this_chapter) {
+    return (
+      <div className="mt-16 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Đang tải...</p>
+      </div>
+    );
   }
 
   return (
     <>
       <ReadingProgressBar
-        readingSeconds={readingSeconds + localSeconds}
-        isMissionCompleted={isMissionCompleted}
+        readingSeconds={readingSeconds}
+        totalPoints={totalPoints}
       />
+      {isMissionCompleted && (
+        <div className="text-green-600 text-center font-bold mt-2">
+          🎉 Bạn đã tích đủ điểm hôm nay!
+        </div>
+      )}
+      {showRestNotice && (
+        <div className="fixed top-16 left-0 w-full z-50 pointer-events-none flex justify-center">
+          <div className="overflow-hidden bg-transparent">
+            <div
+              className="whitespace-nowrap text-xl font-bold text-green-800  flex items-center gap-4"
+              style={{ padding: "0.75rem 0" }}
+            >
+              ⏰ Bạn đã đọc 120 phút, hãy nghỉ ngơi, uống nước, thư giãn mắt nhé! 🧃👀
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-bgChapterReader p-4">
         <div className="bg-white mx-auto mg-b-5 w-2/3 shadow-md mt-16">
           <div className="max-w-4xl mx-auto p-4">
             {/* Breadcrumb navigation */}
             <nav className="text-sm mb-4">
               <ul className="flex gap-2 text-blue-500">
-                <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href="/">Trang chủ</a></li>
+                <li className="hover:text-blue-800 font-medium transition-colors duration-200">
+                  <a href="/">Trang chủ</a>
+                </li>
                 <li>•</li>
-                <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href="#">Thể loại</a></li>
+                <li className="hover:text-blue-800 font-medium transition-colors duration-200">
+                  <a href="#">Thể loại</a>
+                </li>
                 <li>•</li>
-                <li className="hover:text-blue-800 font-medium transition-colors duration-200"><a href={`/book/${bookID}`}>{bookName}</a></li>
+                <li className="hover:text-blue-800 font-medium transition-colors duration-200">
+                  <a href={`/book/${bookID}`}>{bookName}</a>
+                </li>
                 <li>•</li>
                 <li>Chapter {this_chapter.chapterNumber}</li>
               </ul>
@@ -472,13 +612,12 @@ function ChapterReader() {
                 <span className="text-blue-500">{bookName} - {this_chapter?.title}</span>
                 <span className="text-sm text-gray-500 ml-2">
                   [Cập nhật lúc: {new Date(this_chapter.pushlishDate)
-                    .toLocaleDateString("vi-VN",
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }
-                    )}]</span>
+                    .toLocaleDateString("vi-VN", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}]
+                </span>
                 <span className="text-sm text-gray-500 ml-2">[View: {this_chapter.viewCount}]</span>
               </h1>
             </div>
@@ -491,21 +630,29 @@ function ChapterReader() {
 
           {/* Chapter navigation */}
           <div className="flex justify-center items-center gap-2 p-4">
-            {(chapter_index > 0) && (<button
-              onClick={() => {
-                const selectedChapter = listChapter[chapter_index - 1];
-                setChapterIndex((prev) => prev - 1)
-                setThisChapter(selectedChapter)
-              }}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Back
-            </button>)}
-            <select className="border p-2 rounded"
+            {chapter_index > 0 && (
+              <button
+                onClick={() => {
+                  const selectedChapter = listChapter[chapter_index - 1];
+                  setChapterIndex((prev) => prev - 1);
+                  setThisChapter(selectedChapter);
+                }}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Back
+              </button>
+            )}
+            <select
+              className="border p-2 rounded"
               value={this_chapter?.chapterNumber || ""}
               onChange={(e) => {
-                const selectedChapter = listChapter.find(chapter => chapter.chapterNumber == e.target.value);
+                const selectedChapter = listChapter.find(
+                  (chapter) => chapter.chapterNumber == e.target.value
+                );
                 setThisChapter(selectedChapter);
+                setChapterIndex(listChapter.findIndex(
+                  (chapter) => chapter.chapterNumber == e.target.value
+                ));
               }}
             >
               {listChapter?.map((chapter) => (
@@ -514,29 +661,32 @@ function ChapterReader() {
                 </option>
               ))}
             </select>
-            {(chapter_index < listChapter.length - 1) && (<button
-              onClick={() => {
-                const selectedChapter = listChapter[chapter_index + 1];
-                setChapterIndex((prev) => prev + 1)
-                setThisChapter(selectedChapter)
-              }}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Next
-            </button>
+            {chapter_index < listChapter.length - 1 && (
+              <button
+                onClick={() => {
+                  const selectedChapter = listChapter[chapter_index + 1];
+                  setChapterIndex((prev) => prev + 1);
+                  setThisChapter(selectedChapter);
+                }}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Next
+              </button>
             )}
-            <button onClick={handleFavoriteClick} className="bg-red-500 text-white px-4 py-2 rounded">{isFavorite ? "Đã theo dõi" : "Theo dõi"}</button>
+            <button
+              onClick={handleFavoriteClick}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
+              {isFavorite ? "Đã theo dõi" : "Theo dõi"}
+            </button>
           </div>
         </div>
         <div>
           {image?.map((i) => (
-            <ChapterImage key={i.id} link={i.content}>
-            </ChapterImage>
-          )
-          )}
+            <ChapterImage key={i.id} link={i.content} />
+          ))}
         </div>
-        <CommentSection chapterID={this_chapter.id}>
-        </CommentSection>
+        <CommentSection chapterID={this_chapter.id} />
       </div>
     </>
   );
