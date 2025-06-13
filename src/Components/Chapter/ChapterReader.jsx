@@ -5,73 +5,77 @@ import CommentSection from "../Comment/CommentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavorites, getFavoriteStatus, removeFromFavorites } from "../../api/apiRequest";
 
-function ReadingProgressBar({ readingSeconds, isMissionCompleted }) {
+// Constants
+const SECONDS_PER_5_MINUTES = 300;  // 5 minutes in seconds
+const MAX_POINTS_PER_DAY = 20;
+const POINTS_PER_5_MINUTES = 5;
+
+// Helper function to get today's date in YYYY-MM-DD format
+const getToday = () => new Date().toISOString().split('T')[0];
+
+// Helper function to get localStorage key
+const getReadingProgressKey = (userId) => `reading_progress_${userId}_${getToday()}`;
+
+function ReadingProgressBar({ readingSeconds, totalPoints }) {
   const minutes = Math.floor(readingSeconds / 60);
   const seconds = readingSeconds % 60;
-  const percent = Math.min((minutes / 20) * 100, 100);
-  const milestones = [5, 10, 15, 20];
+  const progress = (totalPoints / MAX_POINTS_PER_DAY) * 100;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 84,
-        right: 12,
-        zIndex: 1000,
-        width: 260,
-        background: "#fff",
-        border: "1px solid #e5e7eb",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        padding: 16,
-      }}
-    >
-      <div className="font-semibold text-blue-600 mb-2 flex items-center justify-between">
-        <span>Thời gian đọc:</span>
-        <span>
+    <div className="fixed top-96 right-6 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
+      {/* Thời gian đọc */}
+      <div className="mb-3">
+        <div className="text-sm text-gray-500 mb-1">Thời gian đọc</div>
+        <div className="text-2xl font-bold text-blue-600">
           {minutes.toString().padStart(2, "0")}:
           {seconds.toString().padStart(2, "0")}
-        </span>
+        </div>
       </div>
-      <div className="relative h-4 bg-gray-200 rounded-full mb-2">
-        <div
-          className="absolute h-4 bg-blue-500 rounded-full transition-all duration-300"
-          style={{
-            width: `${percent}%`,
-            minWidth: "8px",
-            maxWidth: "100%",
-          }}
-        ></div>
-        {milestones.map((m) => (
+
+      {/* Progress bar */}
+      <div className="mb-3">
+        <div className="flex justify-between text-sm text-gray-500 mb-1">
+          <span>Tiến độ điểm</span>
+          <span>{totalPoints}/{MAX_POINTS_PER_DAY}</span>
+        </div>
+        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
           <div
-            key={m}
-            className="absolute top-5 text-xs text-gray-700"
-            style={{
-              left: `${(m / 20) * 100}%`,
-              transform: "translateX(-50%)",
-            }}
+            className="h-full bg-blue-500 transition-all duration-500 rounded-full"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Milestone markers */}
+      <div className="relative h-6 mt-1">
+        {[5, 10, 15, 20].map((points) => (
+          <div
+            key={points}
+            className={`absolute text-xs transform -translate-x-1/2 ${totalPoints >= points ? "text-blue-600" : "text-gray-400"
+              }`}
+            style={{ left: `${(points / MAX_POINTS_PER_DAY) * 100}%` }}
           >
-            {m}p
+            {points}
           </div>
         ))}
       </div>
-      <div className="text-sm text-center mt-8">
-        {isMissionCompleted ? (
-          <span className="text-green-600 font-bold">🎉 Đã hoàn thành 20 phút!</span>
-        ) : (
-          <span>
-            Đã đọc <span className="font-bold">{minutes}</span> phút / 20 phút
-          </span>
-        )}
+
+      {/* Điểm thưởng */}
+      <div className="text-center mt-2">
+        <div className="text-sm text-gray-500">
+          {totalPoints >= MAX_POINTS_PER_DAY ? (
+            <span className="text-green-600 font-medium">
+              🎉 Chúc mừng! Bạn đã đạt đủ điểm hôm nay
+            </span>
+          ) : (
+            <span>
+              Còn <span className="font-medium text-blue-600">{MAX_POINTS_PER_DAY - totalPoints}</span> điểm để hoàn thành
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
-}
-
-// Hàm lấy key lưu localStorage theo user và ngày
-function getReadingLocalKey(userId) {
-  const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
-  return `reading_progress_${userId}_${today}`;
 }
 
 function ChapterReader() {
@@ -88,6 +92,21 @@ function ChapterReader() {
   const bookID = useParams().bookID;
   const chapter_number = useParams().chapter_number;
   const bookName = location?.state?.bookName;
+  const dispatch = useDispatch();
+
+  // States
+  const [readingSeconds, setReadingSeconds] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [isMissionCompleted, setIsMissionCompleted] = useState(false);
+  const [showRestNotice, setShowRestNotice] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  const progressRef = useRef({
+    totalSeconds: 0,
+    lastUpdated: Date.now(),
+    lastSyncedSeconds: 0
+  });
+
+  // Existing states for chapter functionality
   const [listChapter, setListChapter] = useState(null);
   const [this_chapter, setThisChapter] = useState(null);
   const [chapter_index, setChapterIndex] = useState(null);
@@ -95,174 +114,287 @@ function ChapterReader() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [booksoftbought, setBookSoftBought] = useState(false);
   const [book, setBook] = useState(null);
-  const [progressLoaded, setProgressLoaded] = useState(false);
 
-  // Thời gian đọc
-  const [readingSeconds, setReadingSeconds] = useState(0);
-  const [isMissionCompleted, setIsMissionCompleted] = useState(false);
-  const [showRestNotice, setShowRestNotice] = useState(false);
-  const lastSavedSeconds = useRef(0);
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
-  const retryTimeout = useRef(null);
-  const pendingProgress = useRef(0);
-  const [hasInitReadingSeconds, setHasInitReadingSeconds] = useState(false);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  // Debounce function
-  const debounce = (func, wait) => {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  };
-
-  // Khi vào trang, lấy tổng số giây đã đọc hôm nay
+  // Load initial progress from localStorage and backend
   useEffect(() => {
     if (!user) return;
     setIsLoadingProgress(true);
 
-    const fetchProgress = async () => {
+    const loadProgress = async () => {
       try {
+        // Then fetch from backend first to get the latest data
         const response = await fetch(`${baseURL}/reading/progress?userId=${id}`, {
           method: "GET",
-          headers: { Authorization: `Bearer ${accessToken}` }
-        });
-        const data = await response.json();
-        if (data.code === 200 && !hasInitReadingSeconds) {
-          setReadingSeconds(data.data.totalSecondsToday || 0);
-          setHasInitReadingSeconds(true);
-          setIsMissionCompleted(data.data.isMissionCompleted);
-          lastSavedSeconds.current = data.data.totalSecondsToday || 0;
-          setRetryCount(0); // Reset retry count on success
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy tiến trình đọc:", error);
-        if (retryCount < maxRetries) {
-          setRetryCount(prev => prev + 1);
-          retryTimeout.current = setTimeout(fetchProgress, 2000 * (retryCount + 1)); // Exponential backoff
-        }
-      } finally {
-        setIsLoadingProgress(false);
-        setProgressLoaded(true); // Đảm bảo luôn set true để timer chạy
-      }
-    };
-
-    fetchProgress();
-
-    return () => {
-      if (retryTimeout.current) {
-        clearTimeout(retryTimeout.current);
-      }
-    };
-  }, [user, id, accessToken, baseURL, retryCount, hasInitReadingSeconds]);
-
-  // Gửi tiến trình khi rời trang/tab hoặc mỗi 1 phút
-  const sendProgress = useCallback(async (force = false) => {
-    if (!progressLoaded || !user) return;
-
-    const diff = Math.max(0, readingSeconds - lastSavedSeconds.current);
-    if (diff > 0 || force) {
-      pendingProgress.current = diff;
-      try {
-        const response = await fetch(`${baseURL}/reading/progress`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: new URLSearchParams({
-            userId: id,
-            secondsRead: diff
-          })
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         });
 
         if (!response.ok) {
-          throw new Error('Failed to save progress');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        lastSavedSeconds.current = readingSeconds;
-        pendingProgress.current = 0;
+        const data = await response.json();
+
+        if (data.code === 200) {
+          // Set the initial state from backend
+          setReadingSeconds(data.data.totalSecondsToday);
+          setTotalPoints(data.data.totalPointsToday);
+          setIsMissionCompleted(data.data.isMissionCompleted);
+
+          // Reset progress ref with backend data
+          progressRef.current = {
+            totalSeconds: data.data.totalSecondsToday,
+            lastSyncedSeconds: data.data.totalSecondsToday, // Important: set this to match total seconds
+            lastUpdated: Date.now()
+          };
+
+          // Update localStorage with fresh data
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+        }
       } catch (error) {
-        console.error("Lỗi khi gửi tiến trình đọc:", error);
-        // Store in localStorage for retry
-        const failedProgress = {
+        console.error("Lỗi khi lấy tiến trình đọc:", error);
+        // If backend fails, try to load from localStorage as fallback
+        const storedProgress = localStorage.getItem(getReadingProgressKey(id));
+        if (storedProgress) {
+          const progress = JSON.parse(storedProgress);
+          setReadingSeconds(progress.totalSeconds);
+          setTotalPoints(progress.totalPoints || 0); // Đảm bảo luôn set lại điểm
+          progressRef.current = {
+            ...progress,
+            lastSyncedSeconds: progress.totalSeconds // Ensure lastSyncedSeconds matches totalSeconds
+          };
+        }
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    loadProgress();
+  }, [user, id, accessToken, baseURL]);
+
+  // Timer and progress tracking
+  useEffect(() => {
+    if (!user || isLoadingProgress) return;
+
+    let timer;
+    let isActive = true;
+
+    const updateToServer = async (secondsToSync) => {
+      if (secondsToSync <= 0) return;
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append('userId', id);
+        formData.append('secondsRead', secondsToSync);
+
+        const response = await fetch(`${baseURL}/reading/progress`, {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.code === 200) {
+          setTotalPoints(data.data.totalPointsToday);
+          setIsMissionCompleted(data.data.isMissionCompleted);
+          progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+          // Cập nhật localStorage sau khi sync thành công
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+        }
+      } catch (error) {
+        console.error("Lỗi khi cập nhật tiến trình:", error);
+        // Store failed update in localStorage for retry
+        const failedUpdates = JSON.parse(localStorage.getItem('failedReadingUpdates') || '[]');
+        failedUpdates.push({
           timestamp: Date.now(),
-          seconds: diff,
-          userId: id
-        };
-        localStorage.setItem('failedReadingProgress', JSON.stringify(failedProgress));
+          userId: id,
+          secondsRead: secondsToSync
+        });
+        localStorage.setItem('failedReadingUpdates', JSON.stringify(failedUpdates));
+      }
+    };
+
+    // Add retry mechanism for failed updates
+    const retryFailedUpdates = async () => {
+      const failedUpdates = JSON.parse(localStorage.getItem('failedReadingUpdates') || '[]');
+      if (failedUpdates.length === 0) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const todayUpdates = failedUpdates.filter(update =>
+        new Date(update.timestamp).toISOString().split('T')[0] === today
+      );
+
+      for (const update of todayUpdates) {
+        try {
+          await updateToServer(update.secondsRead);
+          // Remove successful update from failed list
+          const remaining = failedUpdates.filter(u => u.timestamp !== update.timestamp);
+          localStorage.setItem('failedReadingUpdates', JSON.stringify(remaining));
+        } catch (error) {
+          console.error("Retry failed for update:", update);
+        }
+      }
+    };
+
+    // Try to retry failed updates when component mounts
+    retryFailedUpdates();
+
+    function tick() {
+      if (isActive) {
+        setReadingSeconds(prev => {
+          const newSeconds = prev + 1;
+
+          // Update progress in memory
+          progressRef.current.totalSeconds = newSeconds;
+          progressRef.current.lastUpdated = Date.now();
+
+          // Nếu đạt đúng mốc 5, 10, 15, 20 phút thì sync ngay
+          if (newSeconds > 0 && newSeconds % SECONDS_PER_5_MINUTES === 0) {
+            const secondsSinceLastSync = newSeconds - progressRef.current.lastSyncedSeconds;
+            if (secondsSinceLastSync > 0) {
+              updateToServer(secondsSinceLastSync);
+            }
+          } else {
+            // Check if we need to sync with server (every 5 minutes or 300 seconds)
+            const secondsSinceLastSync = newSeconds - progressRef.current.lastSyncedSeconds;
+            if (secondsSinceLastSync >= SECONDS_PER_5_MINUTES) {
+              updateToServer(secondsSinceLastSync);
+            }
+          }
+
+          // Save to localStorage
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+
+          return newSeconds;
+        });
+        timer = setTimeout(tick, 1000);
       }
     }
-  }, [readingSeconds, progressLoaded, user, id, accessToken, baseURL]);
 
-  // Debounced version of sendProgress
-  const debouncedSendProgress = useCallback(
-    debounce(() => sendProgress(false), 1000),
-    [sendProgress]
-  );
+    function handleVisibility() {
+      if (document.hidden) {
+        isActive = false;
+        clearTimeout(timer);
+        // Sync ngay lập tức khi ẩn tab
+        const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+        if (secondsSinceLastSync > 0) {
+          // Sử dụng fetch POST để đảm bảo backend nhận đúng dữ liệu
+          const formData = new URLSearchParams();
+          formData.append('userId', id);
+          formData.append('secondsRead', secondsSinceLastSync);
 
-  useEffect(() => {
-    if (!progressLoaded || !user) return;
-
-    // Định kỳ mỗi 1 phút gửi lên backend
-    const interval = setInterval(() => sendProgress(true), 60000);
-
-    // Gửi khi rời trang/tab
-    const handleLeave = () => {
-      const diff = Math.max(0, readingSeconds - lastSavedSeconds.current);
-      if (diff > 0) {
-        // Lưu vào localStorage để gửi lại khi vào lại trang
-        const failedProgress = {
-          timestamp: Date.now(),
-          seconds: diff,
-          userId: id
-        };
-        localStorage.setItem('failedReadingProgress', JSON.stringify(failedProgress));
-        lastSavedSeconds.current = readingSeconds;
-      }
-    };
-    window.addEventListener("beforeunload", handleLeave);
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) handleLeave();
-    });
-
-    // Check for failed progress on mount
-    const checkFailedProgress = () => {
-      const failedProgress = localStorage.getItem('failedReadingProgress');
-      if (failedProgress) {
-        const { timestamp, seconds, userId } = JSON.parse(failedProgress);
-        // Only retry if it's from today
-        if (new Date(timestamp).toDateString() === new Date().toDateString()) {
-          // Gửi lại bằng fetch (có header)
           fetch(`${baseURL}/reading/progress`, {
             method: "POST",
-            headers: { Authorization: `Bearer ${accessToken}` },
-            body: new URLSearchParams({ userId: id, secondsRead: seconds })
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData
+          }).then(response => {
+            if (response.ok) return response.json();
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }).then(data => {
+            if (data.code === 200) {
+              setTotalPoints(data.data.totalPointsToday);
+              setIsMissionCompleted(data.data.isMissionCompleted);
+              progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+              localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+            }
+          }).catch(error => {
+            console.error("Lỗi khi cập nhật tiến trình khi ẩn tab:", error);
           });
         }
-        localStorage.removeItem('failedReadingProgress');
+      } else {
+        isActive = true;
+        tick();
+      }
+    }
+
+    // Xử lý khi rời trang
+    function handleBeforeUnload() {
+      const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+      if (secondsSinceLastSync > 0) {
+        const formData = new FormData();
+        formData.append('userId', id);
+        formData.append('secondsRead', secondsSinceLastSync);
+
+        // Sử dụng sendBeacon để đảm bảo request được gửi
+        navigator.sendBeacon(
+          `${baseURL}/reading/progress`,
+          formData
+        );
+      }
+    }
+
+    // Thêm event listeners
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Bắt đầu timer
+    tick();
+
+    // Cleanup
+    return () => {
+      isActive = false;
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+
+      // Sync lần cuối khi unmount
+      const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+      if (secondsSinceLastSync > 0) {
+        updateToServer(secondsSinceLastSync);
       }
     };
-    checkFailedProgress();
+  }, [user, isLoadingProgress, id, accessToken, baseURL]);
 
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener("beforeunload", handleLeave);
-      document.removeEventListener("visibilitychange", handleLeave);
-    };
-  }, [progressLoaded, user, sendProgress, readingSeconds, id, accessToken, baseURL]);
+  // Sync khi chuyển chapter
+  useEffect(() => {
+    if (!user || !this_chapter) return;
 
-  // Thông báo nghỉ ngơi khi đủ 120 phút
+    // Sync thời gian đọc khi chuyển chapter
+    const secondsSinceLastSync = progressRef.current.totalSeconds - progressRef.current.lastSyncedSeconds;
+    if (secondsSinceLastSync > 0) {
+      const formData = new URLSearchParams();
+      formData.append('userId', id);
+      formData.append('secondsRead', secondsSinceLastSync);
+
+      fetch(`${baseURL}/reading/progress`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      }).then(response => {
+        if (response.ok) return response.json();
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }).then(data => {
+        if (data.code === 200) {
+          setTotalPoints(data.data.totalPointsToday);
+          setIsMissionCompleted(data.data.isMissionCompleted);
+          progressRef.current.lastSyncedSeconds = progressRef.current.totalSeconds;
+          localStorage.setItem(getReadingProgressKey(id), JSON.stringify(progressRef.current));
+        }
+      }).catch(error => {
+        console.error("Lỗi khi cập nhật tiến trình chuyển chapter:", error);
+      });
+    }
+  }, [this_chapter, user, id, accessToken, baseURL]);
+
+  // Rest notification
   useEffect(() => {
     if (readingSeconds >= 7200 && !showRestNotice) {
       setShowRestNotice(true);
-      alert("Bạn đã đọc 120 phút, hãy nghỉ ngơi nhé!");
     }
   }, [readingSeconds, showRestNotice]);
 
@@ -419,40 +551,7 @@ function ChapterReader() {
     }
   }, [this_chapter, baseURL]);
 
-  // Timer: tăng readingSeconds mỗi giây
-  useEffect(() => {
-    if (!progressLoaded || !user) return;
-    let timer;
-    let isActive = true;
-
-    function tick() {
-      if (isActive) {
-        setReadingSeconds(prev => prev + 1);
-        timer = setTimeout(tick, 1000);
-      }
-    }
-
-    function handleVisibility() {
-      if (document.hidden) {
-        isActive = false;
-        clearTimeout(timer);
-      } else {
-        isActive = true;
-        tick();
-      }
-    }
-
-    tick();
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      isActive = false;
-      clearTimeout(timer);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [progressLoaded, user]);
-
-  // Trạng thái tải
+  // Render
   if (isLoadingProgress || !image || !this_chapter) {
     return (
       <div className="mt-16 text-center">
@@ -466,21 +565,23 @@ function ChapterReader() {
     <>
       <ReadingProgressBar
         readingSeconds={readingSeconds}
-        isMissionCompleted={isMissionCompleted}
+        totalPoints={totalPoints}
       />
-      {pendingProgress.current > 0 && (
-        <div className="text-yellow-600 text-center font-bold mt-2">
-          ⚠️ Đang lưu tiến trình đọc...
-        </div>
-      )}
       {isMissionCompleted && (
         <div className="text-green-600 text-center font-bold mt-2">
           🎉 Bạn đã tích đủ điểm hôm nay!
         </div>
       )}
-      {readingSeconds >= 7200 && (
-        <div className="text-red-600 text-center font-bold mt-2">
-          ⏰ Đã đến lúc nghỉ ngơi!
+      {showRestNotice && (
+        <div className="fixed top-16 left-0 w-full z-50 pointer-events-none flex justify-center">
+          <div className="overflow-hidden bg-transparent">
+            <div
+              className="whitespace-nowrap text-xl font-bold text-green-800  flex items-center gap-4"
+              style={{ padding: "0.75rem 0" }}
+            >
+              ⏰ Bạn đã đọc 120 phút, hãy nghỉ ngơi, uống nước, thư giãn mắt nhé! 🧃👀
+            </div>
+          </div>
         </div>
       )}
       <div className="bg-bgChapterReader p-4">

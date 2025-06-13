@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import Loading from '../Loading/Loading'
 
 const OrderSuccess = () => {
     useEffect(() => {
@@ -51,7 +52,11 @@ const OrderSuccess = () => {
     }, [user, navigate])
 
     const handleXemDon = () => {
-        navigate(`/account/orders/orderDetails/${orders.id}` , {state: {order: orders}})
+        navigate(`/account/orders/orderDetails/${orders.id}`, { state: { order: orders } })
+    }
+
+    if (!orders) {
+        return <Loading size="medium" />;
     }
 
     return (
@@ -65,10 +70,10 @@ const OrderSuccess = () => {
                         </h1>
                         {orders.paymentMethod === "cod" ? (<p className="text-white text-center text-xl">
                             Khách hàng chuẩn bị tiền mặt <span className="font-bold">{orders?.totalPrice.toLocaleString()}đ</span>
-                        </p>): (<p className="text-white text-center text-xl">
+                        </p>) : (<p className="text-white text-center text-xl">
                             Khách hàng đã thanh toán <span className="font-bold">{orders?.totalPrice.toLocaleString()}đ</span>
                         </p>)}
-                        
+
                     </div>
                 </div>
 
@@ -82,9 +87,9 @@ const OrderSuccess = () => {
                         {/* <p className="text-gray-600">Giao thứ 2, trước 19h, 09/12</p> */}
                     </div>
                     {orders?.orderDetails.map((product) =>
-                        <div className="flex items-center space-x-4 mb-6" key={orders.paymentMethod === "cod" ? product.bookID: product?.book?.id}>
+                        <div className="flex items-center space-x-4 mb-6" key={orders.paymentMethod === "cod" ? product.bookID : product?.book?.id}>
                             <img
-                                src={orders.paymentMethod === "cod"? product?.bookThumbnail:product?.book?.thumbnail}
+                                src={orders.paymentMethod === "cod" ? product?.bookThumbnail : product?.book?.thumbnail}
                                 alt={product.bookName}
                                 className="w-20 h-20 object-cover rounded"
                             />
@@ -93,10 +98,10 @@ const OrderSuccess = () => {
                                     {orders.paymentMethod === "cod" ? product.bookName : product?.book?.name}
                                 </h3>
                                 <h3 className="font-medium text-gray-900">
-                                     Số lượng: { product.quantity}
+                                    Số lượng: {product.quantity}
                                 </h3>
                             </div>
-                            
+
                         </div>
                     )}
 
