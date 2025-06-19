@@ -70,12 +70,13 @@ import DesktopMenu from "./Components/Header/DesktopMenu.jsx";
 
 function App() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.login.currentUser);
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const role = user?.data?.account?.is_admin;
   const { checkedInToday } = useSelector((state) => state.attendance);
   const [showAttendance, setShowAttendance] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && !role) {
       dispatch(fetchAttendanceStatus({
         userId: user?.data?.account?.id,
         accessToken: user?.data?.accessToken

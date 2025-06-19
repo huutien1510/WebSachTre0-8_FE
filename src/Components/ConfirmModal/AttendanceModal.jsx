@@ -9,9 +9,10 @@ export default function AttendanceModal({ open, onClose }) {
     const { checkedInToday, streak, canRecover, recoveryCount, firstCheckIn, isRecovery, loading } = useSelector((state) => state.attendance);
 
     const user = useSelector((state) => state.auth?.login?.currentUser);
+    const role = user?.data?.account?.is_admin;
 
     const handleCheckIn = async () => {
-        if (user) {
+        if (user && !role) {
             await dispatch(checkInAttendance({
                 userId: user?.data?.account?.id,
                 accessToken: user?.data?.accessToken
@@ -32,6 +33,7 @@ export default function AttendanceModal({ open, onClose }) {
         lottieSrc = "https://lottie.host/0d85714a-543f-4bef-89f7-8597043d72d8/771q3qbHEt.lottie";
         title = "🥚 Một quả trứng bí ẩn đang chờ bạn đánh thức!";
         description = "Chỉ cần một lần chạm để ấp nở ngọn lửa đầu tiên và bắt đầu hành trình của bạn!";
+        buttonText = "👉 Điểm danh ngay bây giờ!";
     } else if (checkedInToday) {
         lottieSrc = "https://lottie.host/fd3c8293-f1ed-4c1f-801f-e3f0214d3e63/AumkMnaJx0.lottie";
         title = "🎉 Tuyệt vời! Bạn đã điểm danh hôm nay rồi!";
@@ -48,7 +50,7 @@ export default function AttendanceModal({ open, onClose }) {
         description = `Bạn đã khôi phục streak của mình! Còn ${recoveryCount} lần khôi phục trong tháng này.`;
         buttonText = "👉 Điểm danh ngay bây giờ!";
     } else if (!canRecover) {
-        lottieSrc = "https://lottie.host/ec70dcb5-e1f1-4950-9eaf-cea4d40d5255/l8jMER0m9q.lottie"; 
+        lottieSrc = "https://lottie.host/ec70dcb5-e1f1-4950-9eaf-cea4d40d5255/l8jMER0m9q.lottie";
         title = "💔 Streak đã bị mất!";
         description = "Đừng buồn! Hãy bắt đầu lại streak mới ngay hôm nay!";
         buttonText = "👉 Bắt đầu lại hôm nay!";

@@ -661,7 +661,6 @@ export const checkOut = async (
   accessToken
 ) => {
   const axiosInstance = createAxiosInstance(user, dispatch);
-  console.log(JSON.stringify(order))
 
   try {
     const response = await axiosInstance.post(`${baseURL}/orders`,order,

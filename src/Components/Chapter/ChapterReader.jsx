@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import CommentSection from "../Comment/CommentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavorites, getFavoriteStatus, removeFromFavorites } from "../../api/apiRequest";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // Constants
 const SECONDS_PER_5_MINUTES = 300;  // 5 minutes in seconds
@@ -22,7 +23,7 @@ function ReadingProgressBar({ readingSeconds, totalPoints }) {
   const progress = (totalPoints / MAX_POINTS_PER_DAY) * 100;
 
   return (
-    <div className="fixed top-96 right-6 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
+    <div className="fixed top-[340px] right-6 bg-white rounded-lg shadow-lg p-4 w-64 z-50">
       {/* Thời gian đọc */}
       <div className="mb-3">
         <div className="text-sm text-gray-500 mb-1">Thời gian đọc</div>
@@ -114,6 +115,7 @@ function ChapterReader() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [booksoftbought, setBookSoftBought] = useState(false);
   const [book, setBook] = useState(null);
+  const [showProgressBar, setShowProgressBar] = useState(true);
 
   // Load initial progress from localStorage and backend
   useEffect(() => {
@@ -563,10 +565,28 @@ function ChapterReader() {
 
   return (
     <>
-      <ReadingProgressBar
-        readingSeconds={readingSeconds}
-        totalPoints={totalPoints}
-      />
+      {/* Floating toggle button for ReadingProgressBar */}
+      <div className="fixed bottom-28 right-6 z-50">
+        <button
+          className="rounded-full shadow-lg bg-white p-2 flex items-center justify-center hover:scale-110 transition-transform"
+          style={{ width: 64, height: 64 }}
+          onClick={() => setShowProgressBar((prev) => !prev)}
+        >
+          <DotLottieReact
+            src="https://lottie.host/27d036e6-9c64-4d4e-b6cf-0147c88c6b91/WxPV2qVcPj.lottie"
+            loop
+            autoplay
+            style={{ width: 48, height: 48 }}
+          />
+        </button>
+      </div>
+      {/* ReadingProgressBar toggleable */}
+      {showProgressBar && (
+        <ReadingProgressBar
+          readingSeconds={readingSeconds}
+          totalPoints={totalPoints}
+        />
+      )}
       {isMissionCompleted && (
         <div className="text-green-600 text-center font-bold mt-2">
           🎉 Bạn đã tích đủ điểm hôm nay!

@@ -8,6 +8,7 @@ import AttendanceModal from "../ConfirmModal/AttendanceModal";
 
 const DesktopMenu = ({ menuItems, openAttendanceModal }) => {
   const user = useSelector((state) => state.auth.login.currentUser);
+  const role = user?.data?.account?.is_admin;
   const { checkedInToday, streak, canRecover, recoveryCount, firstCheckIn, isRecovery, loading } = useSelector((state) => state.attendance);
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -273,7 +274,7 @@ const DesktopMenu = ({ menuItems, openAttendanceModal }) => {
         </div>
 
       </div>
-      {user && (
+      {user && !role && (
         <div className="absolute top-[-20px] right-[-120px] cursor-pointer w-32 h-auto">
           <button className="w-full h-full" onClick={openAttendanceModal}>
             <DotLottieReact src={lottieSrc} loop autoplay />
